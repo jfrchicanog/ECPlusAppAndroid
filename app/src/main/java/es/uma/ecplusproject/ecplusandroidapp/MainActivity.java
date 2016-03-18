@@ -10,6 +10,9 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import es.uma.ecplusproject.ecplusandroidapp.fragments.Palabras;
+import es.uma.ecplusproject.ecplusandroidapp.fragments.Sindromes;
+
 public class MainActivity extends AppCompatActivity {
 
     /**
@@ -36,7 +39,8 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
-        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(), new Sindromes(), new Palabras());
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(),
+                new Sindromes(this), new Palabras(this));
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
