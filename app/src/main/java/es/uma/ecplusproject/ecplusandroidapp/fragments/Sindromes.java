@@ -20,22 +20,19 @@ public class Sindromes extends Panel {
     private ArrayAdapter<Sindrome> adaptador;
     private DAO dao;
 
-    public Sindromes(Context ctx) {
-        super(ctx);
+
+    public Sindromes() {
+        super();
         dao = new DAO();
     }
 
-    @Override
-    public String getFragmentName() {
-        return ctx.getString(R.string.sindrome);
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.sindromes, container, false);
         listaSindromes = (ListView)rootView.findViewById(R.id.listaSindromes);
-        adaptador = new ArrayAdapter<Sindrome>(ctx, android.R.layout.simple_list_item_1,dao.getSindromes());
+        adaptador = new ArrayAdapter<Sindrome>(getContext(), android.R.layout.simple_list_item_1,dao.getSindromes());
         listaSindromes.setAdapter(adaptador);
         return rootView;
     }

@@ -1,5 +1,6 @@
 package es.uma.ecplusproject.ecplusandroidapp;
 
+import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -11,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import es.uma.ecplusproject.ecplusandroidapp.fragments.Palabras;
+import es.uma.ecplusproject.ecplusandroidapp.fragments.Panel;
 import es.uma.ecplusproject.ecplusandroidapp.fragments.Sindromes;
 
 public class MainActivity extends AppCompatActivity {
@@ -40,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(),
-                new Sindromes(this), new Palabras(this));
+                getPanelSindromes(), getPanelPalabras());
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
@@ -49,6 +51,24 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
+    }
+
+    @NonNull
+    private Palabras getPanelPalabras() {
+        Palabras palabras = new Palabras();
+        Bundle arguments = new Bundle();
+        arguments.putString(Panel.NAME, getString(R.string.palabras));
+        palabras.setArguments(arguments);
+        return palabras;
+    }
+
+    @NonNull
+    private Sindromes getPanelSindromes() {
+        Sindromes sindromes = new Sindromes();
+        Bundle arguments = new Bundle();
+        arguments.putString(Panel.NAME, getString(R.string.sindrome));
+        sindromes.setArguments(arguments);
+        return sindromes;
     }
 
 

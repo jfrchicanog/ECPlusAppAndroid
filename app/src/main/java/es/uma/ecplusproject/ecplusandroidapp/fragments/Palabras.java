@@ -22,14 +22,9 @@ public class Palabras extends Panel {
     private ArrayAdapter<Palabra> adaptador;
     private DAO dao;
 
-    public Palabras(Context ctx) {
-        super(ctx);
+    public Palabras() {
+        super();
         dao = new DAO();
-    }
-
-    @Override
-    public String getFragmentName() {
-        return ctx.getString(R.string.palabras);
     }
 
     @Override
@@ -37,7 +32,7 @@ public class Palabras extends Panel {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.palabras, container, false);
         listaPalabras = (ListView)rootView.findViewById(R.id.listaPalabras);
-        adaptador = new ArrayAdapter<>(ctx, android.R.layout.simple_list_item_1,dao.getPalabras());
+        adaptador = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1,dao.getPalabras());
         listaPalabras.setAdapter(adaptador);
         return rootView;
     }
