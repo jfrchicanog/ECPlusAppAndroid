@@ -19,6 +19,10 @@ public class DetalleSindrome extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detallesindrome);
 
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setLogo(R.mipmap.logo);
+        getSupportActionBar().setDisplayUseLogoEnabled(true);
+
         WebView web = (WebView)findViewById(R.id.webView);
         InputStreamReader reader = new InputStreamReader(getResources().openRawResource(R.raw.angelman));
         StringWriter writer = new StringWriter();

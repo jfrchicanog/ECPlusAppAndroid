@@ -15,5 +15,9 @@ public class DetallePalabra extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detallepalabra);
 
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setLogo(R.mipmap.logo);
+        getSupportActionBar().setDisplayUseLogoEnabled(true);
+
     }
 }
