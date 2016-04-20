@@ -57,9 +57,6 @@ public class DAO {
 
         palabra = createPalabra("Manzana", R.drawable.manzana);
         listaPalabras.add(palabra);
-
-
-
     }
 
     @NonNull
@@ -78,9 +75,38 @@ public class DAO {
 
     private void crearListaDeSindromes() {
         listaSindromes = new ArrayList<>();
-        for (String sindrome: sindromes) {
-            listaSindromes.add(new Sindrome(sindrome));
-        }
+        Sindrome sind = new Sindrome("Angelman");
+        listaSindromes.add(sind);
+
+        sind = new Sindrome("Pitt Hopkins");
+        listaSindromes.add(sind);
+
+        sind = new Sindrome("Mowat Wilson");
+        listaSindromes.add(sind);
+
+        sind = new Sindrome("Phelan McDermid");
+        listaSindromes.add(sind);
+
+        sind = new Sindrome("Kleefstra");
+        listaSindromes.add(sind);
+
+        sind = new Sindrome("Clásico de Rett");
+        listaSindromes.add(sind);
+
+        sind = new Sindrome("Autismo severo");
+        listaSindromes.add(sind);
+
+        sind = new Sindrome("Microduplicación/microdeleción con afectación grave del lenguaje");
+        listaSindromes.add(sind);
+
+        sind = new Sindrome("Parálisis cerebral tetraparesia distónica");
+        listaSindromes.add(sind);
+
+        sind = new Sindrome("West");
+        listaSindromes.add(sind);
+
+        sind = new Sindrome("Dravet");
+        listaSindromes.add(sind);
     }
 
     private static DAO dao;

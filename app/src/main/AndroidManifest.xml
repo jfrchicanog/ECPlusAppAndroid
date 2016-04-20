@@ -19,6 +19,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".DetallePalabra"/>
+        <activity android:name=".DetalleSindrome"/>
     </application>
 
 </manifest>
