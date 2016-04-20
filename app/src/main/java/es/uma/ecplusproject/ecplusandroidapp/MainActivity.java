@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import es.uma.ecplusproject.ecplusandroidapp.fragments.Palabras;
 import es.uma.ecplusproject.ecplusandroidapp.fragments.Panel;
 import es.uma.ecplusproject.ecplusandroidapp.fragments.Sindromes;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.DAO;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -37,12 +38,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        DAO.setContext(this);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        getSupportActionBar().setLogo(R.mipmap.logo);
+        getSupportActionBar().setDisplayUseLogoEnabled(true);
+
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(),
-                getPanelSindromes(), getPanelPalabras());
+                getPanelPalabras(), getPanelSindromes());
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
