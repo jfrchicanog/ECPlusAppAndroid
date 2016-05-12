@@ -1,5 +1,6 @@
 package es.uma.ecplusproject.ecplusandroidapp.fragments;
 
+import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -23,12 +24,10 @@ public class Sindromes extends Panel {
     private ArrayAdapter<Sindrome> adaptador;
     private DAO dao;
 
-
     public Sindromes() {
         super();
         dao = new DAO();
     }
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -41,9 +40,16 @@ public class Sindromes extends Panel {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent detalleSindrome = new Intent(getContext(), DetalleSindrome.class);
+                detalleSindrome.putExtra(DetalleSindrome.SINDROME, adaptador.getItem(position));
                 startActivity(detalleSindrome);
             }
         });
+
         return rootView;
+    }
+
+    @Override
+    public String getFragmentName() {
+        return contexto.getString(R.string.sindrome);
     }
 }

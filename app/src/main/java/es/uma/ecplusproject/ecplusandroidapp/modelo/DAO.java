@@ -13,11 +13,6 @@ import es.uma.ecplusproject.ecplusandroidapp.R;
  */
 public class DAO {
 
-
-    private static String [] sindromes = new String [] {
-        "Angelman", "Pit", "Mckey", "MacGiver", "Anibal", "Skywalker", "McAfee", "Panda", "Down", "Diógenes"
-    };
-
     private List<Palabra> listaPalabras;
     private List<Sindrome> listaSindromes;
 
@@ -76,6 +71,7 @@ public class DAO {
     private void crearListaDeSindromes() {
         listaSindromes = new ArrayList<>();
         Sindrome sind = new Sindrome("Angelman");
+        sind.setDescripcion("<html><body><h1>Angelman</h1>Hola</body></html>");
         listaSindromes.add(sind);
 
         sind = new Sindrome("Pitt Hopkins");

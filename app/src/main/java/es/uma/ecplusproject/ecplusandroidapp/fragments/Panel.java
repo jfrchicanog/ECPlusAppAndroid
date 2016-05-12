@@ -10,8 +10,11 @@ import android.widget.TextView;
 
 
 public abstract class Panel extends Fragment {
-    public static final String NAME = "name";
-    public String getFragmentName() {
-        return getArguments().getString(NAME);
+    protected Context contexto;
+
+    public void setContext(Context ctx) {
+        contexto = ctx;
     }
+
+    public abstract String getFragmentName();
 }

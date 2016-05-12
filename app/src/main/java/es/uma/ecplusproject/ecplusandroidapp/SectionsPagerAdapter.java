@@ -12,25 +12,25 @@ import es.uma.ecplusproject.ecplusandroidapp.fragments.Panel;
  */
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-    private Panel[] sindromes;
+    private Panel[] paneles;
 
-    public SectionsPagerAdapter(FragmentManager fm, Panel... sindromes) {
+    public SectionsPagerAdapter(FragmentManager fm, Panel... paneles) {
         super(fm);
-        this.sindromes = sindromes;
+        this.paneles = paneles;
     }
 
     @Override
     public Fragment getItem(int position) {
-        return sindromes[position];
+        return paneles[position];
     }
 
     @Override
     public int getCount() {
-        return sindromes.length;
+        return paneles.length;
     }
 
     @Override
     public CharSequence getPageTitle(int position) {
-        return sindromes[position].getFragmentName();
+        return paneles[position].getFragmentName();
     }
 }

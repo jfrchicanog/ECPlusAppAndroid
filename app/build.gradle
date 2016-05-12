@@ -1,14 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    signingConfigs {
-        ECPlus {
-            keyAlias 'android'
-            keyPassword 'sd4f5achi4'
-            storeFile file('/Users/francis/AndroidStudioProjects/keystore.jks')
-            storePassword 'sd4f5achi4'
-        }
-    }
+
     compileSdkVersion 23
     buildToolsVersion "23.0.2"
     defaultConfig {

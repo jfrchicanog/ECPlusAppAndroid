@@ -64,18 +64,14 @@ public class MainActivity extends AppCompatActivity {
     @NonNull
     private Palabras getPanelPalabras() {
         Palabras palabras = new Palabras();
-        Bundle arguments = new Bundle();
-        arguments.putString(Panel.NAME, getString(R.string.palabras));
-        palabras.setArguments(arguments);
+        palabras.setContext(this);
         return palabras;
     }
 
     @NonNull
     private Sindromes getPanelSindromes() {
         Sindromes sindromes = new Sindromes();
-        Bundle arguments = new Bundle();
-        arguments.putString(Panel.NAME, getString(R.string.sindrome));
-        sindromes.setArguments(arguments);
+        sindromes.setContext(this);
         return sindromes;
     }
 

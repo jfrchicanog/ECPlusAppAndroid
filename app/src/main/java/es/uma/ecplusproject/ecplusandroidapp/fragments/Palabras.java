@@ -25,7 +25,7 @@ import es.uma.ecplusproject.ecplusandroidapp.modelo.Palabra;
 public class Palabras extends Panel {
 
     private ListView listaPalabras;
-    private ArrayAdapter<Palabra> adaptador;
+    private AdaptadorPalabras adaptador;
     private DAO dao;
 
     public Palabras() {
@@ -51,5 +51,10 @@ public class Palabras extends Panel {
             }
         });
         return rootView;
+    }
+
+    @Override
+    public String getFragmentName() {
+        return contexto.getString(R.string.palabras);
     }
 }
