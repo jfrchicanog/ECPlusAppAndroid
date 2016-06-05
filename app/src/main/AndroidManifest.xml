@@ -21,5 +21,6 @@
         <activity android:name=".DetallePalabra"/>
         <activity android:name=".DetalleSindrome"/>
     </application>
+    <uses-permission android:name="android.permission.INTERNET"/>
 
 </manifest>

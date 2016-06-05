@@ -18,6 +18,7 @@ import es.uma.ecplusproject.ecplusandroidapp.R;
 import es.uma.ecplusproject.ecplusandroidapp.fragments.Panel;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.DAO;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.Palabra;
+import es.uma.ecplusproject.ecplusandroidapp.restws.DescargaListaPalabras;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -39,9 +40,9 @@ public class Palabras extends Panel {
         View rootView = inflater.inflate(R.layout.palabras, container, false);
         listaPalabras = (ListView)rootView.findViewById(R.id.listaPalabras);
         adaptador = new AdaptadorPalabras(getContext());
-        for (Palabra palabra: dao.getPalabras()) {
-            adaptador.add(palabra);
-        }
+
+        poulateAdaptorREST();
+
         listaPalabras.setAdapter(adaptador);
         listaPalabras.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -51,6 +52,19 @@ public class Palabras extends Panel {
             }
         });
         return rootView;
+    }
+
+    private void poulateAdaptor() {
+        for (Palabra palabra: dao.getPalabras()) {
+            adaptador.add(palabra);
+        }
+    }
+
+    private void poulateAdaptorREST() {
+
+        new DescargaListaPalabras(adaptador).execute();
+
+
     }
 
     @Override
