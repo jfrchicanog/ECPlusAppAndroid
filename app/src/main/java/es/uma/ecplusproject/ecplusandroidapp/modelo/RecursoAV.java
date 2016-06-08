@@ -2,13 +2,14 @@ package es.uma.ecplusproject.ecplusandroidapp.modelo;
 
 import android.graphics.drawable.Drawable;
 
+import java.io.Serializable;
 import java.util.Map;
 
 /**
  * Created by francis on 18/3/16.
  */
-public abstract class RecursoAV {
-    private Drawable drawable;
+public abstract class RecursoAV implements Serializable {
+    private String hash;
 
     public String getHash() {
         return hash;
@@ -18,15 +19,6 @@ public abstract class RecursoAV {
         this.hash = hash;
     }
 
-    private String hash;
 
-
-    public RecursoAV(Drawable drawable) {
-        this.drawable = drawable;
-    }
-
-    public Drawable getDrawable() {
-        return drawable;
-    }
 
 }

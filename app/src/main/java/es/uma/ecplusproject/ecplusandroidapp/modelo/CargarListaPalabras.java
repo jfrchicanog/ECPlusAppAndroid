@@ -54,7 +54,7 @@ public class CargarListaPalabras extends AsyncTask<String, Palabra, Void> {
             do {
                 long idPalabra = c.getLong(c.getColumnIndex(PID));
                 if (palabra == null || palabra.getId() != idPalabra) {
-                    publishProgress(palabra);
+                    reportPalabra(palabra);
                     palabra = new Palabra(c.getString(c.getColumnIndex(NOMBRE)));
                     palabra.setId(idPalabra);
                 }
@@ -63,44 +63,15 @@ public class CargarListaPalabras extends AsyncTask<String, Palabra, Void> {
                 palabra.addRecurso(rav);
             } while (c.moveToNext());
         }
-        publishProgress(palabra);
+        reportPalabra(palabra);
 
-        /*
-        SQLiteDatabase db = ECPlusDB.getDatabase();
-        Cursor c = db.query(ECPlusDBContract.ListaPalabras.TABLE_NAME, new String[]{ECPlusDBContract.ListaPalabras.ID},
-                ECPlusDBContract.ListaPalabras.IDIOMA+"=?",new String [] {idioma}, null, null, null);
-        c.moveToFirst();
-        long id = c.getLong(c.getColumnIndex(ECPlusDBContract.ListaPalabras.ID));
-
-        c = db.query(ECPlusDBContract.Palabra.TABLE_NAME, new String[]{ECPlusDBContract.Palabra.ID
-        , ECPlusDBContract.Palabra.NOMBRE, ECPlusDBContract.Palabra.ICONO_REEMPLAZABLE, ECPlusDBContract.Palabra.REF_ICONO},
-                ECPlusDBContract.Palabra.REF_LISTA_PALABRAS+"=?",new String[]{""+id},null,null,ECPlusDBContract.Palabra.NOMBRE+" ASC");
-
-        if (c.moveToFirst()) {
-            do {
-                Palabra palabra = new Palabra(c.getString(c.getColumnIndex(ECPlusDBContract.Palabra.NOMBRE)));
-
-                Cursor c2= db.query(ECPlusDBContract.PalabraRecursoAudioVisual.TABLE_NAME, new String[] {ECPlusDBContract.PalabraRecursoAudioVisual.REF_RECURSO_AUDIOVISUAL
-                ,ECPlusDBContract.PalabraRecursoAudioVisual.REF_PALABRA}, ECPlusDBContract.PalabraRecursoAudioVisual.REF_PALABRA+"=?",
-                        new String[]{""+c.getLong(c.getColumnIndex(ECPlusDBContract.Palabra.ID))},null, null, null);
-
-                if (c2.moveToFirst()) {
-                    do {
-                        Cursor c3 = db.query(ECPlusDBContract.RecursoAudioVisual.TABLE_NAME, new String[]{
-                        ECPlusDBContract.RecursoAudioVisual.DTYPE}, ECPlusDBContract.RecursoAudioVisual.ID+"=?",new String[]{
-                                ""+c2.getLong(c2.getColumnIndex(ECPlusDBContract.PalabraRecursoAudioVisual.REF_RECURSO_AUDIOVISUAL)},null,null,null
-                        );
-                    } while (c2.moveToNext());
-                }
-
-                publishProgress(palabra);
-            } while (c.moveToNext());
-        }
-
-        c.close();
-
-*/
         return null;
+    }
+
+    private void reportPalabra(Palabra palabra) {
+        if (palabra != null) {
+            publishProgress(palabra);
+        }
     }
 
     @Nullable
@@ -109,13 +80,13 @@ public class CargarListaPalabras extends AsyncTask<String, Palabra, Void> {
 
         switch (dtype) {
             case "Pictograma":
-                rav = new Pictograma(null);
+                rav = new Pictograma();
                 break;
             case "Video":
-                rav = new Video(null);
+                rav = new Video();
                 break;
             case "Foto":
-                rav = new Fotografia(null);
+                rav = new Fotografia();
                 break;
         }
         return rav;
@@ -123,8 +94,6 @@ public class CargarListaPalabras extends AsyncTask<String, Palabra, Void> {
 
     @Override
     protected void onProgressUpdate(Palabra... values) {
-        if (values[0] != null) {
-            adaptador.add(values[0]);
-        }
+        adaptador.add(values[0]);
     }
 }

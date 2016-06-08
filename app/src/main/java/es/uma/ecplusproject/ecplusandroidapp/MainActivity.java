@@ -2,6 +2,7 @@ package es.uma.ecplusproject.ecplusandroidapp;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +13,11 @@ import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 import es.uma.ecplusproject.ecplusandroidapp.database.ECPlusDB;
 import es.uma.ecplusproject.ecplusandroidapp.database.ECPlusDBContract;
@@ -66,6 +72,18 @@ public class MainActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(mViewPager);
 
         ECPlusDB.setContext(this);
+
+        System.out.println(Environment.getExternalStorageDirectory().getAbsolutePath());
+        File dir = Environment.getExternalStorageDirectory();
+        File file = new File(dir, "archivo.obb");
+        try {
+            PrintWriter pw = new PrintWriter(new FileOutputStream(file));
+            pw.println("hola caracola");
+            pw.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
 
 
         // Pruebas de la BBDD

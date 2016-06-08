@@ -37,8 +37,8 @@ public class DetallePalabra extends AppCompatActivity {
         adaptador = new AdaptadorImagenes(this);
         gridView.setAdapter(adaptador);
 
-        adaptador.add(new Pictograma(getResources().getDrawable(R.drawable.manzana)));
-        adaptador.add(new Fotografia(getResources().getDrawable(R.drawable.manzanafoto)));
+        //adaptador.add(new Pictograma(getResources().getDrawable(R.drawable.manzana)));
+        //adaptador.add(new Fotografia(getResources().getDrawable(R.drawable.manzanafoto)));
 
         video.setVideoURI(Uri.parse("android.resource://"+getPackageName()+"/"+R.raw.video));
 

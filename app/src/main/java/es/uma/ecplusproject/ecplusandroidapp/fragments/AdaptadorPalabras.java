@@ -38,14 +38,16 @@ public class AdaptadorPalabras extends ArrayAdapter<Palabra> {
         ImageView imagen = (ImageView)view.findViewById(R.id.imagenPalabra);
 
         texto.setText(palabra.toString());
+        imagen.setImageDrawable(contexto.getResources().getDrawable(R.drawable.abrigo));
+        /*
         for (RecursoAV recurso: palabra.getRecursos()) {
             if (recurso instanceof Pictograma) {
-                imagen.setImageDrawable(recurso.getDrawable());
+                //imagen.setImageDrawable(recurso.getDrawable());
                 int tam = (int)contexto.getResources().getDimension(R.dimen.imagenPalabras);
                 //imagen.setLayoutParams(new LinearLayout.LayoutParams(tam, tam));
                 break;
             }
-        }
+        }*/
         return view;
     }
 }

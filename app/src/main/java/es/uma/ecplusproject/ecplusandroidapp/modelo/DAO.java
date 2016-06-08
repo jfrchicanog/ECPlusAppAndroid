@@ -57,7 +57,7 @@ public class DAO {
     @NonNull
     private Palabra createPalabra(String cadenaPalabra, int pictograma) {
         Palabra palabra = new Palabra(cadenaPalabra);
-        palabra.addRecurso(new Pictograma(contexto.getResources().getDrawable(pictograma)));
+        palabra.addRecurso(new Pictograma());
         return palabra;
     }
 

@@ -35,7 +35,7 @@ public class AdaptadorImagenes extends ArrayAdapter<RecursoAV> {
 
 
         int ancho = getColumnWidth(((GridView)parent));
-        imagen.setImageDrawable(recurso.getDrawable());
+        imagen.setImageDrawable(null);
 
         imagen.setLayoutParams(new GridView.LayoutParams(ancho,ancho));
         imagen.setScaleType(ImageView.ScaleType.CENTER_INSIDE);

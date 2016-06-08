@@ -4,6 +4,13 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Scanner;
+import java.util.zip.GZIPInputStream;
+
+import es.uma.ecplusproject.ecplusandroidapp.R;
+
 /**
  * Created by francis on 5/6/16.
  */
@@ -95,16 +102,43 @@ public class ECPlusDBHelper extends SQLiteOpenHelper {
             ") ";
 
 
+    private Context context;
     public ECPlusDBHelper(Context context) {
         super(context, DATABASE_FILE, null, DATABASE_VERSION);
+        this.context = context;
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        // TODO
+
         System.out.println("Me han llamado?");
-        //db.execSQL(SQL_CREATE_FICHEROS);
+
+        try {
+            //loadFromRawResource(db, APKExpansionSupport.getAPKExpansionZipFile(context, 3, 0).getInputStream("ecplusdb-android.sql"));
+            loadFromRawResource(db, new GZIPInputStream(context.getResources().openRawResource(R.raw.ecplusdb)));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
+
+    private void loadFromRawResource(SQLiteDatabase db, InputStream is) {
+        Scanner sc = new Scanner(is);
+        StringBuilder sb = new StringBuilder();
+
+        while (sc.hasNextLine()) {
+            String line = sc.nextLine();
+            sb.append(line);
+            if (line.endsWith(";")) {
+                db.execSQL(sb.toString());
+                sb = new StringBuilder();
+            }
+        }
+        if (sb.length() > 0) {
+            db.execSQL(sb.toString());
+        }
+        sc.close();
+    }
+
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {

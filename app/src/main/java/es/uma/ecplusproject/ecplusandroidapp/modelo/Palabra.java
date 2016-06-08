@@ -1,13 +1,17 @@
 package es.uma.ecplusproject.ecplusandroidapp.modelo;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Created by francis on 18/3/16.
  */
-public class Palabra {
+public class Palabra implements Serializable {
     private String texto;
+    private long id;
+    private List<RecursoAV> recursos;
+
 
     public long getId() {
         return id;
@@ -17,8 +21,6 @@ public class Palabra {
         this.id = id;
     }
 
-    private long id;
-    private List<RecursoAV> recursos;
 
     public Palabra(String texto) {
         this.texto = texto;
