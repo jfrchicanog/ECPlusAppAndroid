@@ -1,5 +1,7 @@
 package es.uma.ecplusproject.ecplusandroidapp;
 
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -11,9 +13,13 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import es.uma.ecplusproject.ecplusandroidapp.database.ECPlusDB;
+import es.uma.ecplusproject.ecplusandroidapp.database.ECPlusDBContract;
+import es.uma.ecplusproject.ecplusandroidapp.database.ECPlusDBHelper;
 import es.uma.ecplusproject.ecplusandroidapp.fragments.Palabras;
 import es.uma.ecplusproject.ecplusandroidapp.fragments.Panel;
 import es.uma.ecplusproject.ecplusandroidapp.fragments.Sindromes;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.CargarListaPalabras;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.DAO;
 
 public class MainActivity extends AppCompatActivity {
@@ -59,6 +65,25 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
+        ECPlusDB.setContext(this);
+
+
+        // Pruebas de la BBDD
+/*
+        ECPlusDBHelper helper = new ECPlusDBHelper(this);
+        SQLiteDatabase database = helper.getReadableDatabase();
+        String [] projection = new String [] {ECPlusDBContract.Ficheros.RESOLUCION,
+                ECPlusDBContract.Ficheros.HASH, ECPlusDBContract.Ficheros.REF_RECURSO_AUDIOVISUAL};
+        Cursor c = database.query(ECPlusDBContract.Ficheros.TABLE_NAME, projection, null, null, null, null, null);
+        if (c.moveToFirst()) {
+            do {
+                String hash = c.getString(c.getColumnIndex(ECPlusDBContract.Ficheros.HASH));
+                String resolucion = c.getString(c.getColumnIndex(ECPlusDBContract.Ficheros.RESOLUCION));
+                Long ravId = c.getLong(c.getColumnIndex(ECPlusDBContract.Ficheros.REF_RECURSO_AUDIOVISUAL));
+                System.out.println(ravId+", "+hash+", "+resolucion);
+            } while (c.moveToNext());
+        }
+*/
     }
 
     @NonNull

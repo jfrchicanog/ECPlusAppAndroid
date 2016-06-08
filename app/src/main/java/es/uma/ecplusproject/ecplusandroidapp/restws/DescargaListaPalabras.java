@@ -26,7 +26,7 @@ public class DescargaListaPalabras extends AsyncTask<Void, Palabra, Video> {
     @Override
     protected Video doInBackground(Void... params) {
 
-        final String url = "http://ecplusproject.uma.es/ECplusRS/ecplus/api/v1/words/cat";
+        final String url = "http://ecplusproject.uma.es/academicPortal/ecplus/api/v1/words/cat";
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 

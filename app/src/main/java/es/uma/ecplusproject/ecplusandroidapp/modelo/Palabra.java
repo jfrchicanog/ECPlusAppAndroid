@@ -8,6 +8,16 @@ import java.util.List;
  */
 public class Palabra {
     private String texto;
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    private long id;
     private List<RecursoAV> recursos;
 
     public Palabra(String texto) {

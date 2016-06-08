@@ -16,6 +16,7 @@ import android.widget.ListView;
 import es.uma.ecplusproject.ecplusandroidapp.DetallePalabra;
 import es.uma.ecplusproject.ecplusandroidapp.R;
 import es.uma.ecplusproject.ecplusandroidapp.fragments.Panel;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.CargarListaPalabras;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.DAO;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.Palabra;
 import es.uma.ecplusproject.ecplusandroidapp.restws.DescargaListaPalabras;
@@ -41,7 +42,8 @@ public class Palabras extends Panel {
         listaPalabras = (ListView)rootView.findViewById(R.id.listaPalabras);
         adaptador = new AdaptadorPalabras(getContext());
 
-        poulateAdaptorREST();
+        //poulateAdaptor();
+        populateAdaptorDB();
 
         listaPalabras.setAdapter(adaptador);
         listaPalabras.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -63,8 +65,10 @@ public class Palabras extends Panel {
     private void poulateAdaptorREST() {
 
         new DescargaListaPalabras(adaptador).execute();
+    }
 
-
+    private void populateAdaptorDB() {
+        new CargarListaPalabras(adaptador).execute("cat");
     }
 
     @Override
