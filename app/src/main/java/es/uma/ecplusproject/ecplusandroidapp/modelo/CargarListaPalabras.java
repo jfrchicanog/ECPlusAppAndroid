@@ -37,7 +37,7 @@ public class CargarListaPalabras extends AsyncTask<String, Palabra, Void> {
             "inner join "+ECPlusDBContract.ListaPalabras.TABLE_NAME+" lp on lp."
                 +ECPlusDBContract.ListaPalabras.ID+" = p."+ECPlusDBContract.Palabra.REF_LISTA_PALABRAS+" " +
             "where f."+ECPlusDBContract.Ficheros.RESOLUCION+" = ? and lp."+ECPlusDBContract.ListaPalabras.IDIOMA
-                +"=? order by p."+ECPlusDBContract.Palabra.ID;
+                +"=? order by p."+ECPlusDBContract.Palabra.NOMBRE+" ASC";
 
     public CargarListaPalabras(ArrayAdapter<Palabra> adaptador) {
         this.adaptador = adaptador;
@@ -64,6 +64,7 @@ public class CargarListaPalabras extends AsyncTask<String, Palabra, Void> {
             } while (c.moveToNext());
         }
         reportPalabra(palabra);
+        c.close();
 
         return null;
     }

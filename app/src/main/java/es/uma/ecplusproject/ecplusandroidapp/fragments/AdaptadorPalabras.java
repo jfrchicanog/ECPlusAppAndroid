@@ -38,7 +38,7 @@ public class AdaptadorPalabras extends ArrayAdapter<Palabra> {
         ImageView imagen = (ImageView)view.findViewById(R.id.imagenPalabra);
 
         texto.setText(palabra.toString());
-        imagen.setImageDrawable(contexto.getResources().getDrawable(R.drawable.abrigo));
+        //imagen.setImageDrawable(contexto.getResources().getDrawable(R.drawable.abrigo));
         /*
         for (RecursoAV recurso: palabra.getRecursos()) {
             if (recurso instanceof Pictograma) {

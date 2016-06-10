@@ -1,0 +1,44 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ffffff"
+    tools:context="es.uma.ecplusproject.ecplusandroidapp.Splash">
+
+    <!-- The primary full-screen view. This can be replaced with whatever view
+         is needed to present your content, e.g. VideoView, SurfaceView,
+         TextureView, etc. -->
+    <TextView
+        android:id="@+id/fullscreen_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="top|center_horizontal"
+        android:keepScreenOn="true"
+        android:text="@string/splash_text"
+        android:textColor="#33b5e5"
+        android:textSize="50sp"
+        android:textStyle="bold" />
+
+    <!-- This FrameLayout insets its children based on system windows using
+         android:fitsSystemWindows. -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="true">
+
+        <ImageView
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:id="@+id/imageView"
+            android:layout_gravity="center"
+            android:src="@mipmap/logo" />
+
+        <ProgressBar
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/progressBar"
+            android:layout_gravity="center_horizontal|bottom" />
+    </FrameLayout>
+
+</FrameLayout>

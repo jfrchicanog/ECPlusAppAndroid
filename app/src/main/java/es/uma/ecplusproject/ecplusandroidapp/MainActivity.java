@@ -71,37 +71,6 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
-        ECPlusDB.setContext(this);
-
-        System.out.println(Environment.getExternalStorageDirectory().getAbsolutePath());
-        File dir = Environment.getExternalStorageDirectory();
-        File file = new File(dir, "archivo.obb");
-        try {
-            PrintWriter pw = new PrintWriter(new FileOutputStream(file));
-            pw.println("hola caracola");
-            pw.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-
-
-        // Pruebas de la BBDD
-/*
-        ECPlusDBHelper helper = new ECPlusDBHelper(this);
-        SQLiteDatabase database = helper.getReadableDatabase();
-        String [] projection = new String [] {ECPlusDBContract.Ficheros.RESOLUCION,
-                ECPlusDBContract.Ficheros.HASH, ECPlusDBContract.Ficheros.REF_RECURSO_AUDIOVISUAL};
-        Cursor c = database.query(ECPlusDBContract.Ficheros.TABLE_NAME, projection, null, null, null, null, null);
-        if (c.moveToFirst()) {
-            do {
-                String hash = c.getString(c.getColumnIndex(ECPlusDBContract.Ficheros.HASH));
-                String resolucion = c.getString(c.getColumnIndex(ECPlusDBContract.Ficheros.RESOLUCION));
-                Long ravId = c.getLong(c.getColumnIndex(ECPlusDBContract.Ficheros.REF_RECURSO_AUDIOVISUAL));
-                System.out.println(ravId+", "+hash+", "+resolucion);
-            } while (c.moveToNext());
-        }
-*/
     }
 
     @NonNull

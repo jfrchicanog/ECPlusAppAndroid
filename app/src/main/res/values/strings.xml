@@ -4,4 +4,9 @@
     <string name="section_format">Hello World from section: %1$d</string>
     <string name="sindrome">Síndromes</string>
     <string name="palabras">Palabras</string>
+
+    <string name="title_activity_splash">Splash</string>
+    <string name="dummy_button">Dummy Button</string>
+    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="splash_text">EC+: Enhancing Communication</string>
 </resources>

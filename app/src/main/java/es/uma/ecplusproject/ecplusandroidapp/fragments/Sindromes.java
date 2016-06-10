@@ -13,8 +13,11 @@ import android.widget.ListView;
 
 import es.uma.ecplusproject.ecplusandroidapp.DetalleSindrome;
 import es.uma.ecplusproject.ecplusandroidapp.R;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.CargaListaSindromes;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.CargarListaPalabras;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.DAO;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.Sindrome;
+import es.uma.ecplusproject.ecplusandroidapp.restws.DescargaListaPalabras;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -34,7 +37,11 @@ public class Sindromes extends Panel {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.sindromes, container, false);
         listaSindromes = (ListView)rootView.findViewById(R.id.listaSindromes);
-        adaptador = new ArrayAdapter<Sindrome>(getContext(), android.R.layout.simple_list_item_1,dao.getSindromes());
+
+        adaptador = new ArrayAdapter<Sindrome>(getContext(), android.R.layout.simple_list_item_1);
+
+        populateAdaptorDB();
+
         listaSindromes.setAdapter(adaptador);
         listaSindromes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -46,6 +53,16 @@ public class Sindromes extends Panel {
         });
 
         return rootView;
+    }
+
+    private void populateAdaptor() {
+        for (Sindrome s: dao.getSindromes()) {
+            adaptador.add(s);
+        }
+    }
+
+    private void populateAdaptorDB() {
+        new CargaListaSindromes(adaptador).execute("cat");
     }
 
     @Override

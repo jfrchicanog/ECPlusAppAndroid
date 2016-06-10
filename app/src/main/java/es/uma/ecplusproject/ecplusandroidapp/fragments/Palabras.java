@@ -1,21 +1,15 @@
 package es.uma.ecplusproject.ecplusandroidapp.fragments;
 
-import android.app.Application;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import es.uma.ecplusproject.ecplusandroidapp.DetallePalabra;
 import es.uma.ecplusproject.ecplusandroidapp.R;
-import es.uma.ecplusproject.ecplusandroidapp.fragments.Panel;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.CargarListaPalabras;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.DAO;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.Palabra;
@@ -50,6 +44,7 @@ public class Palabras extends Panel {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent detallePalabra = new Intent(getContext(),DetallePalabra.class);
+                detallePalabra.putExtra(DetallePalabra.PALABRA, adaptador.getItem(position));
                 startActivity(detallePalabra);
             }
         });
@@ -63,7 +58,6 @@ public class Palabras extends Panel {
     }
 
     private void poulateAdaptorREST() {
-
         new DescargaListaPalabras(adaptador).execute();
     }
 
