@@ -3,8 +3,10 @@ package es.uma.ecplusproject.ecplusandroidapp;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.GridView;
+import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.VideoView;
 
@@ -44,6 +46,11 @@ public class DetallePalabra extends AppCompatActivity {
         getSupportActionBar().setDisplayUseLogoEnabled(true);
 
         video = (VideoView)findViewById(R.id.video);
+        MediaController mediaController = new MediaController(this);
+        mediaController.setAnchorView(video);
+        video.setMediaController(mediaController);
+
+
         gridView = (GridView)findViewById(R.id.imagenes);
 
         adaptador = new AdaptadorImagenes(this);
@@ -63,17 +70,8 @@ public class DetallePalabra extends AppCompatActivity {
 
                 //video.setVideoURI(Uri.parse("android.resource://"+getPackageName()+"/"+R.raw.video));
 
-                video.start();
-                video.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if (video.isPlaying()) {
-                            video.pause();
-                        } else {
-                            video.resume();
-                        }
-                    }
-                });
+                //video.start();
+
             } else {
                 adaptador.add(rav);
             }
