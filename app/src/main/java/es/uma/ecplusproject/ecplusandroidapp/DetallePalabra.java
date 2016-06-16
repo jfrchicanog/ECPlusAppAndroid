@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.GridView;
+import android.widget.TextView;
 import android.widget.VideoView;
 
 import com.android.vending.expansion.zipfile.APKExpansionSupport;
@@ -30,6 +31,7 @@ public class DetallePalabra extends AppCompatActivity {
     private GridView gridView;
     private AdaptadorImagenes adaptador;
     private File hashesDir;
+    private TextView nombre;
 
 
     @Override
@@ -50,6 +52,9 @@ public class DetallePalabra extends AppCompatActivity {
         hashesDir = new File(getFilesDir(), HASHES);
 
         Palabra palabra = (Palabra) getIntent().getSerializableExtra(PALABRA);
+        nombre = (TextView) findViewById(R.id.nombre);
+        nombre.setText(palabra.getNombre());
+
 
         for (RecursoAV rav: palabra.getRecursos()) {
             if (rav instanceof  Video) {

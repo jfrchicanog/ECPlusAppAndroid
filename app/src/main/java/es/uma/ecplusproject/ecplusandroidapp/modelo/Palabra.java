@@ -8,7 +8,7 @@ import java.util.List;
  * Created by francis on 18/3/16.
  */
 public class Palabra implements Serializable {
-    private String texto;
+    private String nombre;
     private long id;
     private List<RecursoAV> recursos;
 
@@ -22,12 +22,19 @@ public class Palabra implements Serializable {
     }
 
 
-    public Palabra(String texto) {
-        this.texto = texto;
+    public Palabra(String nombre) {
+        this.nombre = nombre;
+    }
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String texto) {
+        this.nombre = texto;
     }
 
     public String toString() {
-        return texto;
+        return nombre;
     }
     public List<RecursoAV> getRecursos() {
         if (recursos==null) {
