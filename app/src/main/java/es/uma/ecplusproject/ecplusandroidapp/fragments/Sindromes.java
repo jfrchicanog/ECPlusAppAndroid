@@ -3,6 +3,7 @@ package es.uma.ecplusproject.ecplusandroidapp.fragments;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,7 +13,9 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import es.uma.ecplusproject.ecplusandroidapp.DetalleSindrome;
+import es.uma.ecplusproject.ecplusandroidapp.MainActivity;
 import es.uma.ecplusproject.ecplusandroidapp.R;
+import es.uma.ecplusproject.ecplusandroidapp.Splash;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.CargaListaSindromes;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.CargarListaPalabras;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.DAO;
@@ -26,6 +29,7 @@ public class Sindromes extends Panel {
     private ListView listaSindromes;
     private ArrayAdapter<Sindrome> adaptador;
     private DAO dao;
+    private String preferredLanguage;
 
     public Sindromes() {
         super();
@@ -40,6 +44,10 @@ public class Sindromes extends Panel {
 
         adaptador = new ArrayAdapter<Sindrome>(getContext(), android.R.layout.simple_list_item_1);
 
+        SharedPreferences preferences = getActivity().getSharedPreferences(Splash.ECPLUS_MAIN_PREFS, Context.MODE_PRIVATE);
+        preferredLanguage = preferences.getString(MainActivity.PREFERRED_LANGUAGE, "cat");
+
+
         populateAdaptorDB();
 
         listaSindromes.setAdapter(adaptador);
@@ -52,6 +60,7 @@ public class Sindromes extends Panel {
             }
         });
 
+
         return rootView;
     }
 
@@ -62,7 +71,7 @@ public class Sindromes extends Panel {
     }
 
     private void populateAdaptorDB() {
-        new CargaListaSindromes(adaptador).execute("cat");
+        new CargaListaSindromes(adaptador).execute(preferredLanguage);
     }
 
     @Override

@@ -1,16 +1,20 @@
 package es.uma.ecplusproject.ecplusandroidapp;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.os.Handler;
-import android.view.MotionEvent;
 import android.view.View;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import es.uma.ecplusproject.ecplusandroidapp.database.ECPlusDB;
+import es.uma.ecplusproject.ecplusandroidapp.database.ECPlusDBContract;
 import es.uma.ecplusproject.ecplusandroidapp.database.ECPlusDBHelper;
 
 /**
@@ -19,8 +23,10 @@ import es.uma.ecplusproject.ecplusandroidapp.database.ECPlusDBHelper;
  */
 public class Splash extends AppCompatActivity {
 
+    public static final String ECPLUS_MAIN_PREFS = "ecplus-main";
+    public static final String LANGUAGES_KEY_PREFS = "languages";
     private View mContentView;
-    private boolean activityAlife;
+    private boolean activityAlive;
 
     /**
      * Touch listener to use for in-layout UI controls to delay hiding the
@@ -34,7 +40,7 @@ public class Splash extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        activityAlife = true;
+        activityAlive = true;
 
         mContentView = findViewById(R.id.fullscreen_content);
 
@@ -57,21 +63,60 @@ public class Splash extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        activityAlife = false;
+        activityAlive = false;
     }
 
     private class PreparaDB extends AsyncTask<Void, Void, Void> {
+
         @Override
         protected Void doInBackground(Void... params) {
             ECPlusDB.setContext(Splash.this);
             ECPlusDBHelper helper = new ECPlusDBHelper(Splash.this);
-            helper.getWritableDatabase();
+            SQLiteDatabase db = helper.getWritableDatabase();
+
+            SharedPreferences preferences = getSharedPreferences(ECPLUS_MAIN_PREFS, MODE_PRIVATE);
+            if (!preferences.contains(LANGUAGES_KEY_PREFS)) {
+                // Consulta el idioma de los recursos
+                // y los guarda en las preferencias
+                Set<String> idiomas = new HashSet<>();
+                idiomasPalabras(db, idiomas);
+                idiomasSindromes(db, idiomas);
+
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putStringSet(LANGUAGES_KEY_PREFS, idiomas);
+                editor.commit();
+            }
+
             return null;
+        }
+
+        private void idiomasSindromes(SQLiteDatabase db, Set<String> idiomas) {
+            Cursor c;
+
+            c = db.query(true, ECPlusDBContract.ListaSindromes.TABLE_NAME, new String[]{
+                    ECPlusDBContract.ListaSindromes.IDIOMA},null, null, null, null, null, null);
+            if (c.moveToFirst()) {
+                do {
+                    idiomas.add(c.getString(c.getColumnIndex(ECPlusDBContract.ListaSindromes.IDIOMA)));
+                } while (c.moveToNext());
+            }
+            c.close();
+        }
+
+        private void idiomasPalabras(SQLiteDatabase db, Set<String> idiomas) {
+            Cursor c = db.query(true, ECPlusDBContract.ListaPalabras.TABLE_NAME, new String[]{
+                    ECPlusDBContract.ListaPalabras.IDIOMA},null, null, null, null, null, null);
+            if (c.moveToFirst()) {
+                do {
+                    idiomas.add(c.getString(c.getColumnIndex(ECPlusDBContract.ListaPalabras.IDIOMA)));
+                } while (c.moveToNext());
+            }
+            c.close();
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            if (activityAlife) {
+            if (activityAlive) {
                 finish();
                 Intent i = new Intent(Splash.this, MainActivity.class);
                 startActivity(i);

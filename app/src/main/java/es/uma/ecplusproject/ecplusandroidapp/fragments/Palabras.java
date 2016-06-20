@@ -1,6 +1,8 @@
 package es.uma.ecplusproject.ecplusandroidapp.fragments;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,7 +11,9 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import es.uma.ecplusproject.ecplusandroidapp.DetallePalabra;
+import es.uma.ecplusproject.ecplusandroidapp.MainActivity;
 import es.uma.ecplusproject.ecplusandroidapp.R;
+import es.uma.ecplusproject.ecplusandroidapp.Splash;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.CargarListaPalabras;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.DAO;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.Palabra;
@@ -23,6 +27,7 @@ public class Palabras extends Panel {
     private ListView listaPalabras;
     private AdaptadorPalabras adaptador;
     private DAO dao;
+    private String preferredLanguage;
 
     public Palabras() {
         super();
@@ -36,6 +41,9 @@ public class Palabras extends Panel {
         listaPalabras = (ListView)rootView.findViewById(R.id.listaPalabras);
         adaptador = new AdaptadorPalabras(getContext());
 
+        SharedPreferences preferences = getActivity().getSharedPreferences(Splash.ECPLUS_MAIN_PREFS, Context.MODE_PRIVATE);
+        preferredLanguage = preferences.getString(MainActivity.PREFERRED_LANGUAGE, "cat");
+
         //poulateAdaptor();
         populateAdaptorDB();
 
@@ -48,6 +56,9 @@ public class Palabras extends Panel {
                 startActivity(detallePalabra);
             }
         });
+
+
+
         return rootView;
     }
 
@@ -62,8 +73,10 @@ public class Palabras extends Panel {
     }
 
     private void populateAdaptorDB() {
-        new CargarListaPalabras(adaptador).execute("cat");
+        new CargarListaPalabras(adaptador).execute(preferredLanguage);
     }
+
+
 
     @Override
     public String getFragmentName() {

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">EC+</string>
+    <string name="palabras">Palabras</string>
+    <string name="sindrome">Síndromes</string>
+    <string name="no_languages">No hay idiomas disponibles</string>
+    <string name="language_menu">Escoger idioma</string>
+</resources>
