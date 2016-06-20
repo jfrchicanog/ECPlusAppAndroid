@@ -1,5 +1,6 @@
 package es.uma.ecplusproject.ecplusandroidapp;
 
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -46,9 +47,15 @@ public class DetallePalabra extends AppCompatActivity {
         getSupportActionBar().setDisplayUseLogoEnabled(true);
 
         video = (VideoView)findViewById(R.id.video);
-        MediaController mediaController = new MediaController(this);
-        mediaController.setAnchorView(video);
-        video.setMediaController(mediaController);
+
+        video.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                MediaController mediaController = new MediaController(DetallePalabra.this);
+                mediaController.setAnchorView(video);
+                video.setMediaController(mediaController);
+            }
+        });
 
 
         gridView = (GridView)findViewById(R.id.imagenes);
