@@ -53,7 +53,7 @@ public class AdaptadorImagenes extends ArrayAdapter<RecursoAV> {
         if (recurso instanceof Fotografia) {
             try {
                 String hash = recurso.getHash();
-                InputStream is = APKExpansionSupport.getAPKExpansionZipFile(ctx, 3, 0).getInputStream(hash.toLowerCase());
+                InputStream is = APKExpansionSupport.getAPKExpansionZipFile(ctx, Splash.MAIN_VERSION, 0).getInputStream(hash.toLowerCase());
                 Bitmap bm = BitmapFactory.decodeStream(is);
                 is.close();
                 imagen.setImageBitmap(bm);
@@ -64,7 +64,7 @@ public class AdaptadorImagenes extends ArrayAdapter<RecursoAV> {
         } else if (recurso instanceof Pictograma) {
             try {
                 String hash = recurso.getHash();
-                InputStream is = APKExpansionSupport.getAPKExpansionZipFile(ctx, 3, 0).getInputStream(hash.toLowerCase());
+                InputStream is = APKExpansionSupport.getAPKExpansionZipFile(ctx, Splash.MAIN_VERSION, 0).getInputStream(hash.toLowerCase());
                 SVG svg = SVG.getFromInputStream(is);
 
                 SVG.Box box = svg.getDocumentBoundingBox();

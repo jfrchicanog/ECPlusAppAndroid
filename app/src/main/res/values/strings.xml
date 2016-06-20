@@ -1,10 +1,7 @@
 <resources>
     <string name="app_name">EC+</string>
-    <string name="section_format">Hello World from section: %1$d</string>
     <string name="sindrome">Syndromes</string>
     <string name="palabras">Words</string>
-
-    <string name="title_activity_splash">Splash</string>
     <string name="splash_text" translatable="false">EC+: Enhancing Communication</string>
     <string name="language_menu">Choose Language</string>
     <string name="no_languages">No languages available</string>

@@ -114,7 +114,7 @@ public class DetallePalabra extends AppCompatActivity {
     }
 
     private InputStream obtainResourceFromOBB(String hash) throws IOException {
-        return APKExpansionSupport.getAPKExpansionZipFile(this, 3, 0).getInputStream(hash.toLowerCase());
+        return APKExpansionSupport.getAPKExpansionZipFile(this, Splash.MAIN_VERSION, 0).getInputStream(hash.toLowerCase());
     }
 
     private void createHashesDirIfNecessary() {

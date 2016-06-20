@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import es.uma.ecplusproject.ecplusandroidapp.R;
+import es.uma.ecplusproject.ecplusandroidapp.Splash;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.Palabra;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.Pictograma;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.RecursoAV;
@@ -55,7 +56,7 @@ public class AdaptadorPalabras extends ArrayAdapter<Palabra> {
             if (recurso instanceof Pictograma) {
                 try {
                     String hash = recurso.getHash();
-                    InputStream is = APKExpansionSupport.getAPKExpansionZipFile(contexto, 3, 0).getInputStream(hash.toLowerCase());
+                    InputStream is = APKExpansionSupport.getAPKExpansionZipFile(contexto, Splash.MAIN_VERSION, 0).getInputStream(hash.toLowerCase());
                     SVG svg = SVG.getFromInputStream(is);
 
                     svg.renderToPicture();

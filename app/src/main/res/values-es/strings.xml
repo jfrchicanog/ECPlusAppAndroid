@@ -5,4 +5,5 @@
     <string name="sindrome">Síndromes</string>
     <string name="no_languages">No hay idiomas disponibles</string>
     <string name="language_menu">Escoger idioma</string>
+    <string name="language_dialog_ok">OK</string>
 </resources>
