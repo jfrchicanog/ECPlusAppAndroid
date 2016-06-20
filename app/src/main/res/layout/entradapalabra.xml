@@ -3,7 +3,7 @@
     android:orientation="horizontal" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ImageView
+    <com.caverock.androidsvg.SVGImageView
         android:layout_width="@dimen/imagenPalabras"
         android:layout_height="@dimen/imagenPalabras"
         android:id="@+id/imagenPalabra"

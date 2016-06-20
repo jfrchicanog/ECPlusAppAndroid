@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ECPlusAndroidApp.iml" filepath="$PROJECT_DIR$/ECPlusAndroidApp.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../androidsvg/androidsvg/androidsvg.iml" filepath="$PROJECT_DIR$/../androidsvg/androidsvg/androidsvg.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/googleapkexpansionsupport/googleapkexpansionsupport.iml" filepath="$PROJECT_DIR$/googleapkexpansionsupport/googleapkexpansionsupport.iml" />
     </modules>

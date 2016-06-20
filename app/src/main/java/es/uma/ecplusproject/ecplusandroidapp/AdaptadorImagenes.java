@@ -3,7 +3,9 @@ package es.uma.ecplusproject.ecplusandroidapp;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Picture;
 import android.graphics.RectF;
+import android.graphics.drawable.PictureDrawable;
 import android.os.Build;
 import android.view.View;
 import android.view.ViewGroup;
@@ -64,10 +66,14 @@ public class AdaptadorImagenes extends ArrayAdapter<RecursoAV> {
                 String hash = recurso.getHash();
                 InputStream is = APKExpansionSupport.getAPKExpansionZipFile(ctx, 3, 0).getInputStream(hash.toLowerCase());
                 SVG svg = SVG.getFromInputStream(is);
+
+                SVG.Box box = svg.getDocumentBoundingBox();
+                Picture p = svg.renderToPicture();
+                box = svg.getDocumentBoundingBox();
+                svg.setDocumentViewBox(box.minX, box.minY, box.width, box.height);
                 //svg.setDocumentViewBox(49,178,164,129);
 
-                SVGImageView svgIV = (SVGImageView)imagen;
-                svgIV.setSVG(svg);
+                ((SVGImageView)imagen).setSVG(svg);
                 is.close();
             } catch (IOException e) {
                 throw new RuntimeException(e);

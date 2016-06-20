@@ -1,1 +1,5 @@
-include ':app', ':googleapkexpansionsupport'
+include ':app', ':googleapkexpansionsupport', ':androidsvg'
+
+project(':androidsvg').projectDir = new File(settingsDir, '../androidsvg/androidsvg')
+
+
