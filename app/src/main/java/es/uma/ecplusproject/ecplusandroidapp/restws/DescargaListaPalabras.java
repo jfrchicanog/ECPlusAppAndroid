@@ -13,8 +13,14 @@ import es.uma.ecplusproject.ecplusandroidapp.modelo.webservice.PalabraRes;
 /**
  * Created by francis on 24/5/16.
  */
-public class DescargaListaPalabras extends AsyncTask<Void, Palabra, Video> {
+public class DescargaListaPalabras extends AsyncTask<String, Palabra, Video> {
 
+    public static final String HOST = "192.168.57.1:8080";
+    //public static final String HOST = "ecplusproject.uma.es";
+    public static final String PROTOCOL = "http://";
+    public static final String CONTEXT_PATH = "/academicPortal";
+    public static final String REST_API_BASE = "/ecplus/api/v1";
+    public static final String WORDS_RESOURCE = "/words";
     private ArrayAdapter<Palabra> adaptador;
 
     public DescargaListaPalabras(ArrayAdapter<Palabra> adao) {
@@ -24,9 +30,17 @@ public class DescargaListaPalabras extends AsyncTask<Void, Palabra, Video> {
 
 
     @Override
-    protected Video doInBackground(Void... params) {
+    protected Video doInBackground(String... params) {
 
-        final String url = "http://ecplusproject.uma.es/academicPortal/ecplus/api/v1/words/cat";
+        String language = params[0];
+        String resolution = null;
+
+        if (params.length > 1) {
+            resolution = params[1];
+        }
+
+        String url = PROTOCOL + HOST + CONTEXT_PATH + REST_API_BASE + WORDS_RESOURCE + "/" + language;
+
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
 

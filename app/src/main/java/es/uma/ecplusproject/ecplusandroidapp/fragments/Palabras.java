@@ -45,7 +45,8 @@ public class Palabras extends Panel {
         preferredLanguage = preferences.getString(MainActivity.PREFERRED_LANGUAGE, "cat");
 
         //poulateAdaptor();
-        populateAdaptorDB();
+        //populateAdaptorDB();
+        poulateAdaptorREST();
 
         listaPalabras.setAdapter(adaptador);
         listaPalabras.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -69,7 +70,7 @@ public class Palabras extends Panel {
     }
 
     private void poulateAdaptorREST() {
-        new DescargaListaPalabras(adaptador).execute();
+        new DescargaListaPalabras(adaptador).execute(preferredLanguage);
     }
 
     private void populateAdaptorDB() {
