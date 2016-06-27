@@ -54,6 +54,7 @@ public class DetallePalabra extends AppCompatActivity {
                 MediaController mediaController = new MediaController(DetallePalabra.this);
                 mediaController.setAnchorView(video);
                 video.setMediaController(mediaController);
+                video.start();
             }
         });
 
