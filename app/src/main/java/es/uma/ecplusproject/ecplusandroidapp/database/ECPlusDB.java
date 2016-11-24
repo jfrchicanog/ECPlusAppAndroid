@@ -19,6 +19,13 @@ public class ECPlusDB {
         return database;
     }
 
+    public static SQLiteDatabase getDatabase(Context context) {
+        if (context != null) {
+            setContext(context);
+        }
+        return getDatabase();
+    }
+
     public static synchronized  void setContext(Context context) {
         if (database == null) {
             ecplusDBHelper = new ECPlusDBHelper(context);

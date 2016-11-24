@@ -3,17 +3,25 @@ package es.uma.ecplusproject.ecplusandroidapp.services;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.support.annotation.Nullable;
 
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
+import java.util.List;
 
-import es.uma.ecplusproject.ecplusandroidapp.database.ECPlusDB;
-import es.uma.ecplusproject.ecplusandroidapp.database.ECPlusDBContract;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.PalabrasDAO;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.PalabrasDAOImpl;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.SindromesDAO;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.SindromesDAOImpl;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Sindrome;
+import es.uma.ecplusproject.ecplusandroidapp.restws.PalabrasWS;
+import es.uma.ecplusproject.ecplusandroidapp.restws.SindromesWS;
+import es.uma.ecplusproject.ecplusandroidapp.restws.SindromesWSImpl;
 import es.uma.ecplusproject.ecplusandroidapp.restws.domain.PalabraRes;
 
 
@@ -24,14 +32,13 @@ public class UpdateService extends IntentService {
     private static final String EXTRA_LANGUAGE = "es.uma.ecplusproject.ecplusandroidapp.services.extra.language";
     private static final String EXTRA_RESOLUTION = "es.uma.ecplusproject.ecplusandroidapp.services.extra.resolution";
 
-    private static final String HOST = "192.168.57.1:8080";
-    //public static final String HOST = "ecplusproject.uma.es";
-    private static final String PROTOCOL = "http://";
+    //private static final String HOST = "192.168.57.1:8080";
+    public static final String HOST = "ecplusproject.uma.es";
+    private static final String PROTOCOL = "https://";
     private static final String CONTEXT_PATH = "/academicPortal";
     private static final String REST_API_BASE = "/ecplus/api/v1";
     private static final String WORDS_RESOURCE = "/words";
-    private static final String SYNDROMES_RESOURCE = "/sindromes";
-    public static final Comparator<PalabraRes> PALABRA_COMPARATOR = new Comparator<PalabraRes>() {
+    private static final Comparator<PalabraRes> PALABRA_COMPARATOR = new Comparator<PalabraRes>() {
         @Override
         public int compare(PalabraRes lhs, PalabraRes rhs) {
             if (lhs.getId() < rhs.getId()) {
@@ -43,6 +50,25 @@ public class UpdateService extends IntentService {
             }
         }
     };
+
+    private static final Comparator<Sindrome> SYNDROME_COMPARATOR = new Comparator<Sindrome>() {
+        @Override
+        public int compare(Sindrome lhs, Sindrome rhs) {
+            if (lhs.getId() < rhs.getId()) {
+                return -1;
+            } else if (lhs.getId() > rhs.getId()) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }
+    };
+
+    private SindromesDAO daoSindromes;
+    private PalabrasDAO daoPalabras;
+
+    private SindromesWS wsSindromes;
+    private PalabrasWS wsPalabras;
 
     public UpdateService() {
         super("UpdateService");
@@ -80,7 +106,6 @@ public class UpdateService extends IntentService {
     }
 
     private void handleUpdateWords(String language, String resolution) {
-        // TODO
         String url = PROTOCOL + HOST + CONTEXT_PATH + REST_API_BASE + WORDS_RESOURCE + "/" + language;
 
         RestTemplate restTemplate = new RestTemplate();
@@ -100,31 +125,81 @@ public class UpdateService extends IntentService {
      * parameters.
      */
     private void handleUpdateSyndromes(String language) {
-        String hash = getHashFromDBForListOfSyndromes(language);
-        if (hash == null) {
-            return;
+        String localHash = getDAOSindromes().getHashForListOfSyndromes(language);
+        String remoteHash = getWSSindromes().getHashForListOfSindromes(language);
+
+        if (remoteHash==null) {
+            getDAOSindromes().removeSyndromeList(language);
+
+        } else if (localHash == null || !localHash.equals(remoteHash)) {
+            if (localHash == null) {
+                getDAOSindromes().createListOfSyndromes(language);
+            }
+            updateLocalSyndromeList(language, remoteHash);
         }
-
-
-
-
-
-        // TODO: Handle action Baz
-        throw new UnsupportedOperationException("Not yet implemented");
     }
 
-    private String getHashFromDBForListOfSyndromes(String language) {
-        SQLiteDatabase db = ECPlusDB.getDatabase();
-        Cursor c = db.query(ECPlusDBContract.ListaSindromes.TABLE_NAME,
-                new String[]{ECPlusDBContract.ListaSindromes.HASH},
-                ECPlusDBContract.ListaSindromes.IDIOMA+"=?",new String[]{language},null,null,null);
-        String hash = null;
-        if (c.moveToFirst()) {
-            hash = c.getString(c.getColumnIndex(ECPlusDBContract.ListaSindromes.HASH));
-        }
-        c.close();
-        db.close();
+    private void updateLocalSyndromeList(String language, String remoteHash) {
+        List<Sindrome> remoteSindromes = getWSSindromes().getSindromes(language);
+        List<Sindrome> localSindromes = getDAOSindromes().getSindromes(language);
+        Collections.sort(remoteSindromes, SYNDROME_COMPARATOR);
+        Collections.sort(localSindromes, SYNDROME_COMPARATOR);
 
-        return hash;
+        Iterator<Sindrome> iterator = localSindromes.iterator();
+        for (Sindrome remote: remoteSindromes) {
+
+            Sindrome local = removeLocalSyndromesUpToNextRemoteSyndrome(iterator, remote);
+
+            if (local == null || local.getId() > remote.getId()) {
+                getDAOSindromes().addSyndrome(remote, language);
+            } else if (local.getId() == remote.getId()) {
+                if (local.getHash() != remote.getHash()) {
+                    getDAOSindromes().updateSyndrome(remote);
+                }
+            }
+        }
+
+        getDAOSindromes().setHashForListOfSyndromes(language, remoteHash);
+
     }
+
+    @Nullable
+    private Sindrome removeLocalSyndromesUpToNextRemoteSyndrome(Iterator<Sindrome> iterator, Sindrome remote) {
+        Sindrome local;
+        do {
+            if (iterator.hasNext()) {
+                local = iterator.next();
+                if (local.getId() < remote.getId()) {
+                    getDAOSindromes().removeSyndrome(local);
+                }
+            } else {
+                local=null;
+            }
+        } while ((local != null) && (local.getId() < remote.getId()));
+        return local;
+    }
+
+    private SindromesDAO getDAOSindromes() {
+        if (daoSindromes==null) {
+            daoSindromes = new SindromesDAOImpl(this);
+        }
+        return daoSindromes;
+    }
+
+    private PalabrasDAO getDAOPalabras() {
+        if (daoPalabras==null) {
+            daoPalabras = new PalabrasDAOImpl(this);
+        }
+        return daoPalabras;
+    }
+
+    private SindromesWS getWSSindromes() {
+        if (wsSindromes == null) {
+            wsSindromes = new SindromesWSImpl();
+        }
+        return wsSindromes;
+    }
+
+
+
 }

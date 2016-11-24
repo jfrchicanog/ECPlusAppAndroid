@@ -1,5 +1,6 @@
 package es.uma.ecplusproject.ecplusandroidapp.modelo;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
@@ -45,12 +46,21 @@ public class PalabrasDAOImpl implements PalabrasDAO {
             +"=? order by p."+ECPlusDBContract.Palabra.NOMBRE+" ASC";
 
 
+    private Context contexto;
+
+    public PalabrasDAOImpl() {
+    }
+
+    public PalabrasDAOImpl(Context context) {
+        this.contexto = contexto;
+    }
+
     @Override
     public List<Palabra> getPalabras(String language, Resolucion resolution) {
         String idioma = language;
         List<Palabra> resultado = new ArrayList<>();
 
-        SQLiteDatabase db = ECPlusDB.getDatabase();
+        SQLiteDatabase db = ECPlusDB.getDatabase(contexto);
         Cursor c = db.rawQuery(megaconsulta, new String[]{resolution.toString(), idioma});
         Palabra palabra = null;
         if (c.moveToFirst()) {
