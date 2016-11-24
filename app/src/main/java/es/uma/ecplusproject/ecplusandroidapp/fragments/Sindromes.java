@@ -21,6 +21,7 @@ import es.uma.ecplusproject.ecplusandroidapp.modelo.CargarListaPalabras;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.DAO;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.Sindrome;
 import es.uma.ecplusproject.ecplusandroidapp.restws.DescargaListaPalabras;
+import es.uma.ecplusproject.ecplusandroidapp.restws.DescargaListaSindromes;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -48,7 +49,8 @@ public class Sindromes extends Panel {
         preferredLanguage = preferences.getString(MainActivity.PREFERRED_LANGUAGE, "cat");
 
 
-        populateAdaptorDB();
+        //populateAdaptorDB();
+        populateAdaptorREST();
 
         listaSindromes.setAdapter(adaptador);
         listaSindromes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -72,6 +74,10 @@ public class Sindromes extends Panel {
 
     private void populateAdaptorDB() {
         new CargaListaSindromes(adaptador).execute(preferredLanguage);
+    }
+
+    private void populateAdaptorREST() {
+        new DescargaListaSindromes(adaptador).execute(preferredLanguage);
     }
 
     @Override

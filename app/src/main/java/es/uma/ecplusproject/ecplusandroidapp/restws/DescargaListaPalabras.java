@@ -15,12 +15,12 @@ import es.uma.ecplusproject.ecplusandroidapp.modelo.webservice.PalabraRes;
  */
 public class DescargaListaPalabras extends AsyncTask<String, Palabra, Video> {
 
-    public static final String HOST = "192.168.57.1:8080";
-    //public static final String HOST = "ecplusproject.uma.es";
-    public static final String PROTOCOL = "http://";
-    public static final String CONTEXT_PATH = "/academicPortal";
-    public static final String REST_API_BASE = "/ecplus/api/v1";
-    public static final String WORDS_RESOURCE = "/words";
+    //private static final String HOST = "192.168.57.1:8080";
+    public static final String HOST = "ecplusproject.uma.es";
+    private static final String PROTOCOL = "https://";
+    private static final String CONTEXT_PATH = "/academicPortal";
+    private static final String REST_API_BASE = "/ecplus/api/v1";
+    private static final String WORDS_RESOURCE = "/words";
     private ArrayAdapter<Palabra> adaptador;
 
     public DescargaListaPalabras(ArrayAdapter<Palabra> adao) {
