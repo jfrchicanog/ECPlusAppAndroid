@@ -9,9 +9,7 @@ import java.nio.charset.Charset;
 
 import es.uma.ecplusproject.ecplusandroidapp.database.ECPlusDB;
 import es.uma.ecplusproject.ecplusandroidapp.database.ECPlusDBContract;
-import es.uma.ecplusproject.ecplusandroidapp.modelo.Palabra;
-import es.uma.ecplusproject.ecplusandroidapp.modelo.Resolucion;
-import es.uma.ecplusproject.ecplusandroidapp.modelo.Sindrome;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Sindrome;
 
 /**
  * Created by francis on 8/6/16.

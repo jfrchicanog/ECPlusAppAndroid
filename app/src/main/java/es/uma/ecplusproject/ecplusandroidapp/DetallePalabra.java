@@ -4,8 +4,6 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.View;
 import android.widget.GridView;
 import android.widget.MediaController;
 import android.widget.TextView;
@@ -19,9 +17,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import es.uma.ecplusproject.ecplusandroidapp.modelo.Palabra;
-import es.uma.ecplusproject.ecplusandroidapp.modelo.RecursoAV;
-import es.uma.ecplusproject.ecplusandroidapp.modelo.Video;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Palabra;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.RecursoAV;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Video;
 
 /**
  * Created by francis on 20/4/16.

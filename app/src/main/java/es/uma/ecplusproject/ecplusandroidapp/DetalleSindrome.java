@@ -6,7 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.webkit.WebView;
 
 
-import es.uma.ecplusproject.ecplusandroidapp.modelo.Sindrome;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Sindrome;
 
 /**
  * Created by francis on 20/4/16.

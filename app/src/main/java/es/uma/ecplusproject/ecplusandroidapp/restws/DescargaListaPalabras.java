@@ -6,8 +6,8 @@ import android.widget.ArrayAdapter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
-import es.uma.ecplusproject.ecplusandroidapp.modelo.Palabra;
-import es.uma.ecplusproject.ecplusandroidapp.modelo.Video;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Palabra;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Video;
 import es.uma.ecplusproject.ecplusandroidapp.restws.webservice.PalabraRes;
 
 /**

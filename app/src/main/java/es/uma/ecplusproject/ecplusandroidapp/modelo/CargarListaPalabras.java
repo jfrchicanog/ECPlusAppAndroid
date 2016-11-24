@@ -6,10 +6,14 @@ import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.widget.ArrayAdapter;
 
-import java.lang.reflect.Array;
-
 import es.uma.ecplusproject.ecplusandroidapp.database.ECPlusDB;
 import es.uma.ecplusproject.ecplusandroidapp.database.ECPlusDBContract;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Fotografia;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Palabra;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Pictograma;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.RecursoAV;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Resolucion;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Video;
 
 /**
  * Created by francis on 8/6/16.

@@ -1,6 +1,5 @@
 package es.uma.ecplusproject.ecplusandroidapp.fragments;
 
-import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -17,10 +16,8 @@ import es.uma.ecplusproject.ecplusandroidapp.MainActivity;
 import es.uma.ecplusproject.ecplusandroidapp.R;
 import es.uma.ecplusproject.ecplusandroidapp.Splash;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.CargaListaSindromes;
-import es.uma.ecplusproject.ecplusandroidapp.modelo.CargarListaPalabras;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.DAO;
-import es.uma.ecplusproject.ecplusandroidapp.modelo.Sindrome;
-import es.uma.ecplusproject.ecplusandroidapp.restws.DescargaListaPalabras;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Sindrome;
 import es.uma.ecplusproject.ecplusandroidapp.restws.DescargaListaSindromes;
 
 /**

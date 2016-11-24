@@ -1,4 +1,4 @@
-package es.uma.ecplusproject.ecplusandroidapp.modelo;
+package es.uma.ecplusproject.ecplusandroidapp.modelo.dominio;
 
 /**
  * Created by francis on 8/6/16.

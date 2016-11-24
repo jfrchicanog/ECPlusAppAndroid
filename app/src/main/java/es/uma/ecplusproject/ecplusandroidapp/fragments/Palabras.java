@@ -16,7 +16,7 @@ import es.uma.ecplusproject.ecplusandroidapp.R;
 import es.uma.ecplusproject.ecplusandroidapp.Splash;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.CargarListaPalabras;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.DAO;
-import es.uma.ecplusproject.ecplusandroidapp.modelo.Palabra;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Palabra;
 import es.uma.ecplusproject.ecplusandroidapp.restws.DescargaListaPalabras;
 
 /**

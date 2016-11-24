@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import es.uma.ecplusproject.ecplusandroidapp.R;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Palabra;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Pictograma;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Sindrome;
 
 /**
  * Created by francis on 18/3/16.

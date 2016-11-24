@@ -4,8 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Picture;
-import android.graphics.RectF;
-import android.graphics.drawable.PictureDrawable;
 import android.os.Build;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,15 +15,14 @@ import com.android.vending.expansion.zipfile.APKExpansionSupport;
 import com.caverock.androidsvg.SVG;
 import com.caverock.androidsvg.SVGImageView;
 import com.caverock.androidsvg.SVGParseException;
-import com.caverock.androidsvg.SVGParser;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 
-import es.uma.ecplusproject.ecplusandroidapp.modelo.Fotografia;
-import es.uma.ecplusproject.ecplusandroidapp.modelo.Pictograma;
-import es.uma.ecplusproject.ecplusandroidapp.modelo.RecursoAV;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Fotografia;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Pictograma;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.RecursoAV;
 
 /**
  * Created by francis on 13/5/16.

@@ -1,4 +1,4 @@
-package es.uma.ecplusproject.ecplusandroidapp.modelo;
+package es.uma.ecplusproject.ecplusandroidapp.modelo.dominio;
 
 import android.graphics.drawable.Drawable;
 

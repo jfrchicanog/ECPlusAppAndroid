@@ -8,8 +8,8 @@ import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.Charset;
 
-import es.uma.ecplusproject.ecplusandroidapp.modelo.Sindrome;
-import es.uma.ecplusproject.ecplusandroidapp.modelo.Video;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Sindrome;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Video;
 import es.uma.ecplusproject.ecplusandroidapp.restws.webservice.SindromeClass;
 
 /**

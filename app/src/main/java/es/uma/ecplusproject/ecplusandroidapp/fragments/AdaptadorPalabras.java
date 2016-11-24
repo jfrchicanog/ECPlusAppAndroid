@@ -1,14 +1,10 @@
 package es.uma.ecplusproject.ecplusandroidapp.fragments;
 
 import android.content.Context;
-import android.graphics.Picture;
-import android.graphics.drawable.PictureDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.vending.expansion.zipfile.APKExpansionSupport;
@@ -21,9 +17,9 @@ import java.io.InputStream;
 
 import es.uma.ecplusproject.ecplusandroidapp.R;
 import es.uma.ecplusproject.ecplusandroidapp.Splash;
-import es.uma.ecplusproject.ecplusandroidapp.modelo.Palabra;
-import es.uma.ecplusproject.ecplusandroidapp.modelo.Pictograma;
-import es.uma.ecplusproject.ecplusandroidapp.modelo.RecursoAV;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Palabra;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Pictograma;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.RecursoAV;
 
 /**
  * Created by francis on 20/4/16.
