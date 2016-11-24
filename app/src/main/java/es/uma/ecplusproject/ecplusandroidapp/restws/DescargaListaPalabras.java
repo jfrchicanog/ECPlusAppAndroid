@@ -8,7 +8,7 @@ import org.springframework.web.client.RestTemplate;
 
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Palabra;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Video;
-import es.uma.ecplusproject.ecplusandroidapp.restws.webservice.PalabraRes;
+import es.uma.ecplusproject.ecplusandroidapp.restws.domain.PalabraRes;
 
 /**
  * Created by francis on 24/5/16.

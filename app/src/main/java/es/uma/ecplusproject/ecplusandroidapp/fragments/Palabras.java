@@ -3,6 +3,7 @@ package es.uma.ecplusproject.ecplusandroidapp.fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,13 +11,18 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 
+import java.util.List;
+
 import es.uma.ecplusproject.ecplusandroidapp.DetallePalabra;
 import es.uma.ecplusproject.ecplusandroidapp.MainActivity;
 import es.uma.ecplusproject.ecplusandroidapp.R;
 import es.uma.ecplusproject.ecplusandroidapp.Splash;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.CargarListaPalabras;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.DAO;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.PalabrasDAO;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.PalabrasDAOImpl;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Palabra;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Resolucion;
 import es.uma.ecplusproject.ecplusandroidapp.restws.DescargaListaPalabras;
 
 /**
@@ -75,6 +81,21 @@ public class Palabras extends Panel {
 
     private void populateAdaptorDB() {
         new CargarListaPalabras(adaptador).execute(preferredLanguage);
+    }
+
+    private void populateAdaptorDBComplete() {
+        final PalabrasDAO daoPalabras =new PalabrasDAOImpl();
+        new AsyncTask<Void, Void, List<Palabra>>(){
+            @Override
+            protected List<Palabra> doInBackground(Void... params) {
+                return daoPalabras.getPalabras(preferredLanguage, Resolucion.BAJA);
+            }
+
+            @Override
+            protected void onPostExecute(List<Palabra> palabras) {
+                adaptador.addAll(palabras);
+            }
+        }.execute();
     }
 
 

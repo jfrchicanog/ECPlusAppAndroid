@@ -14,7 +14,7 @@ import java.util.Comparator;
 
 import es.uma.ecplusproject.ecplusandroidapp.database.ECPlusDB;
 import es.uma.ecplusproject.ecplusandroidapp.database.ECPlusDBContract;
-import es.uma.ecplusproject.ecplusandroidapp.restws.webservice.PalabraRes;
+import es.uma.ecplusproject.ecplusandroidapp.restws.domain.PalabraRes;
 
 
 public class UpdateService extends IntentService {

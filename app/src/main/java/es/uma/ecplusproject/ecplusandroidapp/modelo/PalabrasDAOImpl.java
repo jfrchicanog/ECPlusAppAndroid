@@ -2,9 +2,11 @@ package es.uma.ecplusproject.ecplusandroidapp.modelo;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.AsyncTask;
 import android.support.annotation.Nullable;
 import android.widget.ArrayAdapter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import es.uma.ecplusproject.ecplusandroidapp.database.ECPlusDB;
 import es.uma.ecplusproject.ecplusandroidapp.database.ECPlusDBContract;
@@ -16,49 +18,49 @@ import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Resolucion;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Video;
 
 /**
- * Created by francis on 8/6/16.
+ * Created by francis on 24/11/16.
  */
-public class CargarListaPalabras extends AsyncTask<String, Palabra, Void> {
 
+public class PalabrasDAOImpl implements PalabrasDAO {
     private static final String PID = "pid";
     private static final String NOMBRE = "nombre";
     private static final String DTYPE = "dtype";
     private static final String HASH = "hash";
-    private ArrayAdapter<Palabra> adaptador;
 
     private static final String megaconsulta = "select " +
-            "p."+ECPlusDBContract.Palabra.NOMBRE+" as "+NOMBRE+", " +
+            "p."+ ECPlusDBContract.Palabra.NOMBRE+" as "+NOMBRE+", " +
             "p."+ECPlusDBContract.Palabra.ID+" as "+PID+", " +
             "r."+ECPlusDBContract.RecursoAudioVisual.DTYPE+" as "+DTYPE+", " +
             "f."+ECPlusDBContract.Ficheros.HASH+" as "+HASH+" " +
             "from "+ECPlusDBContract.Palabra.TABLE_NAME+" p " +
             "inner join "+ECPlusDBContract.PalabraRecursoAudioVisual.TABLE_NAME+" pr on p."
-                +ECPlusDBContract.Palabra.ID+" = pr."+ECPlusDBContract.PalabraRecursoAudioVisual.REF_PALABRA+" " +
+            +ECPlusDBContract.Palabra.ID+" = pr."+ECPlusDBContract.PalabraRecursoAudioVisual.REF_PALABRA+" " +
             "inner join "+ECPlusDBContract.RecursoAudioVisual.TABLE_NAME+" r on pr."
-                +ECPlusDBContract.PalabraRecursoAudioVisual.REF_RECURSO_AUDIOVISUAL+" = r."+ECPlusDBContract.RecursoAudioVisual.ID+" " +
+            +ECPlusDBContract.PalabraRecursoAudioVisual.REF_RECURSO_AUDIOVISUAL+" = r."+ECPlusDBContract.RecursoAudioVisual.ID+" " +
             "inner join "+ECPlusDBContract.Ficheros.TABLE_NAME+" f on f."
-                +ECPlusDBContract.Ficheros.REF_RECURSO_AUDIOVISUAL+" = r."+ECPlusDBContract.RecursoAudioVisual.ID+" " +
+            +ECPlusDBContract.Ficheros.REF_RECURSO_AUDIOVISUAL+" = r."+ECPlusDBContract.RecursoAudioVisual.ID+" " +
             "inner join "+ECPlusDBContract.ListaPalabras.TABLE_NAME+" lp on lp."
-                +ECPlusDBContract.ListaPalabras.ID+" = p."+ECPlusDBContract.Palabra.REF_LISTA_PALABRAS+" " +
+            +ECPlusDBContract.ListaPalabras.ID+" = p."+ECPlusDBContract.Palabra.REF_LISTA_PALABRAS+" " +
             "where f."+ECPlusDBContract.Ficheros.RESOLUCION+" = ? and lp."+ECPlusDBContract.ListaPalabras.IDIOMA
-                +"=? order by p."+ECPlusDBContract.Palabra.NOMBRE+" ASC";
+            +"=? order by p."+ECPlusDBContract.Palabra.NOMBRE+" ASC";
 
-    public CargarListaPalabras(ArrayAdapter<Palabra> adaptador) {
-        this.adaptador = adaptador;
-    }
 
     @Override
-    protected Void doInBackground(String... params) {
-        String idioma = params[0];
+    public List<Palabra> getPalabras(String language, Resolucion resolution) {
+        String idioma = language;
+        List<Palabra> resultado = new ArrayList<>();
 
         SQLiteDatabase db = ECPlusDB.getDatabase();
-        Cursor c = db.rawQuery(megaconsulta, new String[]{Resolucion.BAJA.toString(), idioma});
+        Cursor c = db.rawQuery(megaconsulta, new String[]{resolution.toString(), idioma});
         Palabra palabra = null;
         if (c.moveToFirst()) {
             do {
                 long idPalabra = c.getLong(c.getColumnIndex(PID));
                 if (palabra == null || palabra.getId() != idPalabra) {
-                    reportPalabra(palabra);
+                    if (palabra != null) {
+                        resultado.add(palabra);
+                    }
+
                     palabra = new Palabra(c.getString(c.getColumnIndex(NOMBRE)));
                     palabra.setId(idPalabra);
                 }
@@ -67,16 +69,13 @@ public class CargarListaPalabras extends AsyncTask<String, Palabra, Void> {
                 palabra.addRecurso(rav);
             } while (c.moveToNext());
         }
-        reportPalabra(palabra);
+        if (palabra != null) {
+            resultado.add(palabra);
+        }
         c.close();
 
-        return null;
-    }
+        return resultado;
 
-    private void reportPalabra(Palabra palabra) {
-        if (palabra != null) {
-            publishProgress(palabra);
-        }
     }
 
     @Nullable
@@ -95,10 +94,5 @@ public class CargarListaPalabras extends AsyncTask<String, Palabra, Void> {
                 break;
         }
         return rav;
-    }
-
-    @Override
-    protected void onProgressUpdate(Palabra... values) {
-        adaptador.add(values[0]);
     }
 }

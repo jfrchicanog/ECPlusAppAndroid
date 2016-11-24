@@ -10,7 +10,7 @@ import java.nio.charset.Charset;
 
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Sindrome;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Video;
-import es.uma.ecplusproject.ecplusandroidapp.restws.webservice.SindromeClass;
+import es.uma.ecplusproject.ecplusandroidapp.restws.domain.SindromeClass;
 
 /**
  * Created by francis on 24/5/16.

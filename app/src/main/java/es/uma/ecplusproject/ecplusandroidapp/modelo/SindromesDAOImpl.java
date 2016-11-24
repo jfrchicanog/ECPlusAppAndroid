@@ -2,20 +2,20 @@ package es.uma.ecplusproject.ecplusandroidapp.modelo;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.AsyncTask;
-import android.widget.ArrayAdapter;
 
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
 
 import es.uma.ecplusproject.ecplusandroidapp.database.ECPlusDB;
 import es.uma.ecplusproject.ecplusandroidapp.database.ECPlusDBContract;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Sindrome;
 
 /**
- * Created by francis on 8/6/16.
+ * Created by francis on 24/11/16.
  */
-public class CargaListaSindromes extends AsyncTask<String, Sindrome, Void> {
 
+public class SindromesDAOImpl implements SindromesDAO {
     private static final String NOMBRE = "nombre";
     private static final String CONTENIDO = "contenido";
     private static final String consulta = "select " +
@@ -26,32 +26,22 @@ public class CargaListaSindromes extends AsyncTask<String, Sindrome, Void> {
             "s."+ECPlusDBContract.Sindrome.REF_LISTA_SINDROMES+" = ls."+ECPlusDBContract.ListaSindromes.ID
             +" where ls."+ECPlusDBContract.ListaSindromes.IDIOMA+"=?";
 
-    private ArrayAdapter<Sindrome> adaptador;
-
-    public CargaListaSindromes(ArrayAdapter<Sindrome> adaptador) {
-        this.adaptador = adaptador;
-    }
-
-
     @Override
-    protected Void doInBackground(String... params) {
-        String idioma = params[0];
+    public List<Sindrome> getSindromes(String language) {
+        List<Sindrome> resultado = new ArrayList<>();
+
+        String idioma = language;
         SQLiteDatabase db = ECPlusDB.getDatabase();
         Cursor c = db.rawQuery(consulta, new String[]{idioma});
         if (c.moveToFirst()) {
             do {
                 Sindrome sindrome =  new Sindrome(c.getString(c.getColumnIndex(NOMBRE)));
                 sindrome.setDescripcion(new String(c.getBlob(c.getColumnIndex(CONTENIDO)), Charset.forName("UTF-8")));
-                publishProgress(sindrome);
+                resultado.add(sindrome);
             } while (c.moveToNext());
         }
         c.close();
 
-        return null;
-    }
-
-    @Override
-    protected void onProgressUpdate(Sindrome... values) {
-        adaptador.add(values[0]);
+        return resultado;
     }
 }
