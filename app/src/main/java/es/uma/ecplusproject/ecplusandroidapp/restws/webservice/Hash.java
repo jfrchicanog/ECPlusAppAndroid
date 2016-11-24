@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package es.uma.ecplusproject.ecplusandroidapp.modelo.webservice;
+package es.uma.ecplusproject.ecplusandroidapp.restws.webservice;
 
 
 /**

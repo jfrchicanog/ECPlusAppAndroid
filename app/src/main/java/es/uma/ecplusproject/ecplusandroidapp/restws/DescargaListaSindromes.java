@@ -8,11 +8,9 @@ import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.Charset;
 
-import es.uma.ecplusproject.ecplusandroidapp.modelo.Palabra;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.Sindrome;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.Video;
-import es.uma.ecplusproject.ecplusandroidapp.modelo.webservice.PalabraRes;
-import es.uma.ecplusproject.ecplusandroidapp.modelo.webservice.SindromeClass;
+import es.uma.ecplusproject.ecplusandroidapp.restws.webservice.SindromeClass;
 
 /**
  * Created by francis on 24/5/16.
