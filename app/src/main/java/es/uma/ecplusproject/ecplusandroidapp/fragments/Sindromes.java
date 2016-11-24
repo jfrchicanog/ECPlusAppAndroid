@@ -55,12 +55,8 @@ public class Sindromes extends Panel {
         SharedPreferences preferences = getActivity().getSharedPreferences(Splash.ECPLUS_MAIN_PREFS, Context.MODE_PRIVATE);
         preferredLanguage = preferences.getString(MainActivity.PREFERRED_LANGUAGE, "cat");
 
-        // Arrancar servicio de actualización
-        UpdateService.startUpdateSyndromes(getContext(), preferredLanguage);
 
-
-        populateAdaptorDBComplete();
-        //populateAdaptorREST();
+        reloadSyndromes();
 
         listaSindromes.setAdapter(adaptador);
         listaSindromes.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -100,9 +96,14 @@ public class Sindromes extends Panel {
 
             @Override
             protected void onPostExecute(List<Sindrome> sindromes) {
+                adaptador.clear();
                 adaptador.addAll(sindromes);
             }
         }.execute();
+    }
+
+    public void reloadSyndromes() {
+        populateAdaptorDBComplete();
     }
 
     @Override

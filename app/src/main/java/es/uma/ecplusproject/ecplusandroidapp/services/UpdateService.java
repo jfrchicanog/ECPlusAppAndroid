@@ -3,11 +3,14 @@ package es.uma.ecplusproject.ecplusandroidapp.services;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
+import android.os.Binder;
+import android.os.IBinder;
 import android.support.annotation.Nullable;
 
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -64,14 +67,25 @@ public class UpdateService extends IntentService {
         }
     };
 
+    public class UpdateServiceBinder extends Binder {
+        public UpdateService getService() {
+            return UpdateService.this;
+        }
+    }
+
     private SindromesDAO daoSindromes;
     private PalabrasDAO daoPalabras;
 
     private SindromesWS wsSindromes;
     private PalabrasWS wsPalabras;
 
+    private UpdateServiceBinder binder = new UpdateServiceBinder();
+    private boolean updating;
+    private List<UpdateListener> listeners;
+
     public UpdateService() {
         super("UpdateService");
+        listeners = new ArrayList<>();
     }
 
     public static void startUpdateWords(Context context, String language, String resolution) {
@@ -93,6 +107,7 @@ public class UpdateService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
+            updating=true;
             final String action = intent.getAction();
             if (UPDATE_WORDS.equals(action)) {
                 final String language = intent.getStringExtra(EXTRA_LANGUAGE);
@@ -102,10 +117,12 @@ public class UpdateService extends IntentService {
                 final String language = intent.getStringExtra(EXTRA_LANGUAGE);
                 handleUpdateSyndromes(language);
             }
+            updating=false;
         }
     }
 
     private void handleUpdateWords(String language, String resolution) {
+        fireEvent(UpdateListenerEvent.startUpdateWordsEvent());
         String url = PROTOCOL + HOST + CONTEXT_PATH + REST_API_BASE + WORDS_RESOURCE + "/" + language;
 
         RestTemplate restTemplate = new RestTemplate();
@@ -118,6 +135,9 @@ public class UpdateService extends IntentService {
         for (PalabraRes palabra: palabras) {
             // TODO
         }
+
+        fireEvent(UpdateListenerEvent.stopUpdateWordsDatabaseEvent(false));
+        fireEvent(UpdateListenerEvent.stopUpdateWordsFilesEvent(false));
     }
 
     /**
@@ -125,18 +145,23 @@ public class UpdateService extends IntentService {
      * parameters.
      */
     private void handleUpdateSyndromes(String language) {
+        fireEvent(UpdateListenerEvent.startUpdateSyndromesEvent());
+
         String localHash = getDAOSindromes().getHashForListOfSyndromes(language);
         String remoteHash = getWSSindromes().getHashForListOfSindromes(language);
 
+        boolean databaseChanged=false;
         if (remoteHash==null) {
             getDAOSindromes().removeSyndromeList(language);
-
+            databaseChanged=true;
         } else if (localHash == null || !localHash.equals(remoteHash)) {
             if (localHash == null) {
                 getDAOSindromes().createListOfSyndromes(language);
             }
             updateLocalSyndromeList(language, remoteHash);
+            databaseChanged=true;
         }
+        fireEvent(UpdateListenerEvent.stopUpdateSyndromesEvent(databaseChanged));
     }
 
     private void updateLocalSyndromeList(String language, String remoteHash) {
@@ -200,6 +225,31 @@ public class UpdateService extends IntentService {
         return wsSindromes;
     }
 
+    public boolean isUpdating() {
+        return updating;
+    }
 
+    public void addUpdateListener(UpdateListener listener) {
+        if (listener != null) {
+            listeners.add(listener);
+        }
+    }
 
+    public void removeUpdateListener(UpdateListener listener) {
+        if (listener != null) {
+            listeners.remove(listener);
+        }
+    }
+
+    private void fireEvent(UpdateListenerEvent event) {
+        for (UpdateListener listener: listeners) {
+            listener.onUpdateEvent(event);
+        }
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return binder;
+    }
 }

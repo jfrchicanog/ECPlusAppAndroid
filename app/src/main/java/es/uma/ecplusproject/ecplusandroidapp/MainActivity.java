@@ -1,10 +1,14 @@
 package es.uma.ecplusproject.ecplusandroidapp;
 
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Environment;
+import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -13,9 +17,11 @@ import android.support.v7.widget.Toolbar;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -31,24 +37,58 @@ import es.uma.ecplusproject.ecplusandroidapp.fragments.Panel;
 import es.uma.ecplusproject.ecplusandroidapp.fragments.Sindromes;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.CargarListaPalabras;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.DAO;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Resolucion;
+import es.uma.ecplusproject.ecplusandroidapp.services.UpdateListener;
+import es.uma.ecplusproject.ecplusandroidapp.services.UpdateListenerEvent;
+import es.uma.ecplusproject.ecplusandroidapp.services.UpdateService;
 
 public class MainActivity extends AppCompatActivity {
 
     public static final String PREFERRED_LANGUAGE = "preferred language";
-    /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
-     */
-    private SectionsPagerAdapter mSectionsPagerAdapter;
+    private static final String TAG="EC+ MainActivity";
 
-    /**
-     * The {@link ViewPager} that will host the section contents.
-     */
+    private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
+
+    private UpdateService service;
+    private ServiceConnection connection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder binder) {
+            service = ((UpdateService.UpdateServiceBinder)binder).getService();
+            service.addUpdateListener(updateListener);
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            service.removeUpdateListener(updateListener);
+            service=null;
+        }
+    };
+
+    private UpdateListener updateListener = new UpdateListener() {
+        @Override
+        public void onUpdateEvent(UpdateListenerEvent event) {
+            reportUpdateEvent(event);
+
+            if (UpdateListenerEvent.Element.SYNDROMES.equals(event.getElement()) &&
+                    event.isSomethingChanged()) {
+                getPanelSindromes().reloadSyndromes();
+            }
+
+        }
+    };
+
+
+    private Sindromes panelSindromes;
+    private Palabras panelPalabras;
+
+    private void reportUpdateEvent(UpdateListenerEvent event) {
+        String cadena = event.getAction()+" "
+                + event.getElement()+" "
+                +event.isSomethingChanged();
+
+        Log.d(TAG, cadena);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,21 +116,50 @@ public class MainActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
+        updateDatabase();
 
+    }
+
+    private void updateDatabase() {
+        SharedPreferences preferences = getSharedPreferences(Splash.ECPLUS_MAIN_PREFS, Context.MODE_PRIVATE);
+        String preferredLanguage = preferences.getString(MainActivity.PREFERRED_LANGUAGE, "cat");
+
+        UpdateService.startUpdateSyndromes(this, preferredLanguage);
+        UpdateService.startUpdateWords(this, preferredLanguage, Resolucion.BAJA.toString());
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        Intent intent = new Intent(MainActivity.this, UpdateService.class);
+        bindService(intent, connection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (service!=null) {
+            service.removeUpdateListener(updateListener);
+            unbindService(connection);
+        }
     }
 
     @NonNull
     private Palabras getPanelPalabras() {
-        Palabras palabras = new Palabras();
-        palabras.setContext(this);
-        return palabras;
+        if (panelPalabras == null) {
+            panelPalabras = new Palabras();
+            panelPalabras.setContext(this);
+        }
+        return panelPalabras;
     }
 
     @NonNull
     private Sindromes getPanelSindromes() {
-        Sindromes sindromes = new Sindromes();
-        sindromes.setContext(this);
-        return sindromes;
+        if (panelSindromes == null) {
+            panelSindromes = new Sindromes();
+            panelSindromes.setContext(this);
+        }
+        return panelSindromes;
     }
 
     @Override
