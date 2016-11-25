@@ -63,7 +63,7 @@ public class CargarListaPalabras extends AsyncTask<String, Palabra, Void> {
                     palabra.setId(idPalabra);
                 }
                 RecursoAV rav = createRecursoAV(c.getString(c.getColumnIndex(DTYPE)));
-                rav.setHash(c.getString(c.getColumnIndex(HASH)));
+                rav.getFicheros().put(Resolucion.BAJA, c.getString(c.getColumnIndex(HASH)));
                 palabra.addRecurso(rav);
             } while (c.moveToNext());
         }

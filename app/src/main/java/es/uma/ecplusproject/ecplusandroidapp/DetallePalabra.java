@@ -19,7 +19,9 @@ import java.io.OutputStream;
 
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Palabra;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.RecursoAV;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Resolucion;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Video;
+import es.uma.ecplusproject.ecplusandroidapp.services.ResourcesStore;
 
 /**
  * Created by francis on 20/4/16.
@@ -33,12 +35,16 @@ public class DetallePalabra extends AppCompatActivity {
     private AdaptadorImagenes adaptador;
     private File hashesDir;
     private TextView nombre;
+    private Resolucion resolution = Resolucion.BAJA;
+    private ResourcesStore resourcesStore;
 
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detallepalabra);
+
+        resourcesStore = new ResourcesStore(this);
 
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setLogo(R.mipmap.logo);
@@ -52,7 +58,6 @@ public class DetallePalabra extends AppCompatActivity {
                 MediaController mediaController = new MediaController(DetallePalabra.this);
                 mediaController.setAnchorView(video);
                 video.setMediaController(mediaController);
-                video.start();
             }
         });
 
@@ -62,8 +67,6 @@ public class DetallePalabra extends AppCompatActivity {
         adaptador = new AdaptadorImagenes(this);
         gridView.setAdapter(adaptador);
 
-        hashesDir = new File(getFilesDir(), HASHES);
-
         Palabra palabra = (Palabra) getIntent().getSerializableExtra(PALABRA);
         nombre = (TextView) findViewById(R.id.nombre);
         nombre.setText(palabra.getNombre());
@@ -71,56 +74,12 @@ public class DetallePalabra extends AppCompatActivity {
 
         for (RecursoAV rav: palabra.getRecursos()) {
             if (rav instanceof  Video) {
-                File file = decompressFileIfNotReady(rav.getHash());
+                File file = resourcesStore.getFileResource(rav.getFicheros().get(resolution));
                 video.setVideoPath(file.getPath());
-
-                //video.setVideoURI(Uri.parse("android.resource://"+getPackageName()+"/"+R.raw.video));
-
-                //video.start();
-
             } else {
                 adaptador.add(rav);
             }
         }
-
-        //adaptador.add(new Pictograma(getResources().getDrawable(R.drawable.manzana)));
-        //adaptador.add(new Fotografia(getResources().getDrawable(R.drawable.manzanafoto)));
-
     }
 
-    private File decompressFileIfNotReady(String hash) {
-        try {
-            createHashesDirIfNecessary();
-            File file = new File(hashesDir, hash.toLowerCase());
-            if (!file.exists()) {
-                InputStream is = obtainResourceFromOBB(hash);
-                OutputStream os = new FileOutputStream(file);
-                byte [] buffer = new byte [1024];
-                int leidos;
-
-                while ((leidos=is.read(buffer))>0) {
-                    os.write(buffer, 0, leidos);
-                }
-
-                is.close();
-                os.close();
-
-            }
-            return file;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private InputStream obtainResourceFromOBB(String hash) throws IOException {
-        return APKExpansionSupport.getAPKExpansionZipFile(this, Splash.MAIN_VERSION, 0).getInputStream(hash.toLowerCase());
-    }
-
-    private void createHashesDirIfNecessary() {
-        if (!hashesDir.exists()) {
-            if (!hashesDir.mkdir()) {
-                throw new RuntimeException("I was not able to create the directory "+hashesDir.getAbsolutePath());
-            }
-        }
-    }
 }

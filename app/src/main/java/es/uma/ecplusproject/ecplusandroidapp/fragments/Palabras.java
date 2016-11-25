@@ -52,7 +52,8 @@ public class Palabras extends Panel {
 
         //poulateAdaptor();
         //populateAdaptorDB();
-        poulateAdaptorREST();
+        //poulateAdaptorREST();
+        populateAdaptorDBComplete();
 
         listaPalabras.setAdapter(adaptador);
         listaPalabras.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -88,16 +89,20 @@ public class Palabras extends Panel {
         new AsyncTask<Void, Void, List<Palabra>>(){
             @Override
             protected List<Palabra> doInBackground(Void... params) {
-                return daoPalabras.getPalabras(preferredLanguage, Resolucion.BAJA);
+                return daoPalabras.getWords(preferredLanguage, Resolucion.BAJA);
             }
 
             @Override
             protected void onPostExecute(List<Palabra> palabras) {
+                adaptador.clear();
                 adaptador.addAll(palabras);
             }
         }.execute();
     }
 
+    public void reloadWords() {
+        populateAdaptorDBComplete();
+    }
 
 
     @Override

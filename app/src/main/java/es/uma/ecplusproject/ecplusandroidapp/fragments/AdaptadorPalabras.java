@@ -1,6 +1,7 @@
 package es.uma.ecplusproject.ecplusandroidapp.fragments;
 
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +13,7 @@ import com.caverock.androidsvg.SVG;
 import com.caverock.androidsvg.SVGImageView;
 import com.caverock.androidsvg.SVGParseException;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -20,16 +22,23 @@ import es.uma.ecplusproject.ecplusandroidapp.Splash;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Palabra;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Pictograma;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.RecursoAV;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Resolucion;
+import es.uma.ecplusproject.ecplusandroidapp.services.ResourcesStore;
 
 /**
  * Created by francis on 20/4/16.
  */
 public class AdaptadorPalabras extends ArrayAdapter<Palabra> {
     private Context contexto;
+    private Resolucion resolucion;
+    private ResourcesStore resourceStore;
 
     public AdaptadorPalabras(Context contexto) {
         super(contexto, 0);
         this.contexto=contexto;
+        resourceStore = new ResourcesStore(contexto);
+        // TODO: change this when resolution modification is added to the App
+        resolucion = Resolucion.BAJA;
     }
 
     @Override
@@ -51,8 +60,8 @@ public class AdaptadorPalabras extends ArrayAdapter<Palabra> {
         for (RecursoAV recurso: palabra.getRecursos()) {
             if (recurso instanceof Pictograma) {
                 try {
-                    String hash = recurso.getHash();
-                    InputStream is = APKExpansionSupport.getAPKExpansionZipFile(contexto, Splash.MAIN_VERSION, 0).getInputStream(hash.toLowerCase());
+                    String hash = recurso.getFicheros().get(resolucion);
+                    InputStream is = new FileInputStream(resourceStore.getFileResource(hash));
                     SVG svg = SVG.getFromInputStream(is);
 
                     svg.renderToPicture();

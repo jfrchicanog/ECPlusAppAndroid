@@ -1,6 +1,8 @@
 package es.uma.ecplusproject.ecplusandroidapp.modelo;
 
 
+import android.print.PrintAttributes;
+
 import java.util.List;
 
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Palabra;
@@ -11,5 +13,12 @@ import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Resolucion;
  */
 
 public interface PalabrasDAO {
-    List<Palabra> getPalabras(String language, Resolucion resolution);
+    String getHashForListOfWords(String language, Resolucion resolucion);
+    void removeAllResourcesForWordsList(String language, Resolucion resolution);
+    void createListOfWords(String language);
+    List<Palabra> getWords(String language, Resolucion resolution);
+    void addWord(Palabra word, String language, Resolucion reoslution);
+    void updateWord(Palabra remote);
+    void setHashForListOfWords(String language, Resolucion resolution, String hash);
+    void removeWord(Palabra word);
 }

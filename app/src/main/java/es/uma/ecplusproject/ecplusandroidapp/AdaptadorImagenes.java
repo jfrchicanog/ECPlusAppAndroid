@@ -1,6 +1,7 @@
 package es.uma.ecplusproject.ecplusandroidapp;
 
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Picture;
@@ -16,6 +17,7 @@ import com.caverock.androidsvg.SVG;
 import com.caverock.androidsvg.SVGImageView;
 import com.caverock.androidsvg.SVGParseException;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
@@ -23,16 +25,21 @@ import java.lang.reflect.Field;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Fotografia;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Pictograma;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.RecursoAV;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Resolucion;
+import es.uma.ecplusproject.ecplusandroidapp.services.ResourcesStore;
 
 /**
  * Created by francis on 13/5/16.
  */
 public class AdaptadorImagenes extends ArrayAdapter<RecursoAV> {
     private Context ctx;
+    private ResourcesStore resourcesStore;
+    private Resolucion resolucion = Resolucion.BAJA;
 
     public AdaptadorImagenes(Context ctx) {
         super(ctx,0);
         this.ctx = ctx;
+        resourcesStore = new ResourcesStore(ctx);
     }
 
     @Override
@@ -49,8 +56,8 @@ public class AdaptadorImagenes extends ArrayAdapter<RecursoAV> {
 
         if (recurso instanceof Fotografia) {
             try {
-                String hash = recurso.getHash();
-                InputStream is = APKExpansionSupport.getAPKExpansionZipFile(ctx, Splash.MAIN_VERSION, 0).getInputStream(hash.toLowerCase());
+                String hash = recurso.getFicheros().get(resolucion);
+                InputStream is = new FileInputStream(resourcesStore.getFileResource(hash));
                 Bitmap bm = BitmapFactory.decodeStream(is);
                 is.close();
                 imagen.setImageBitmap(bm);
@@ -60,8 +67,8 @@ public class AdaptadorImagenes extends ArrayAdapter<RecursoAV> {
             }
         } else if (recurso instanceof Pictograma) {
             try {
-                String hash = recurso.getHash();
-                InputStream is = APKExpansionSupport.getAPKExpansionZipFile(ctx, Splash.MAIN_VERSION, 0).getInputStream(hash.toLowerCase());
+                String hash = recurso.getFicheros().get(resolucion);
+                InputStream is = new FileInputStream(resourcesStore.getFileResource(hash));
                 SVG svg = SVG.getFromInputStream(is);
 
                 SVG.Box box = svg.getDocumentBoundingBox();

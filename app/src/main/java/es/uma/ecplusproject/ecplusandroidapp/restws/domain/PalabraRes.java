@@ -23,8 +23,8 @@ public class PalabraRes implements Serializable {
     private String nombre;
     private Boolean iconoReemplazable;
     private String hash;
-    private Set<String> audiovisuales;
-    private String icono;
+    private Set<RecursoAudioVisualREST> audiovisuales;
+    private Long icono;
     private String iconoReemplazado;
 
     public String getNombre() {
@@ -51,19 +51,19 @@ public class PalabraRes implements Serializable {
         this.hash = hash;
     }
 
-    public Set<String> getAudiovisuales() {
+    public Set<RecursoAudioVisualREST> getAudiovisuales() {
         return audiovisuales;
     }
 
-    public void setAudiovisuales(Set<String> audiovisuales) {
+    public void setAudiovisuales(Set<RecursoAudioVisualREST> audiovisuales) {
         this.audiovisuales = audiovisuales;
     }
 
-    public String getIcono() {
+    public Long getIcono() {
         return icono;
     }
 
-    public void setIcono(String icono) {
+    public void setIcono(Long icono) {
         this.icono = icono;
     }
 

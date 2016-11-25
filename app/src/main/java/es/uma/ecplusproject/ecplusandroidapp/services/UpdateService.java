@@ -7,11 +7,11 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.web.client.RestTemplate;
-
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -21,11 +21,14 @@ import es.uma.ecplusproject.ecplusandroidapp.modelo.PalabrasDAO;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.PalabrasDAOImpl;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.SindromesDAO;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.SindromesDAOImpl;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Palabra;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.RecursoAV;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Resolucion;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Sindrome;
 import es.uma.ecplusproject.ecplusandroidapp.restws.PalabrasWS;
+import es.uma.ecplusproject.ecplusandroidapp.restws.PalabrasWSImpl;
 import es.uma.ecplusproject.ecplusandroidapp.restws.SindromesWS;
 import es.uma.ecplusproject.ecplusandroidapp.restws.SindromesWSImpl;
-import es.uma.ecplusproject.ecplusandroidapp.restws.domain.PalabraRes;
 
 
 public class UpdateService extends IntentService {
@@ -35,15 +38,9 @@ public class UpdateService extends IntentService {
     private static final String EXTRA_LANGUAGE = "es.uma.ecplusproject.ecplusandroidapp.services.extra.language";
     private static final String EXTRA_RESOLUTION = "es.uma.ecplusproject.ecplusandroidapp.services.extra.resolution";
 
-    //private static final String HOST = "192.168.57.1:8080";
-    public static final String HOST = "ecplusproject.uma.es";
-    private static final String PROTOCOL = "https://";
-    private static final String CONTEXT_PATH = "/academicPortal";
-    private static final String REST_API_BASE = "/ecplus/api/v1";
-    private static final String WORDS_RESOURCE = "/words";
-    private static final Comparator<PalabraRes> PALABRA_COMPARATOR = new Comparator<PalabraRes>() {
+    private static final Comparator<Palabra> PALABRA_COMPARATOR = new Comparator<Palabra>() {
         @Override
-        public int compare(PalabraRes lhs, PalabraRes rhs) {
+        public int compare(Palabra lhs, Palabra rhs) {
             if (lhs.getId() < rhs.getId()) {
                 return -1;
             } else if (lhs.getId() > rhs.getId()) {
@@ -79,6 +76,8 @@ public class UpdateService extends IntentService {
     private SindromesWS wsSindromes;
     private PalabrasWS wsPalabras;
 
+    private ResourcesStore resourcesStore;
+
     private UpdateServiceBinder binder = new UpdateServiceBinder();
     private boolean updating;
     private List<UpdateListener> listeners;
@@ -86,6 +85,13 @@ public class UpdateService extends IntentService {
     public UpdateService() {
         super("UpdateService");
         listeners = new ArrayList<>();
+    }
+
+    private ResourcesStore getResourcesStore() {
+        if (resourcesStore ==null) {
+            resourcesStore = new ResourcesStore(this);
+        }
+        return resourcesStore;
     }
 
     public static void startUpdateWords(Context context, String language, String resolution) {
@@ -107,44 +113,89 @@ public class UpdateService extends IntentService {
     @Override
     protected void onHandleIntent(Intent intent) {
         if (intent != null) {
-            updating=true;
+
             final String action = intent.getAction();
             if (UPDATE_WORDS.equals(action)) {
                 final String language = intent.getStringExtra(EXTRA_LANGUAGE);
                 final String resolution = intent.getStringExtra(EXTRA_RESOLUTION);
-                handleUpdateWords(language, resolution);
+                handleUpdateWords(language, Resolucion.valueOf(resolution));
             } else if (UPDATE_SYNDROMES.equals(action)) {
                 final String language = intent.getStringExtra(EXTRA_LANGUAGE);
                 handleUpdateSyndromes(language);
             }
-            updating=false;
+
         }
     }
 
-    private void handleUpdateWords(String language, String resolution) {
+    private void handleUpdateWords(String language, Resolucion resolution) {
+        updating=true;
         fireEvent(UpdateListenerEvent.startUpdateWordsEvent());
-        String url = PROTOCOL + HOST + CONTEXT_PATH + REST_API_BASE + WORDS_RESOURCE + "/" + language;
 
-        RestTemplate restTemplate = new RestTemplate();
-        restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+        String localHash = getDAOPalabras().getHashForListOfWords(language, resolution);
+        String remoteHash = getWSPalabras().getHashForListOfWords(language, resolution);
 
-        PalabraRes[] palabras = restTemplate.getForObject(url, PalabraRes [].class);
-        Arrays.sort(palabras, PALABRA_COMPARATOR);
-
-
-        for (PalabraRes palabra: palabras) {
-            // TODO
+        boolean databaseChanged=false;
+        if (remoteHash==null) {
+            getDAOPalabras().removeAllResourcesForWordsList(language, resolution);
+            databaseChanged=true;
+        } else if (localHash == null || !localHash.equals(remoteHash)) {
+            if (localHash == null) {
+                getDAOPalabras().createListOfWords(language);
+            }
+            updateLocalWordList(language, resolution, remoteHash);
+            databaseChanged=true;
         }
 
-        fireEvent(UpdateListenerEvent.stopUpdateWordsDatabaseEvent(false));
+        fireEvent(UpdateListenerEvent.stopUpdateWordsDatabaseEvent(databaseChanged));
+
+        updateFiles(language, resolution);
+        updating=false;
         fireEvent(UpdateListenerEvent.stopUpdateWordsFilesEvent(false));
     }
 
-    /**
-     * Handle action Baz in the provided background thread with the provided
-     * parameters.
-     */
+    private void updateFiles(String language, Resolucion resolution) {
+        for (Palabra palabra: getDAOPalabras().getWords(language, resolution)) {
+            for (RecursoAV recurso: palabra.getRecursos()) {
+                String hash = recurso.getFicheros().get(resolution);
+                if (!existsResource(hash)) {
+                    downloadResource(hash);
+                }
+            }
+        }
+    }
+
+    private boolean existsResource(String file) {
+        return getResourcesStore().getFileResource(file).exists();
+    }
+
+    private void downloadResource(String hash) {
+        try {
+            InputStream is = getWSPalabras().getResource(hash);
+            OutputStream os = new FileOutputStream(getResourcesStore().getFileResource(hash));
+
+            copyStream(is, os);
+
+            is.close();
+            os.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static void copyStream(InputStream is, OutputStream os) throws IOException {
+        final int buffer_size = 1024;
+
+        byte[] bytes = new byte[buffer_size];
+        for (; ; ) {
+            int count = is.read(bytes, 0, buffer_size);
+            if (count == -1)
+                break;
+            os.write(bytes, 0, count);
+        }
+    }
+
     private void handleUpdateSyndromes(String language) {
+        updating=true;
         fireEvent(UpdateListenerEvent.startUpdateSyndromesEvent());
 
         String localHash = getDAOSindromes().getHashForListOfSyndromes(language);
@@ -154,14 +205,35 @@ public class UpdateService extends IntentService {
         if (remoteHash==null) {
             getDAOSindromes().removeSyndromeList(language);
             databaseChanged=true;
-        } else if (localHash == null || !localHash.equals(remoteHash)) {
+        } else if (localHash == null || !localHash.equalsIgnoreCase(remoteHash)) {
             if (localHash == null) {
                 getDAOSindromes().createListOfSyndromes(language);
             }
             updateLocalSyndromeList(language, remoteHash);
             databaseChanged=true;
         }
+        updating=false;
         fireEvent(UpdateListenerEvent.stopUpdateSyndromesEvent(databaseChanged));
+    }
+
+    private void updateLocalWordList(String language, Resolucion resolution, String remoteHash) {
+        List<Palabra> remoteWords = getWSPalabras().getWords(language, resolution);
+        List<Palabra> localWords = getDAOPalabras().getWords(language, resolution);
+        Collections.sort(remoteWords, PALABRA_COMPARATOR);
+        Collections.sort(localWords, PALABRA_COMPARATOR);
+
+        Iterator<Palabra> iterator = localWords.iterator();
+        for (Palabra remote: remoteWords) {
+            Palabra local = removeLocalWordUpToNextRemoteWord(iterator, remote);
+            if (local == null || local.getId() > remote.getId()) {
+                getDAOPalabras().addWord(remote, language, resolution);
+            } else if (local.getId() == remote.getId()) {
+                if (!local.getHash(resolution).equalsIgnoreCase(remote.getHash(resolution))) {
+                    getDAOPalabras().updateWord(remote);
+                }
+            }
+        }
+        getDAOPalabras().setHashForListOfWords(language, resolution, remoteHash);
     }
 
     private void updateLocalSyndromeList(String language, String remoteHash) {
@@ -178,14 +250,28 @@ public class UpdateService extends IntentService {
             if (local == null || local.getId() > remote.getId()) {
                 getDAOSindromes().addSyndrome(remote, language);
             } else if (local.getId() == remote.getId()) {
-                if (local.getHash() != remote.getHash()) {
+                if (!local.getHash().equalsIgnoreCase(remote.getHash())) {
                     getDAOSindromes().updateSyndrome(remote);
                 }
             }
         }
 
         getDAOSindromes().setHashForListOfSyndromes(language, remoteHash);
+    }
 
+    private Palabra removeLocalWordUpToNextRemoteWord(Iterator<Palabra> iterator, Palabra remote) {
+        Palabra local;
+        do {
+            if (iterator.hasNext()) {
+                local = iterator.next();
+                if (local.getId() < remote.getId()) {
+                    getDAOPalabras().removeWord(local);
+                }
+            } else {
+                local = null;
+            }
+        } while ((local!=null) && local.getId() < remote.getId());
+        return local;
     }
 
     @Nullable
@@ -223,6 +309,13 @@ public class UpdateService extends IntentService {
             wsSindromes = new SindromesWSImpl();
         }
         return wsSindromes;
+    }
+
+    private PalabrasWS getWSPalabras() {
+        if (wsPalabras == null) {
+            wsPalabras = new PalabrasWSImpl();
+        }
+        return wsPalabras;
     }
 
     public boolean isUpdating() {
