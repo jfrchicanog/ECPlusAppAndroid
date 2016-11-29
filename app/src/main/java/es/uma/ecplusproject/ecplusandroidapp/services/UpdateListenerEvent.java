@@ -4,7 +4,7 @@ package es.uma.ecplusproject.ecplusandroidapp.services;
  * Created by francis on 24/11/16.
  */
 public class UpdateListenerEvent {
-    public enum Action {START, STOP_DATABASE, STOP_FILE};
+    public enum Action {START, STOP_DATABASE, STOP_FILE, STOP_ERROR};
     public enum Element {SYNDROMES, WORDS};
 
     private Action action;
@@ -41,6 +41,10 @@ public class UpdateListenerEvent {
         return new UpdateListenerEvent(Action.STOP_FILE, Element.WORDS, filesChanged);
     }
 
+    protected static UpdateListenerEvent stopUpdateWordsError() {
+        return new UpdateListenerEvent(Action.STOP_ERROR, Element.WORDS, false);
+    }
+
     protected static UpdateListenerEvent startUpdateSyndromesEvent() {
         return new UpdateListenerEvent(Action.START, Element.SYNDROMES, false);
     }
@@ -48,5 +52,10 @@ public class UpdateListenerEvent {
     protected static UpdateListenerEvent stopUpdateSyndromesEvent(boolean databaseChanged) {
         return new UpdateListenerEvent(Action.STOP_DATABASE, Element.SYNDROMES, databaseChanged);
     }
+
+    protected static UpdateListenerEvent stopUpdateSyndromesError() {
+        return new UpdateListenerEvent(Action.STOP_ERROR, Element.SYNDROMES, false);
+    }
+
 
 }

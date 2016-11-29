@@ -75,7 +75,9 @@ public class DetallePalabra extends AppCompatActivity {
         for (RecursoAV rav: palabra.getRecursos()) {
             if (rav instanceof  Video) {
                 File file = resourcesStore.getFileResource(rav.getFicheros().get(resolution));
-                video.setVideoPath(file.getPath());
+                if (file.exists()) {
+                    video.setVideoPath(file.getPath());
+                }
             } else {
                 adaptador.add(rav);
             }

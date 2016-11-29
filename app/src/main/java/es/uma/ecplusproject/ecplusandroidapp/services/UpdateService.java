@@ -130,29 +130,35 @@ public class UpdateService extends IntentService {
     }
 
     private void handleUpdateWords(String language, Resolucion resolution) {
-        updating=true;
-        fireEvent(UpdateListenerEvent.startUpdateWordsEvent());
+        try {
+            updating = true;
+            fireEvent(UpdateListenerEvent.startUpdateWordsEvent());
 
-        String localHash = getDAOPalabras().getHashForListOfWords(language, resolution);
-        String remoteHash = getWSPalabras().getHashForListOfWords(language, resolution);
+            String localHash = getDAOPalabras().getHashForListOfWords(language, resolution);
+            String remoteHash = getWSPalabras().getHashForListOfWords(language, resolution);
 
-        boolean databaseChanged=false;
-        if (remoteHash==null) {
-            getDAOPalabras().removeAllResourcesForWordsList(language, resolution);
-            databaseChanged=true;
-        } else /*if (localHash == null || !localHash.equals(remoteHash))*/ {
-            if (localHash == null) {
-                getDAOPalabras().createListOfWords(language);
+            boolean databaseChanged = false;
+            if (remoteHash == null) {
+                getDAOPalabras().removeAllResourcesForWordsList(language, resolution);
+                databaseChanged = true;
+            } else if (localHash == null || !localHash.equals(remoteHash)) {
+                if (localHash == null) {
+                    getDAOPalabras().createListOfWords(language);
+                }
+                updateLocalWordList(language, resolution, remoteHash);
+                databaseChanged = true;
             }
-            updateLocalWordList(language, resolution, remoteHash);
-            databaseChanged=true;
+
+            fireEvent(UpdateListenerEvent.stopUpdateWordsDatabaseEvent(databaseChanged));
+
+            updateFiles(language, resolution);
+            updating = false;
+            fireEvent(UpdateListenerEvent.stopUpdateWordsFilesEvent(false));
+        } catch (RuntimeException e) {
+            Log.d(TAG, e.getMessage());
+            updating=false;
+            fireEvent(UpdateListenerEvent.stopUpdateWordsError());
         }
-
-        fireEvent(UpdateListenerEvent.stopUpdateWordsDatabaseEvent(databaseChanged));
-
-        updateFiles(language, resolution);
-        updating=false;
-        fireEvent(UpdateListenerEvent.stopUpdateWordsFilesEvent(false));
     }
 
     private void updateFiles(String language, Resolucion resolution) {
@@ -198,25 +204,30 @@ public class UpdateService extends IntentService {
     }
 
     private void handleUpdateSyndromes(String language) {
-        updating=true;
-        fireEvent(UpdateListenerEvent.startUpdateSyndromesEvent());
+        try {
+            updating = true;
+            fireEvent(UpdateListenerEvent.startUpdateSyndromesEvent());
 
-        String localHash = getDAOSindromes().getHashForListOfSyndromes(language);
-        String remoteHash = getWSSindromes().getHashForListOfSindromes(language);
+            String localHash = getDAOSindromes().getHashForListOfSyndromes(language);
+            String remoteHash = getWSSindromes().getHashForListOfSindromes(language);
 
-        boolean databaseChanged=false;
-        if (remoteHash==null) {
-            getDAOSindromes().removeSyndromeList(language);
-            databaseChanged=true;
-        } else if (localHash == null || !localHash.equalsIgnoreCase(remoteHash)) {
-            if (localHash == null) {
-                getDAOSindromes().createListOfSyndromes(language);
+            boolean databaseChanged = false;
+            if (remoteHash == null) {
+                getDAOSindromes().removeSyndromeList(language);
+                databaseChanged = true;
+            } else if (localHash == null || !localHash.equalsIgnoreCase(remoteHash)) {
+                if (localHash == null) {
+                    getDAOSindromes().createListOfSyndromes(language);
+                }
+                updateLocalSyndromeList(language, remoteHash);
+                databaseChanged = true;
             }
-            updateLocalSyndromeList(language, remoteHash);
-            databaseChanged=true;
+            updating = false;
+            fireEvent(UpdateListenerEvent.stopUpdateSyndromesEvent(databaseChanged));
+        } catch (RuntimeException e) {
+            Log.d(TAG, e.getMessage());
+            fireEvent(UpdateListenerEvent.stopUpdateSyndromesError());
         }
-        updating=false;
-        fireEvent(UpdateListenerEvent.stopUpdateSyndromesEvent(databaseChanged));
     }
 
     private void updateLocalWordList(String language, Resolucion resolution, String remoteHash) {

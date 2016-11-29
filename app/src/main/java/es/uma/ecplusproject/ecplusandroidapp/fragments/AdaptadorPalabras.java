@@ -1,24 +1,15 @@
 package es.uma.ecplusproject.ecplusandroidapp.fragments;
 
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.android.vending.expansion.zipfile.APKExpansionSupport;
-import com.caverock.androidsvg.SVG;
 import com.caverock.androidsvg.SVGImageView;
-import com.caverock.androidsvg.SVGParseException;
-
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 
 import es.uma.ecplusproject.ecplusandroidapp.R;
-import es.uma.ecplusproject.ecplusandroidapp.Splash;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Palabra;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Pictograma;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.RecursoAV;
@@ -29,6 +20,12 @@ import es.uma.ecplusproject.ecplusandroidapp.services.ResourcesStore;
  * Created by francis on 20/4/16.
  */
 public class AdaptadorPalabras extends ArrayAdapter<Palabra> {
+
+    private static class ViewHolder {
+        private TextView texto;
+        private SVGImageView icono;
+    }
+
     private Context contexto;
     private Resolucion resolucion;
     private ResourcesStore resourceStore;
@@ -47,36 +44,33 @@ public class AdaptadorPalabras extends ArrayAdapter<Palabra> {
         View view=null;
         if (convertView == null) {
             view = LayoutInflater.from(contexto).inflate(R.layout.entradapalabra, null);
+            ViewHolder viewHolder = new ViewHolder();
+            viewHolder.texto = (TextView)view.findViewById(R.id.textoPalabra);
+            viewHolder.icono = (SVGImageView)view.findViewById(R.id.imagenPalabra);
+            view.setTag(viewHolder);
+
         } else {
             view = convertView;
         }
-        TextView texto = (TextView)view.findViewById(R.id.textoPalabra);
-        SVGImageView imagen = (SVGImageView)view.findViewById(R.id.imagenPalabra);
 
-        texto.setText(palabra.toString());
+        ViewHolder viewHolder = (ViewHolder)view.getTag();
+
+        viewHolder.texto.setText(palabra.toString());
         //imagen.setImageDrawable(contexto.getResources().getDrawable(R.drawable.abrigo));
-        imagen.setImageDrawable(contexto.getResources().getDrawable(R.drawable.logo));
+        SVGImageView icono = viewHolder.icono;
 
-        for (RecursoAV recurso: palabra.getRecursos()) {
-            if (recurso instanceof Pictograma) {
-                try {
-                    String hash = recurso.getFicheros().get(resolucion);
-                    InputStream is = new FileInputStream(resourceStore.getFileResource(hash));
-                    SVG svg = SVG.getFromInputStream(is);
-
-                    svg.renderToPicture();
-                    SVG.Box box = svg.getDocumentBoundingBox();
-                    svg.setDocumentViewBox(box.minX, box.minY, box.width, box.height);
-                    imagen.setSVG(svg);
-                    is.close();
-                } catch (IOException e) {
-                    throw new RuntimeException (e);
-                } catch (SVGParseException e) {
-                    throw new RuntimeException (e);
+        if (palabra.getIcono()!= null && palabra.getIcono() instanceof Pictograma) {
+            resourceStore.tryToUseSVG(icono, palabra.getIcono().getFicheros().get(resolucion));
+        } else {
+            icono.setImageDrawable(contexto.getResources().getDrawable(R.drawable.logo));
+            for (RecursoAV recurso : palabra.getRecursos()) {
+                if (recurso instanceof Pictograma) {
+                    resourceStore.tryToUseSVG(icono, recurso.getFicheros().get(resolucion));
+                    break;
                 }
-                break;
             }
         }
         return view;
     }
+
 }
