@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,26 +28,31 @@ public class PalabrasDAOImpl implements PalabrasDAO {
     private static final String ICON = "icon";
     private static final String REPLACEABLE_ICON = "replaceableIcon";
     private static final String HASH = "hash";
+    private static final String HASH_PALABRA = "hashp";
 
     private static final String megaconsulta = "select " +
             "p."+ ECPlusDBContract.Palabra.NOMBRE+" as "+NOMBRE+", " +
             "p."+ECPlusDBContract.Palabra.ID+" as "+PID+", " +
             "p."+ECPlusDBContract.Palabra.ICONO_REEMPLAZABLE+" as "+REPLACEABLE_ICON+", "+
             "p."+ECPlusDBContract.Palabra.REF_ICONO+" as "+ICON+", "+
-            "p."+ECPlusDBContract.RecursoAudioVisual.ID+" as "+RID+", "+
+            "r."+ECPlusDBContract.RecursoAudioVisual.ID+" as "+RID+", "+
             "r."+ECPlusDBContract.RecursoAudioVisual.DTYPE+" as "+DTYPE+", " +
-            "f."+ECPlusDBContract.Ficheros.HASH+" as "+HASH+" " +
+            "f."+ECPlusDBContract.Ficheros.HASH+" as "+HASH+", " +
+            "hp."+ECPlusDBContract.HashesPalabra.HASH+" as "+HASH_PALABRA+" "+
             "from "+ECPlusDBContract.Palabra.TABLE_NAME+" p " +
-            "inner join "+ECPlusDBContract.PalabraRecursoAudioVisual.TABLE_NAME+" pr on p."
+            "inner join "+ECPlusDBContract.HashesPalabra.TABLE_NAME+" hp on p."+
+            ECPlusDBContract.Palabra.ID+" = hp."+ECPlusDBContract.HashesPalabra.REF_PALABRA+" "+
+            "left join "+ECPlusDBContract.PalabraRecursoAudioVisual.TABLE_NAME+" pr on p."
             +ECPlusDBContract.Palabra.ID+" = pr."+ECPlusDBContract.PalabraRecursoAudioVisual.REF_PALABRA+" " +
-            "inner join "+ECPlusDBContract.RecursoAudioVisual.TABLE_NAME+" r on pr."
+            "left join "+ECPlusDBContract.RecursoAudioVisual.TABLE_NAME+" r on pr."
             +ECPlusDBContract.PalabraRecursoAudioVisual.REF_RECURSO_AUDIOVISUAL+" = r."+ECPlusDBContract.RecursoAudioVisual.ID+" " +
-            "inner join "+ECPlusDBContract.Ficheros.TABLE_NAME+" f on f."
+            "left join "+ECPlusDBContract.Ficheros.TABLE_NAME+" f on f."
             +ECPlusDBContract.Ficheros.REF_RECURSO_AUDIOVISUAL+" = r."+ECPlusDBContract.RecursoAudioVisual.ID+" " +
+            "and f."+ECPlusDBContract.Ficheros.RESOLUCION+"= hp."+ECPlusDBContract.HashesPalabra.RESOLUCION+" "+
             "inner join "+ECPlusDBContract.ListaPalabras.TABLE_NAME+" lp on lp."
             +ECPlusDBContract.ListaPalabras.ID+" = p."+ECPlusDBContract.Palabra.REF_LISTA_PALABRAS+" " +
-            "where f."+ECPlusDBContract.Ficheros.RESOLUCION+" = ? and lp."+ECPlusDBContract.ListaPalabras.IDIOMA
-            +"=? order by p."+ECPlusDBContract.Palabra.NOMBRE+"," +
+            "where hp."+ECPlusDBContract.Ficheros.RESOLUCION+" = ? and lp."+ECPlusDBContract.ListaPalabras.IDIOMA+"=? " +
+            "order by p."+ECPlusDBContract.Palabra.NOMBRE+"," +
             "p."+ECPlusDBContract.Palabra.ID+" "+
             " ASC";
 
@@ -69,6 +75,8 @@ public class PalabrasDAOImpl implements PalabrasDAO {
             "where p."+ECPlusDBContract.Palabra.REF_LISTA_PALABRAS+"=? " +
             "order by pr."+ECPlusDBContract.PalabraRecursoAudioVisual.REF_PALABRA+" ASC";
 
+    private static final String TAG="PalabrasDAOImpl";
+
     private Context contexto;
     private SQLiteDatabase db;
 
@@ -79,6 +87,7 @@ public class PalabrasDAOImpl implements PalabrasDAO {
     public PalabrasDAOImpl(Context context) {
         this.contexto = contexto;
         db = ECPlusDB.getDatabase(contexto);
+        //Log.d(TAG, megaconsulta);
     }
 
     @Override
@@ -110,15 +119,17 @@ public class PalabrasDAOImpl implements PalabrasDAO {
                     }
                     palabra = new Palabra(c.getString(c.getColumnIndex(NOMBRE)));
                     palabra.setId(idPalabra);
-                    palabra.getHashes().put(resolution, c.getString(c.getColumnIndex(HASH)));
+                    palabra.getHashes().put(resolution, c.getString(c.getColumnIndex(HASH_PALABRA)));
                     palabra.setIconoReemplazable(c.getInt(c.getColumnIndex(REPLACEABLE_ICON))>0);
                 }
-                RecursoAV rav = RecursoAV.createRecursoAV(c.getString(c.getColumnIndex(DTYPE)));
-                rav.getFicheros().put(resolution, c.getString(c.getColumnIndex(HASH)));
-                rav.setId(c.getLong(c.getColumnIndex(RID)));
-                palabra.addRecurso(rav);
-                if (rav.getId() == c.getLong(c.getColumnIndex(ICON))) {
-                    palabra.setIcono(rav);
+                if (!c.isNull(c.getColumnIndex(DTYPE))) {
+                    RecursoAV rav = RecursoAV.createRecursoAV(c.getString(c.getColumnIndex(DTYPE)));
+                    rav.getFicheros().put(resolution, c.getString(c.getColumnIndex(HASH)));
+                    rav.setId(c.getLong(c.getColumnIndex(RID)));
+                    palabra.addRecurso(rav);
+                    if (rav.getId() == c.getLong(c.getColumnIndex(ICON))) {
+                        palabra.setIcono(rav);
+                    }
                 }
 
             } while (c.moveToNext());
@@ -230,40 +241,45 @@ public class PalabrasDAOImpl implements PalabrasDAO {
         values.put(ECPlusDBContract.Palabra.ID, word.getId());
         values.put(ECPlusDBContract.Palabra.ICONO_REEMPLAZABLE, word.getIconoReemplazable());
         values.put(ECPlusDBContract.Palabra.NOMBRE, word.getNombre());
+        if (word.getIcono()!=null) {
+            values.put(ECPlusDBContract.Palabra.REF_ICONO, word.getIcono().getId());
+        }
         values.put(ECPlusDBContract.Palabra.REF_LISTA_PALABRAS, idList);
-        db.insert(ECPlusDBContract.Palabra.TABLE_NAME,null, values);
+        long i = db.replace(ECPlusDBContract.Palabra.TABLE_NAME,null, values);
+        Log.d(getClass().getSimpleName(), ""+i);
 
         for (Map.Entry<Resolucion,String> entry: word.getHashes().entrySet()) {
             values = new ContentValues();
             values.put(ECPlusDBContract.HashesPalabra.REF_PALABRA, word.getId());
             values.put(ECPlusDBContract.HashesPalabra.RESOLUCION, entry.getKey().toString());
             values.put(ECPlusDBContract.HashesPalabra.HASH, entry.getValue());
-            db.insert(ECPlusDBContract.HashesPalabra.TABLE_NAME, null, values);
+            db.replace(ECPlusDBContract.HashesPalabra.TABLE_NAME, null, values);
         }
 
         for (RecursoAV rav: word.getRecursos()) {
             values = new ContentValues();
             values.put(ECPlusDBContract.RecursoAudioVisual.DTYPE,rav.getDType());
             values.put(ECPlusDBContract.RecursoAudioVisual.ID, rav.getId());
-            db.insert(ECPlusDBContract.RecursoAudioVisual.TABLE_NAME, null, values);
+            db.replace(ECPlusDBContract.RecursoAudioVisual.TABLE_NAME, null, values);
 
             values = new ContentValues();
             values.put(ECPlusDBContract.PalabraRecursoAudioVisual.REF_PALABRA, word.getId());
             values.put(ECPlusDBContract.PalabraRecursoAudioVisual.REF_RECURSO_AUDIOVISUAL, rav.getId());
-            db.insert(ECPlusDBContract.PalabraRecursoAudioVisual.TABLE_NAME, null, values);
+            db.replace(ECPlusDBContract.PalabraRecursoAudioVisual.TABLE_NAME, null, values);
 
             for (Map.Entry<Resolucion, String> fichero: rav.getFicheros().entrySet()){
                 values = new ContentValues();
                 values.put(ECPlusDBContract.Ficheros.REF_RECURSO_AUDIOVISUAL, rav.getId());
                 values.put(ECPlusDBContract.Ficheros.RESOLUCION, fichero.getKey().toString());
                 values.put(ECPlusDBContract.Ficheros.HASH, fichero.getValue());
-                db.insert(ECPlusDBContract.Ficheros.TABLE_NAME, null, values);
+                db.replace(ECPlusDBContract.Ficheros.TABLE_NAME, null, values);
             }
         }
     }
 
     @Override
-    public void updateWord(Palabra remote) {
+    public void updateWord(Palabra remote, String language) {
+        Long idList = getIDForWordList(language);
         ContentValues values = new ContentValues();
 
         for (RecursoAV rav: remote.getRecursos()) {
@@ -296,7 +312,11 @@ public class PalabrasDAOImpl implements PalabrasDAO {
         values = new ContentValues();
         values.put(ECPlusDBContract.Palabra.NOMBRE, remote.getNombre());
         values.put(ECPlusDBContract.Palabra.ICONO_REEMPLAZABLE, remote.getIconoReemplazable());
-        values.put(ECPlusDBContract.Palabra.REF_ICONO, remote.getIcono().getId());
+        values.put(ECPlusDBContract.Palabra.ID, remote.getId());
+        values.put(ECPlusDBContract.Palabra.REF_LISTA_PALABRAS, idList);
+        if (remote.getIcono()!=null) {
+            values.put(ECPlusDBContract.Palabra.REF_ICONO, remote.getIcono().getId());
+        }
         db.replace(ECPlusDBContract.Palabra.TABLE_NAME,null, values);
     }
 
@@ -338,7 +358,7 @@ public class PalabrasDAOImpl implements PalabrasDAO {
         }
         c.close();
         db.delete(ECPlusDBContract.PalabraRecursoAudioVisual.TABLE_NAME,
-                ECPlusDBContract.PalabraRecursoAudioVisual.REF_PALABRA,
+                ECPlusDBContract.PalabraRecursoAudioVisual.REF_PALABRA+"=?",
                 new String[]{""+ wordId});
     }
 

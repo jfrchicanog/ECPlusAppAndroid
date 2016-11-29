@@ -78,7 +78,7 @@ public class PalabrasWSImpl implements PalabrasWS {
             nuevaPalabra.setIconoReemplazable(palabra.getIconoReemplazable());
 
             for (RecursoAudioVisualREST ravREST : palabra.getAudiovisuales()) {
-                Log.d(getClass().getSimpleName(), ravREST.getType());
+                //Log.d(getClass().getSimpleName(), ravREST.getType());
                 RecursoAV rav = RecursoAV.createRecursoAV(ravREST.getType());
                 rav.setId(ravREST.getId());
                 rav.getFicheros().put(resolution, ravREST.getHash());

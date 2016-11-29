@@ -6,6 +6,7 @@ import android.content.Context;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -63,6 +64,7 @@ public class UpdateService extends IntentService {
             }
         }
     };
+    private static final String TAG = "UpdateService";
 
     public class UpdateServiceBinder extends Binder {
         public UpdateService getService() {
@@ -138,7 +140,7 @@ public class UpdateService extends IntentService {
         if (remoteHash==null) {
             getDAOPalabras().removeAllResourcesForWordsList(language, resolution);
             databaseChanged=true;
-        } else if (localHash == null || !localHash.equals(remoteHash)) {
+        } else /*if (localHash == null || !localHash.equals(remoteHash))*/ {
             if (localHash == null) {
                 getDAOPalabras().createListOfWords(language);
             }
@@ -170,6 +172,7 @@ public class UpdateService extends IntentService {
 
     private void downloadResource(String hash) {
         try {
+            Log.d(TAG, "Downloading "+hash);
             InputStream is = getWSPalabras().getResource(hash);
             OutputStream os = new FileOutputStream(getResourcesStore().getFileResource(hash));
 
@@ -222,18 +225,49 @@ public class UpdateService extends IntentService {
         Collections.sort(remoteWords, PALABRA_COMPARATOR);
         Collections.sort(localWords, PALABRA_COMPARATOR);
 
-        Iterator<Palabra> iterator = localWords.iterator();
-        for (Palabra remote: remoteWords) {
-            Palabra local = removeLocalWordUpToNextRemoteWord(iterator, remote);
-            if (local == null || local.getId() > remote.getId()) {
+        Iterator<Palabra> localIterator = localWords.iterator();
+        Iterator<Palabra> remoteIterator = remoteWords.iterator();
+
+        Palabra local = getNextElementOfIterator(localIterator);
+        Palabra remote = getNextElementOfIterator(remoteIterator);
+
+        while (local!=null || remote != null) {
+            if (local==null) {
+                Log.d(TAG, "Adding "+remote.getId()+" "+remote.getNombre());
                 getDAOPalabras().addWord(remote, language, resolution);
-            } else if (local.getId() == remote.getId()) {
+                remote = getNextElementOfIterator(remoteIterator);
+            } else if (remote == null) {
+                Log.d(TAG, "Removing "+local.getId()+" "+local.getNombre());
+                getDAOPalabras().removeWord(local);
+                local = getNextElementOfIterator(localIterator);
+            } else if (local.getId() > remote.getId()) {
+                Log.d(TAG, "Adding "+remote.getId()+" "+remote.getNombre());
+                getDAOPalabras().addWord(remote, language, resolution);
+                remote = getNextElementOfIterator(remoteIterator);
+            } else if (local.getId() < remote.getId()) {
+                Log.d(TAG, "Removing "+local.getId()+" "+local.getNombre());
+                getDAOPalabras().removeWord(local);
+                local = getNextElementOfIterator(localIterator);
+            } else {
+                //Log.d(TAG, "Should I update? "+local.getId()+" "+local.getNombre());
                 if (!local.getHash(resolution).equalsIgnoreCase(remote.getHash(resolution))) {
-                    getDAOPalabras().updateWord(remote);
+                    Log.d(TAG, "Updating "+local.getId()+" "+local.getNombre());
+                    getDAOPalabras().updateWord(remote, language);
                 }
+                local = getNextElementOfIterator(localIterator);
+                remote = getNextElementOfIterator(remoteIterator);
             }
         }
+
         getDAOPalabras().setHashForListOfWords(language, resolution, remoteHash);
+    }
+
+    private static <E> E getNextElementOfIterator(Iterator<E> iterator) {
+        if (iterator.hasNext()) {
+            return iterator.next();
+        } else {
+            return null;
+        }
     }
 
     private void updateLocalSyndromeList(String language, String remoteHash) {
@@ -259,20 +293,6 @@ public class UpdateService extends IntentService {
         getDAOSindromes().setHashForListOfSyndromes(language, remoteHash);
     }
 
-    private Palabra removeLocalWordUpToNextRemoteWord(Iterator<Palabra> iterator, Palabra remote) {
-        Palabra local;
-        do {
-            if (iterator.hasNext()) {
-                local = iterator.next();
-                if (local.getId() < remote.getId()) {
-                    getDAOPalabras().removeWord(local);
-                }
-            } else {
-                local = null;
-            }
-        } while ((local!=null) && local.getId() < remote.getId());
-        return local;
-    }
 
     @Nullable
     private Sindrome removeLocalSyndromesUpToNextRemoteSyndrome(Iterator<Sindrome> iterator, Sindrome remote) {
