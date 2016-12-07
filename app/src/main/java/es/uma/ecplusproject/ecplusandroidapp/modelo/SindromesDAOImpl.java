@@ -13,6 +13,7 @@ import java.util.List;
 import es.uma.ecplusproject.ecplusandroidapp.database.ECPlusDB;
 import es.uma.ecplusproject.ecplusandroidapp.database.ECPlusDBContract;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Sindrome;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.TipoDocumento;
 
 /**
  * Created by francis on 24/11/16.
@@ -22,11 +23,13 @@ public class SindromesDAOImpl implements SindromesDAO {
     private static final String NOMBRE = "nombre";
     private static final String CONTENIDO = "contenido";
     private static final String HASH = "hash";
+    private static final String TIPO = "tipo";
     private static final String ID = "ID";
     private static final String consulta = "select " +
             "s."+ ECPlusDBContract.Sindrome.NOMBRE+" as " + NOMBRE
             + ", s."+ECPlusDBContract.Sindrome.CONTENIDO+" as " + CONTENIDO
             + ", s."+ECPlusDBContract.Sindrome.HASH+" as " + HASH
+            + ", s."+ECPlusDBContract.Sindrome.TIPO+" as " + TIPO
             + ", s."+ECPlusDBContract.Sindrome.ID+" as " + ID
             + " from "+ECPlusDBContract.Sindrome.TABLE_NAME+" s " +
             "inner join "+ECPlusDBContract.ListaSindromes.TABLE_NAME+" ls on " +
@@ -49,6 +52,9 @@ public class SindromesDAOImpl implements SindromesDAO {
     public void createListOfSyndromes(String language) {
         ContentValues values = new ContentValues();
         values.put(ECPlusDBContract.ListaSindromes.IDIOMA, language);
+        // TODO: Esto es una arreglo para evitar un problema de null
+        // Para arreglarlo hayq ue cambiar la DB
+        values.put(ECPlusDBContract.ListaSindromes.ID, language.hashCode());
         db.insert(ECPlusDBContract.ListaSindromes.TABLE_NAME, null,values);
     }
 
@@ -64,6 +70,7 @@ public class SindromesDAOImpl implements SindromesDAO {
                 sindrome.setDescripcion(new String(c.getBlob(c.getColumnIndex(CONTENIDO)), Charset.forName("UTF-8")));
                 sindrome.setId(c.getLong(c.getColumnIndex(ID)));
                 sindrome.setHash(c.getString(c.getColumnIndex(HASH)));
+                sindrome.setTipo(TipoDocumento.valueOf(c.getString(c.getColumnIndex(TIPO))));
 
                 resultado.add(sindrome);
             } while (c.moveToNext());
@@ -142,6 +149,7 @@ public class SindromesDAOImpl implements SindromesDAO {
                 sindrome.getDescripcion().getBytes(Charset.forName("UTF-8")));
         values.put(ECPlusDBContract.Sindrome.HASH, sindrome.getHash());
         values.put(ECPlusDBContract.Sindrome.NOMBRE, sindrome.getTexto());
+        values.put(ECPlusDBContract.Sindrome.TIPO, sindrome.getTipo().toString());
         db.update(ECPlusDBContract.Sindrome.TABLE_NAME, values,
                 ECPlusDBContract.Sindrome.ID+"=?", new String[]{""+sindrome.getId()});
     }
@@ -160,6 +168,7 @@ public class SindromesDAOImpl implements SindromesDAO {
         values.put(ECPlusDBContract.Sindrome.HASH, sindrome.getHash());
         values.put(ECPlusDBContract.Sindrome.NOMBRE, sindrome.getTexto());
         values.put(ECPlusDBContract.Sindrome.ID, sindrome.getId());
+        values.put(ECPlusDBContract.Sindrome.TIPO, sindrome.getTipo().toString());
         values.put(ECPlusDBContract.Sindrome.REF_LISTA_SINDROMES, idList);
 
         db.insert(ECPlusDBContract.Sindrome.TABLE_NAME, null, values);

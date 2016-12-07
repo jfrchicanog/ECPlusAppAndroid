@@ -26,6 +26,15 @@ public class PalabraRes implements Serializable {
     private Set<RecursoAudioVisualREST> audiovisuales;
     private Long icono;
     private String iconoReemplazado;
+    private Boolean avanzada;
+
+    public Boolean getAvanzada() {
+        return avanzada;
+    }
+
+    public void setAvanzada(Boolean avanzada) {
+        this.avanzada = avanzada;
+    }
 
     public String getNombre() {
         return nombre;

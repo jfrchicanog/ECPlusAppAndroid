@@ -1,7 +1,5 @@
 package es.uma.ecplusproject.ecplusandroidapp.modelo.dominio;
 
-import android.os.Parcelable;
-
 import java.io.Serializable;
 
 /**
@@ -12,8 +10,15 @@ public class Sindrome implements Serializable {
     private String descripcion;
     private long id;
     private String hash;
+    private TipoDocumento tipo;
 
+    public TipoDocumento getTipo() {
+        return tipo;
+    }
 
+    public void setTipo(TipoDocumento tipo) {
+        this.tipo = tipo;
+    }
 
     public Sindrome(String texto) {
         this.texto = texto;

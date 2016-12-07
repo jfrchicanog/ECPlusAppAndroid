@@ -59,6 +59,7 @@ public final class ECPlusDBContract {
         public static final String ID = "id";
         public static final String ICONO_REEMPLAZABLE = "iconoReemplazable";
         public static final String NOMBRE = "nombre";
+        public static final String AVANZADA = "avanzada";
         public static final String REF_ICONO = "icono_id";
         public static final String REF_LISTA_PALABRAS  = "listapalabras";
 
@@ -76,6 +77,7 @@ public final class ECPlusDBContract {
         public static final String CONTENIDO = "contenido";
         public static final String NOMBRE = "nombre";
         public static final String HASH = "hash";
+        public static final String TIPO = "tipo";
         public static final String REF_LISTA_SINDROMES = "listasindromes";
     }
 }

@@ -7,6 +7,8 @@ package es.uma.ecplusproject.ecplusandroidapp.restws.domain;
 
 import java.io.Serializable;
 
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.TipoDocumento;
+
 /**
  *
  * @author gabriel
@@ -18,6 +20,15 @@ public class SindromeClass implements Serializable {
     private String nombre;
     private byte [] contenido;
     private String hash;
+    private TipoDocumento tipo;
+
+    public TipoDocumento getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(TipoDocumento tipo) {
+        this.tipo = tipo;
+    }
 
     public Long getId() {
         return id;

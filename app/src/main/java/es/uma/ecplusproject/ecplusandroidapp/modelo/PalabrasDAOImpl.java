@@ -27,6 +27,7 @@ public class PalabrasDAOImpl implements PalabrasDAO {
     private static final String DTYPE = "dtype";
     private static final String ICON = "icon";
     private static final String REPLACEABLE_ICON = "replaceableIcon";
+    private static final String AVANZADA = "advanced";
     private static final String HASH = "hash";
     private static final String HASH_PALABRA = "hashp";
 
@@ -34,6 +35,7 @@ public class PalabrasDAOImpl implements PalabrasDAO {
             "p."+ ECPlusDBContract.Palabra.NOMBRE+" as "+NOMBRE+", " +
             "p."+ECPlusDBContract.Palabra.ID+" as "+PID+", " +
             "p."+ECPlusDBContract.Palabra.ICONO_REEMPLAZABLE+" as "+REPLACEABLE_ICON+", "+
+            "p."+ECPlusDBContract.Palabra.AVANZADA+" as "+AVANZADA+", "+
             "p."+ECPlusDBContract.Palabra.REF_ICONO+" as "+ICON+", "+
             "r."+ECPlusDBContract.RecursoAudioVisual.ID+" as "+RID+", "+
             "r."+ECPlusDBContract.RecursoAudioVisual.DTYPE+" as "+DTYPE+", " +
@@ -121,6 +123,7 @@ public class PalabrasDAOImpl implements PalabrasDAO {
                     palabra.setId(idPalabra);
                     palabra.getHashes().put(resolution, c.getString(c.getColumnIndex(HASH_PALABRA)));
                     palabra.setIconoReemplazable(c.getInt(c.getColumnIndex(REPLACEABLE_ICON))>0);
+                    palabra.setAvanzada(c.getInt(c.getColumnIndex(AVANZADA))>0);
                 }
                 if (!c.isNull(c.getColumnIndex(DTYPE))) {
                     RecursoAV rav = RecursoAV.createRecursoAV(c.getString(c.getColumnIndex(DTYPE)));
@@ -226,7 +229,7 @@ public class PalabrasDAOImpl implements PalabrasDAO {
     public void createListOfWords(String language) {
         ContentValues values = new ContentValues();
         values.put(ECPlusDBContract.ListaPalabras.IDIOMA, language);
-        // TODO: Esto es una rreglo para evitar un problema de null
+        // TODO: Esto es una arreglo para evitar un problema de null
         // Para arreglarlo hayq ue cambiar la DB
         values.put(ECPlusDBContract.ListaPalabras.ID, language.hashCode());
         db.insert(ECPlusDBContract.ListaPalabras.TABLE_NAME, null, values);
@@ -240,6 +243,7 @@ public class PalabrasDAOImpl implements PalabrasDAO {
         ContentValues values = new ContentValues();
         values.put(ECPlusDBContract.Palabra.ID, word.getId());
         values.put(ECPlusDBContract.Palabra.ICONO_REEMPLAZABLE, word.getIconoReemplazable());
+        values.put(ECPlusDBContract.Palabra.AVANZADA, word.getAvanzada());
         values.put(ECPlusDBContract.Palabra.NOMBRE, word.getNombre());
         if (word.getIcono()!=null) {
             values.put(ECPlusDBContract.Palabra.REF_ICONO, word.getIcono().getId());
@@ -312,6 +316,7 @@ public class PalabrasDAOImpl implements PalabrasDAO {
         values = new ContentValues();
         values.put(ECPlusDBContract.Palabra.NOMBRE, remote.getNombre());
         values.put(ECPlusDBContract.Palabra.ICONO_REEMPLAZABLE, remote.getIconoReemplazable());
+        values.put(ECPlusDBContract.Palabra.AVANZADA, remote.getAvanzada());
         values.put(ECPlusDBContract.Palabra.ID, remote.getId());
         values.put(ECPlusDBContract.Palabra.REF_LISTA_PALABRAS, idList);
         if (remote.getIcono()!=null) {

@@ -56,6 +56,7 @@ public class SindromesWSImpl implements SindromesWS {
             nuevoSindrome.setDescripcion(new String(sindrome.getContenido(), Charset.forName("UTF-8")));
             nuevoSindrome.setHash(sindrome.getHash());
             nuevoSindrome.setId(sindrome.getId());
+            nuevoSindrome.setTipo(sindrome.getTipo());
             resultado.add(nuevoSindrome);
         }
 

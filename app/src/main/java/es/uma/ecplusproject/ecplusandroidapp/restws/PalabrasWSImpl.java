@@ -76,6 +76,7 @@ public class PalabrasWSImpl implements PalabrasWS {
             nuevaPalabra.setId(palabra.getId());
             nuevaPalabra.getHashes().put(resolution, palabra.getHash());
             nuevaPalabra.setIconoReemplazable(palabra.getIconoReemplazable());
+            nuevaPalabra.setAvanzada(palabra.getAvanzada());
 
             for (RecursoAudioVisualREST ravREST : palabra.getAudiovisuales()) {
                 //Log.d(getClass().getSimpleName(), ravREST.getType());

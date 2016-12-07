@@ -16,7 +16,15 @@ public class Palabra implements Serializable {
     private Map<Resolucion, String> hashes;
     private RecursoAV icono;
     private Boolean iconoReemplazable;
+    private Boolean avanzada;
 
+    public Boolean getAvanzada() {
+        return avanzada;
+    }
+
+    public void setAvanzada(Boolean avanzada) {
+        this.avanzada = avanzada;
+    }
 
     public Long getId() {
         return id;
