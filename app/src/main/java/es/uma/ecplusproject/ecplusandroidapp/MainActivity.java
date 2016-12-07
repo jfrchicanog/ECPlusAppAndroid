@@ -35,7 +35,9 @@ import es.uma.ecplusproject.ecplusandroidapp.database.ECPlusDB;
 import es.uma.ecplusproject.ecplusandroidapp.database.ECPlusDBContract;
 import es.uma.ecplusproject.ecplusandroidapp.database.ECPlusDBHelper;
 import es.uma.ecplusproject.ecplusandroidapp.dialogs.ChooseLanguageDialog;
+import es.uma.ecplusproject.ecplusandroidapp.fragments.Comunicacion;
 import es.uma.ecplusproject.ecplusandroidapp.fragments.Palabras;
+import es.uma.ecplusproject.ecplusandroidapp.fragments.PalabrasAvanzadas;
 import es.uma.ecplusproject.ecplusandroidapp.fragments.Panel;
 import es.uma.ecplusproject.ecplusandroidapp.fragments.Sindromes;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.CargarListaPalabras;
@@ -82,13 +84,16 @@ public class MainActivity extends AppCompatActivity {
                     && UpdateListenerEvent.Action.STOP_DATABASE.equals(event.getAction())
                     && event.isSomethingChanged()) {
                 getPanelPalabras().reloadWords();
+                getPanelPalabrasAvanzadas().reloadWords();
             }
         }
     };
 
 
     private Sindromes panelSindromes;
+    private Comunicacion panelComunicacion;
     private Palabras panelPalabras;
+    private PalabrasAvanzadas panelPalabrasAvanzadas;
     private ProgressBar barraProgreso;
 
     private void reportUpdateEvent(UpdateListenerEvent event) {
@@ -129,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(),
-                getPanelPalabras(), getPanelSindromes());
+                getPanelPalabras(), getPanelPalabrasAvanzadas(), getPanelSindromes(), getPanelComunicacion());
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
@@ -176,12 +181,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @NonNull
+    private PalabrasAvanzadas getPanelPalabrasAvanzadas() {
+        if (panelPalabrasAvanzadas == null) {
+            panelPalabrasAvanzadas = new PalabrasAvanzadas();
+            panelPalabrasAvanzadas.setContext(this);
+        }
+        return panelPalabrasAvanzadas;
+    }
+
+    @NonNull
     private Sindromes getPanelSindromes() {
         if (panelSindromes == null) {
             panelSindromes = new Sindromes();
             panelSindromes.setContext(this);
         }
         return panelSindromes;
+    }
+
+    @NonNull
+    private Comunicacion getPanelComunicacion() {
+        if (panelComunicacion == null) {
+            panelComunicacion = new Comunicacion();
+            panelComunicacion.setContext(this);
+        }
+        return panelComunicacion;
     }
 
     @Override

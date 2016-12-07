@@ -6,4 +6,6 @@
     <string name="language_menu">Choose Language</string>
     <string name="no_languages">No languages available</string>
     <string name="language_dialog_ok">OK</string>
+    <string name="palabrasAvanzadas">Advanced</string>
+    <string name="communication">Communication</string>
 </resources>

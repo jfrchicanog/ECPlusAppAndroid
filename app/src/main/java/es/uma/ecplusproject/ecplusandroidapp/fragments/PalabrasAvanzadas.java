@@ -13,6 +13,7 @@ import android.widget.ListView;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import es.uma.ecplusproject.ecplusandroidapp.DetallePalabra;
 import es.uma.ecplusproject.ecplusandroidapp.MainActivity;
@@ -29,13 +30,13 @@ import es.uma.ecplusproject.ecplusandroidapp.restws.DescargaListaPalabras;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class Palabras extends Panel {
+public class PalabrasAvanzadas extends Panel {
 
     private ListView listaPalabras;
     private AdaptadorPalabras adaptador;
     private String preferredLanguage;
 
-    public Palabras() {
+    public PalabrasAvanzadas() {
         super();
     }
 
@@ -61,6 +62,8 @@ public class Palabras extends Panel {
             }
         });
 
+
+
         return rootView;
     }
 
@@ -73,7 +76,7 @@ public class Palabras extends Panel {
                 Iterator<Palabra> iterator = palabras.iterator();
                 while (iterator.hasNext()) {
                     Palabra palabra = iterator.next();
-                    if (palabra.getAvanzada()!=null && palabra.getAvanzada()) {
+                    if (!palabra.getAvanzada()) {
                         iterator.remove();
                     }
                 }
@@ -95,6 +98,6 @@ public class Palabras extends Panel {
 
     @Override
     public String getFragmentName() {
-        return contexto.getString(R.string.palabras);
+        return contexto.getString(R.string.palabrasAvanzadas);
     }
 }

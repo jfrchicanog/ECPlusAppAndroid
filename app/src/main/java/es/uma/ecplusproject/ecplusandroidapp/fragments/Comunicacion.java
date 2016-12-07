@@ -21,26 +21,21 @@ import es.uma.ecplusproject.ecplusandroidapp.R;
 import es.uma.ecplusproject.ecplusandroidapp.Splash;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.CargaListaSindromes;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.DAO;
-import es.uma.ecplusproject.ecplusandroidapp.modelo.PalabrasDAO;
-import es.uma.ecplusproject.ecplusandroidapp.modelo.PalabrasDAOImpl;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.SindromesDAO;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.SindromesDAOImpl;
-import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Palabra;
-import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Resolucion;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Sindrome;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.TipoDocumento;
 import es.uma.ecplusproject.ecplusandroidapp.restws.DescargaListaSindromes;
-import es.uma.ecplusproject.ecplusandroidapp.services.UpdateService;
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class Sindromes extends Panel {
+public class Comunicacion extends Panel {
     private ListView listaSindromes;
     private ArrayAdapter<Sindrome> adaptador;
     private String preferredLanguage;
 
-    public Sindromes() {
+    public Comunicacion() {
         super();
     }
 
@@ -81,7 +76,7 @@ public class Sindromes extends Panel {
                 Iterator<Sindrome> iterator = sindromes.iterator();
                 while (iterator.hasNext()) {
                     Sindrome sindrome = iterator.next();
-                    if (TipoDocumento.GENERALIDAD.equals(sindrome.getTipo())) {
+                    if (!TipoDocumento.GENERALIDAD.equals(sindrome.getTipo())) {
                         iterator.remove();
                     }
                 }
@@ -102,6 +97,6 @@ public class Sindromes extends Panel {
 
     @Override
     public String getFragmentName() {
-        return contexto.getString(R.string.sindrome);
+        return contexto.getString(R.string.communication);
     }
 }
