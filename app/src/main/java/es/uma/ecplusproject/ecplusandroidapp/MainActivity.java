@@ -1,5 +1,6 @@
 package es.uma.ecplusproject.ecplusandroidapp;
 
+import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -21,6 +22,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import java.io.File;
@@ -56,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
         public void onServiceConnected(ComponentName name, IBinder binder) {
             service = ((UpdateService.UpdateServiceBinder)binder).getService();
             service.addUpdateListener(updateListener);
+            updateProgressBar();
         }
 
         @Override
@@ -69,6 +73,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onUpdateEvent(UpdateListenerEvent event) {
             reportUpdateEvent(event);
+            updateProgressBar();
 
             if (UpdateListenerEvent.Element.SYNDROMES.equals(event.getElement()) &&
                     event.isSomethingChanged()) {
@@ -84,6 +89,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Sindromes panelSindromes;
     private Palabras panelPalabras;
+    private ProgressBar barraProgreso;
 
     private void reportUpdateEvent(UpdateListenerEvent event) {
         String cadena = event.getAction()+" "
@@ -93,10 +99,23 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, cadena);
     }
 
+    private void updateProgressBar() {
+        if (service != null) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    barraProgreso.setVisibility(service.isUpdating()?View.VISIBLE:View.GONE);
+                }
+            });
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        barraProgreso = (ProgressBar) findViewById(R.id.progressBar);
 
         DAO.setContext(this);
 
