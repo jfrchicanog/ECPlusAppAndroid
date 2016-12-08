@@ -56,10 +56,6 @@ public class DetallePalabra extends AppCompatActivity {
         }
     };
 
-    private Animator mCurrentAnimator;
-    private int mShortAnimationDuration;
-
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -93,18 +89,7 @@ public class DetallePalabra extends AppCompatActivity {
         });
 
         recursos.setAdapter(adaptador);
-
-
-        // Animación
-        mShortAnimationDuration=300;
-        recursos.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // TODO
-            }
-        });
-
-
+        
 
     }
 
