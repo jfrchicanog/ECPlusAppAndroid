@@ -1,5 +1,6 @@
 package es.uma.ecplusproject.ecplusandroidapp;
 
+import android.animation.Animator;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -7,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 import android.widget.GridView;
 import android.widget.MediaController;
 import android.widget.TextView;
@@ -35,15 +37,10 @@ import es.uma.ecplusproject.ecplusandroidapp.services.ResourcesStore;
 public class DetallePalabra extends AppCompatActivity {
 
     public static final String PALABRA = "palabra";
-    private VideoView video;
-    private GridView gridView;
     private AdaptadorRecursos adaptador;
     private TextView nombre;
-    private Resolucion resolution = Resolucion.BAJA;
-    private ResourcesStore resourcesStore;
 
     private RecyclerView recursos;
-    private RecyclerView.Adapter mAdapter;
     private Comparator<RecursoAV> comparator = new Comparator<RecursoAV>() {
         @Override
         public int compare(RecursoAV lhs, RecursoAV rhs) {
@@ -59,13 +56,14 @@ public class DetallePalabra extends AppCompatActivity {
         }
     };
 
+    private Animator mCurrentAnimator;
+    private int mShortAnimationDuration;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.detallepalabra);
-
-        resourcesStore = new ResourcesStore(this);
 
         getSupportActionBar().setDisplayShowHomeEnabled(true);
         getSupportActionBar().setLogo(R.mipmap.logo);
@@ -95,6 +93,18 @@ public class DetallePalabra extends AppCompatActivity {
         });
 
         recursos.setAdapter(adaptador);
+
+
+        // Animación
+        mShortAnimationDuration=300;
+        recursos.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // TODO
+            }
+        });
+
+
 
     }
 

@@ -61,6 +61,8 @@ public class Palabras extends Panel {
             }
         });
 
+        listaPalabras.setFastScrollEnabled(true);
+
         return rootView;
     }
 

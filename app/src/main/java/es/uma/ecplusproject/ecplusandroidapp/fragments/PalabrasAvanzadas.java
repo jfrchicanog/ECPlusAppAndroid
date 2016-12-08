@@ -62,7 +62,7 @@ public class PalabrasAvanzadas extends Panel {
             }
         });
 
-
+        listaPalabras.setFastScrollEnabled(true);
 
         return rootView;
     }
