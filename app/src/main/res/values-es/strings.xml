@@ -8,4 +8,7 @@
     <string name="language_dialog_ok">OK</string>
     <string name="palabrasAvanzadas">Avanzadas</string>
     <string name="communication">Comunicación</string>
+    <string name="videoNotAvailable">Video no disponible</string>
+    <string name="pictogramNotAvailable">Pictograma no disponible</string>
+    <string name="pictureNotAvailable">Foto no disponible</string>
 </resources>

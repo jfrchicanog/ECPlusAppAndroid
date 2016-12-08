@@ -54,12 +54,14 @@ public class ResourcesStore {
         return svg;
     }
 
-    public void tryToUseSVG(SVGImageView icono, String hash) {
+    public boolean tryToUseSVG(SVGImageView icono, String hash) {
         SVG svg = getSVGFromFile(hash);
         if (svg != null) {
             icono.setSVG(svg);
+            return true;
         } else {
             icono.setImageDrawable(contexto.getResources().getDrawable(R.drawable.logo));
+            return false;
         }
     }
 
@@ -75,12 +77,14 @@ public class ResourcesStore {
         return bm;
     }
 
-    public void tryToUseBitmap(ImageView imagen, String hash) {
+    public boolean tryToUseBitmap(ImageView imagen, String hash) {
         Bitmap bm = getBitmapFromFile(hash);
         if (bm != null) {
             imagen.setImageBitmap(bm);
+            return true;
         } else {
             imagen.setImageDrawable(contexto.getResources().getDrawable(R.drawable.logo));
+            return false;
         }
     }
 
