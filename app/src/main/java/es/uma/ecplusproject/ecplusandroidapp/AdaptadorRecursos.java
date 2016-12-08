@@ -120,7 +120,7 @@ public class AdaptadorRecursos extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(final RecyclerView.ViewHolder holder, int position) {
         RecursoAV recurso = recursos.get(position);
         if (holder instanceof PictogramaViewHolder) {
             Log.d("Adpater", "Mostrando "+recurso.getFicheros().get(resolucion));
@@ -130,11 +130,17 @@ public class AdaptadorRecursos extends RecyclerView.Adapter<RecyclerView.ViewHol
                 ((PictogramaViewHolder) holder).texto.setVisibility(View.VISIBLE);
             }
         } else if (holder instanceof FotoViewHolder) {
-            if (resourcesStore.tryToUseBitmap(((FotoViewHolder) holder).foto, recurso.getFicheros().get(resolucion))) {
-                ((FotoViewHolder) holder).texto.setVisibility(View.GONE);
-            } else {
-                ((FotoViewHolder) holder).texto.setVisibility(View.VISIBLE);
-            }
+            resourcesStore.tryToUseBitmap(((FotoViewHolder) holder).foto, recurso.getFicheros().get(resolucion),
+                    new ResourcesStore.BitmapLoadListener() {
+                        @Override
+                        public void finishedBitmapLoad(boolean success) {
+                            if (success) {
+                                ((FotoViewHolder) holder).texto.setVisibility(View.GONE);
+                            } else {
+                                ((FotoViewHolder) holder).texto.setVisibility(View.VISIBLE);
+                            }
+                        }
+                    });
         } else if (holder instanceof VideoViewHolder) {
             File file = resourcesStore.getFileResource(recurso.getFicheros().get(resolucion));
             if (file.exists()) {
