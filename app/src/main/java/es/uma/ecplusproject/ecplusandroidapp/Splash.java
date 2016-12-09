@@ -2,13 +2,18 @@ package es.uma.ecplusproject.ecplusandroidapp;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+
+import com.caverock.androidsvg.SVG;
+import com.caverock.androidsvg.SVGImageView;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -16,6 +21,7 @@ import java.util.Set;
 import es.uma.ecplusproject.ecplusandroidapp.database.ECPlusDB;
 import es.uma.ecplusproject.ecplusandroidapp.database.ECPlusDBContract;
 import es.uma.ecplusproject.ecplusandroidapp.database.ECPlusDBHelper;
+import es.uma.ecplusproject.ecplusandroidapp.services.ResourcesStore;
 
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
@@ -23,11 +29,16 @@ import es.uma.ecplusproject.ecplusandroidapp.database.ECPlusDBHelper;
  */
 public class Splash extends AppCompatActivity {
 
+    public static final String TAG="Splash";
+    public static final long DURATION=2000;
     public static final String ECPLUS_MAIN_PREFS = "ecplus-main";
     public static final String LANGUAGES_KEY_PREFS = "languages";
     public static final int MAIN_VERSION = 7;
     private View mContentView;
     private boolean activityAlive;
+    private SVGImageView logo;
+    private ResourcesStore resourcesStore;
+    private Long startTime;
 
     /**
      * Touch listener to use for in-layout UI controls to delay hiding the
@@ -40,6 +51,18 @@ public class Splash extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+
+        startTime = System.currentTimeMillis();
+
+        resourcesStore = new ResourcesStore(this);
+
+        logo=(SVGImageView)findViewById(R.id.logoSplash);
+        SVG svg = resourcesStore.getApplicationLogoSVG();
+        if (svg != null) {
+            logo.setSVG(svg);
+        }
+
+
 
         activityAlive = true;
 
@@ -117,11 +140,26 @@ public class Splash extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Void aVoid) {
-            if (activityAlive) {
-                finish();
-                Intent i = new Intent(Splash.this, MainActivity.class);
-                startActivity(i);
+            long time = System.currentTimeMillis();
+            long elapsedTime = time - startTime;
+            Runnable launchMainActivity = new Runnable() {
+                @Override
+                public void run() {
+                    if (activityAlive) {
+                        finish();
+                        Intent i = new Intent(Splash.this, MainActivity.class);
+                        startActivity(i);
+                    }
+                }
+            };
+
+            Log.d(TAG, "Elapsed time: "+elapsedTime);
+            if (elapsedTime >= DURATION) {
+                launchMainActivity.run();
+            } else {
+                logo.postDelayed(launchMainActivity, DURATION-elapsedTime);
             }
+
         }
     }
 

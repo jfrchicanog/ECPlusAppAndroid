@@ -101,7 +101,22 @@ public class ResourcesStore {
             icono.setSVG(svg);
             return svg;
         } else {
-            icono.setImageDrawable(contexto.getResources().getDrawable(R.drawable.logo));
+            icono.setSVG(getApplicationLogoSVG());
+            return null;
+        }
+    }
+
+    public SVG getApplicationLogoSVG() {
+        try {
+            InputStream is = contexto.getResources().openRawResource(R.raw.logo_proyecto);
+            SVG svg = SVG.getFromInputStream(is);
+            svg.renderToPicture();
+            is.close();
+            SVG.Box box = svg.getDocumentBoundingBox();
+            svg.setDocumentViewBox(box.minX, box.minY, box.width, box.height);
+            return svg;
+        } catch (IOException | SVGParseException e) {
+            e.printStackTrace();
             return null;
         }
     }

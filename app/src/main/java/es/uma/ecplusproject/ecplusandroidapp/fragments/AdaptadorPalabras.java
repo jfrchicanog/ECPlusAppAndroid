@@ -93,7 +93,7 @@ public class AdaptadorPalabras extends ArrayAdapter<Palabra> implements SectionI
         if (palabra.getIcono()!= null && palabra.getIcono() instanceof Pictograma) {
             resourceStore.tryToUseSVG(icono, palabra.getIcono().getFicheros().get(resolucion));
         } else {
-            icono.setImageDrawable(contexto.getResources().getDrawable(R.drawable.logo));
+            icono.setSVG(resourceStore.getApplicationLogoSVG());
             for (RecursoAV recurso : palabra.getRecursos()) {
                 if (recurso instanceof Pictograma) {
                     resourceStore.tryToUseSVG(icono, recurso.getFicheros().get(resolucion));
