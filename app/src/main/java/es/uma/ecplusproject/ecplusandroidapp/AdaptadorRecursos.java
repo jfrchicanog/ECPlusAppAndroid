@@ -2,28 +2,23 @@ package es.uma.ecplusproject.ecplusandroidapp;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.media.Image;
 import android.media.MediaPlayer;
 import android.media.ThumbnailUtils;
-import android.os.Build;
 import android.provider.MediaStore;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.VideoView;
 
+import com.caverock.androidsvg.SVG;
 import com.caverock.androidsvg.SVGImageView;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,27 +29,45 @@ import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Resolucion;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Video;
 import es.uma.ecplusproject.ecplusandroidapp.services.ResourcesStore;
 
-import static es.uma.ecplusproject.ecplusandroidapp.R.drawable.video;
-
 /**
  * Created by francis on 13/5/16.
  */
 public class AdaptadorRecursos extends RecyclerView.Adapter<AdaptadorRecursos.RecursosAVViewHolder> {
 
+    private static final String TAG = "AdaptadorRecursos";
     public static final int TIPO_VIDEO = 0;
     public static final int TIPO_PICTOGRAMA = 1;
     public static final int TIPO_FOTO = 2;
     public static final int TIPO_AUDIO = 3;
 
-    public abstract class RecursosAVViewHolder extends RecyclerView.ViewHolder {
-        public RecursosAVViewHolder(View view) {
-            super(view);
-        }
-
-        public abstract void bindRecursoAV(RecursoAV recursoAV);
+    public interface ItemClickListener {
+        void onItemClick(RecursosAVViewHolder viewHolder);
     }
 
-    private class VideoViewHolder extends RecursosAVViewHolder {
+    public abstract class RecursosAVViewHolder extends RecyclerView.ViewHolder {
+        private RecursoAV recurso;
+        public RecursosAVViewHolder(View view) {
+            super(view);
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (listener != null) {
+                        listener.onItemClick(RecursosAVViewHolder.this);
+                    }
+                }
+            });
+        }
+
+        public RecursoAV getRecurso() {
+            return this.recurso;
+        }
+
+        public void bindRecursoAV(RecursoAV recursoAV) {
+            this.recurso = recursoAV;
+        }
+    }
+
+    public class VideoViewHolder extends RecursosAVViewHolder {
         public VideoView video;
         public ImageView thumbnail;
         public TextView texto;
@@ -80,6 +93,7 @@ public class AdaptadorRecursos extends RecyclerView.Adapter<AdaptadorRecursos.Re
 
         @Override
         public void bindRecursoAV(RecursoAV recurso) {
+            super.bindRecursoAV(recurso);
             File file = resourcesStore.getFileResource(recurso.getFicheros().get(resolucion));
             if (file.exists()) {
                 Bitmap bm = ThumbnailUtils.createVideoThumbnail(file.getPath(), MediaStore.Images.Thumbnails.MINI_KIND);
@@ -93,9 +107,10 @@ public class AdaptadorRecursos extends RecyclerView.Adapter<AdaptadorRecursos.Re
         }
     }
 
-    private class PictogramaViewHolder extends RecursosAVViewHolder {
+    public class PictogramaViewHolder extends RecursosAVViewHolder {
         public SVGImageView pictograma;
         public TextView texto;
+        public SVG imagenSVG;
         public PictogramaViewHolder(View pictograma) {
             super(pictograma);
             this.pictograma=(SVGImageView)pictograma.findViewById(R.id.pictograma);
@@ -104,8 +119,10 @@ public class AdaptadorRecursos extends RecyclerView.Adapter<AdaptadorRecursos.Re
 
         @Override
         public void bindRecursoAV(RecursoAV recurso) {
+            super.bindRecursoAV(recurso);
             Log.d("Adpater", "Mostrando "+recurso.getFicheros().get(resolucion));
-            if (resourcesStore.tryToUseSVG(pictograma, recurso.getFicheros().get(resolucion))){
+            imagenSVG = resourcesStore.tryToUseSVG(pictograma, recurso.getFicheros().get(resolucion));
+            if (imagenSVG != null){
                 texto.setVisibility(View.GONE);
             } else {
                 texto.setVisibility(View.VISIBLE);
@@ -113,9 +130,10 @@ public class AdaptadorRecursos extends RecyclerView.Adapter<AdaptadorRecursos.Re
         }
     }
 
-    private class FotoViewHolder extends RecursosAVViewHolder {
+    public class FotoViewHolder extends RecursosAVViewHolder {
         public ImageView foto;
         public TextView texto;
+        public Bitmap bitmap;
         public FotoViewHolder(View foto) {
             super(foto);
             this.foto = (ImageView)foto.findViewById(R.id.foto);
@@ -124,11 +142,13 @@ public class AdaptadorRecursos extends RecyclerView.Adapter<AdaptadorRecursos.Re
 
         @Override
         public void bindRecursoAV(RecursoAV recurso) {
+            super.bindRecursoAV(recurso);
             resourcesStore.tryToUseBitmap(foto, recurso.getFicheros().get(resolucion),
                     new ResourcesStore.BitmapLoadListener() {
                         @Override
-                        public void finishedBitmapLoad(boolean success) {
-                            if (success) {
+                        public void finishedBitmapLoad(Bitmap bitmap) {
+                            FotoViewHolder.this.bitmap = bitmap;
+                            if (bitmap!=null) {
                                 texto.setVisibility(View.GONE);
                             } else {
                                 texto.setVisibility(View.VISIBLE);
@@ -141,25 +161,16 @@ public class AdaptadorRecursos extends RecyclerView.Adapter<AdaptadorRecursos.Re
     private ResourcesStore resourcesStore;
     private Resolucion resolucion = Resolucion.BAJA;
     private List<RecursoAV> recursos;
+    private ItemClickListener listener;
 
     public AdaptadorRecursos(Context ctx) {
         resourcesStore = new ResourcesStore(ctx);
         recursos = new ArrayList<>();
-    }
-
-    @Override
-    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
-        super.onAttachedToRecyclerView(recyclerView);
-        //resourcesStore = new ResourcesStore(recyclerView.getContext());
+        listener = null;
     }
 
     @Override
     public RecursosAVViewHolder onCreateViewHolder(final ViewGroup parent, int viewType) {
-        return createViewHolderInstance(parent, viewType);
-    }
-
-    @Nullable
-    private RecursosAVViewHolder createViewHolderInstance(final ViewGroup parent, int viewType) {
         View view;
         switch (viewType) {
             case TIPO_VIDEO:
@@ -204,4 +215,9 @@ public class AdaptadorRecursos extends RecyclerView.Adapter<AdaptadorRecursos.Re
         this.recursos = recursos;
         notifyDataSetChanged();
     }
+
+    public void setItemClickListener(ItemClickListener listener) {
+        this.listener = listener;
+    }
+
 }

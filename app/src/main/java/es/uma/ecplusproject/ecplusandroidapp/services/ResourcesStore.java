@@ -29,7 +29,7 @@ public class ResourcesStore {
     private Context contexto;
 
     public interface BitmapLoadListener {
-        void finishedBitmapLoad(boolean success);
+        void finishedBitmapLoad(Bitmap bitmap);
     }
 
     public class CargaBitmapEscalado extends AsyncTask<Integer, Void, Bitmap> {
@@ -52,14 +52,14 @@ public class ResourcesStore {
         protected void onPostExecute(Bitmap bm) {
             if (bm != null) {
                 imagen.setImageBitmap(bm);
-                fireBitmapLoadFinished(true);
+                fireBitmapLoadFinished(bm);
             } else {
                 imagen.setImageDrawable(contexto.getResources().getDrawable(R.drawable.logo));
-                fireBitmapLoadFinished(false);
+                fireBitmapLoadFinished(null);
             }
         }
 
-        private void fireBitmapLoadFinished(boolean success) {
+        private void fireBitmapLoadFinished(Bitmap success) {
             if (listener != null) {
                 listener.finishedBitmapLoad(success);
             }
@@ -95,14 +95,14 @@ public class ResourcesStore {
         return svg;
     }
 
-    public boolean tryToUseSVG(SVGImageView icono, String hash) {
+    public SVG tryToUseSVG(SVGImageView icono, String hash) {
         SVG svg = getSVGFromFile(hash);
         if (svg != null) {
             icono.setSVG(svg);
-            return true;
+            return svg;
         } else {
             icono.setImageDrawable(contexto.getResources().getDrawable(R.drawable.logo));
-            return false;
+            return null;
         }
     }
 
@@ -119,13 +119,18 @@ public class ResourcesStore {
     }
 
     public void tryToUseBitmap(final ImageView imagen, final String hash, final BitmapLoadListener listener) {
-        imagen.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-            @Override
-            public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                new CargaBitmapEscalado(imagen, hash, listener).execute(v.getWidth());
-                v.removeOnLayoutChangeListener(this);
-            }
-        });
+        Log.d("RS", "width: "+imagen.getWidth()+", height: "+imagen.getHeight());
+        if (imagen.getWidth()==0 || imagen.getHeight()==0) {
+            imagen.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                @Override
+                public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                    new CargaBitmapEscalado(imagen, hash, listener).execute(v.getWidth());
+                    v.removeOnLayoutChangeListener(this);
+                }
+            });
+        } else {
+            new CargaBitmapEscalado(imagen, hash, listener).execute(imagen.getWidth());
+        }
     }
 
     private Bitmap getBitmapFromFile(String hash, int width) {
@@ -141,6 +146,11 @@ public class ResourcesStore {
         int originalHeight= opciones.outHeight;
 
         // Calculamos por cuanto tenemos que dividir las dimensiones de la imagen
+
+        if (originalWidth < width) {
+            return BitmapFactory.decodeFile(fichero.getAbsolutePath());
+        }
+
         double ratio = (double)originalWidth / width;
         double height = originalHeight/ratio;
 

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <TextView
@@ -25,31 +27,56 @@
         >
 
     </android.support.v7.widget.RecyclerView>
-<!--
-    <VideoView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/video"
-        android:src="@drawable/video"
-        android:layout_below="@+id/nombre"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"/>
 
-    <GridView
-        android:id="@+id/imagenes"
+    <RelativeLayout
+        android:id="@+id/touchableArea"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"
-        android:layout_below="@id/video"
-        android:numColumns="2"
-        android:verticalSpacing="5dp"
-        android:horizontalSpacing="5dp" />
--->
+        >
+    <es.uma.ecplusproject.ecplusandroidapp.views.SquaredCardView
+        android:id="@+id/zoomedCardView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        app:contentPadding="2dp"
+        app:cardCornerRadius="8dp"
+        android:layout_margin="5dp"
+        >
+        <com.caverock.androidsvg.SVGImageView
+            android:id="@+id/zoomedImg"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@mipmap/logo"
+            />
+    </es.uma.ecplusproject.ecplusandroidapp.views.SquaredCardView>
+    </RelativeLayout>
+
+
+    <!--
+        <VideoView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/video"
+            android:src="@drawable/video"
+            android:layout_below="@+id/nombre"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"/>
+
+        <GridView
+            android:id="@+id/imagenes"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_below="@id/video"
+            android:numColumns="2"
+            android:verticalSpacing="5dp"
+            android:horizontalSpacing="5dp" />
+    -->
 
 </RelativeLayout>
