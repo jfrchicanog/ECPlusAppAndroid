@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.media.Image;
@@ -108,6 +109,13 @@ public class DetallePalabra extends AppCompatActivity {
             cardView.setPivotX(0f);
             cardView.setPivotY(0f);
 
+            ValueAnimator alphaIncrease = ValueAnimator.ofInt(0, 100);
+            alphaIncrease.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    touchableArea.setBackgroundColor(Color.argb((Integer)animation.getAnimatedValue(), 0, 0, 0));
+                }
+            });
             AnimatorSet set = new AnimatorSet();
             set
                     .play(ObjectAnimator.ofFloat(cardView, View.TRANSLATION_X,
@@ -115,7 +123,9 @@ public class DetallePalabra extends AppCompatActivity {
                     .with(ObjectAnimator.ofFloat(cardView, View.TRANSLATION_Y,
                             startBounds.top, finalBounds.top))
                     .with(ObjectAnimator.ofFloat(cardView, View.SCALE_X, startScale, 1f))
-                    .with(ObjectAnimator.ofFloat(cardView, View.SCALE_Y, startScale, 1f));
+                    .with(ObjectAnimator.ofFloat(cardView, View.SCALE_Y, startScale, 1f))
+                    .with(alphaIncrease);
+
             set.setDuration(DURATION).setInterpolator(new DecelerateInterpolator());
             return set;
         }
@@ -150,6 +160,13 @@ public class DetallePalabra extends AppCompatActivity {
             cardView.setPivotX(0f);
             cardView.setPivotY(0f);
 
+            ValueAnimator alphaDecrease = ValueAnimator.ofInt(100, 0);
+            alphaDecrease.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @Override
+                public void onAnimationUpdate(ValueAnimator animation) {
+                    touchableArea.setBackgroundColor(Color.argb((Integer)animation.getAnimatedValue(), 0, 0, 0));
+                }
+            });
             AnimatorSet set = new AnimatorSet();
             set
                     .play(ObjectAnimator.ofFloat(cardView, View.TRANSLATION_X,
@@ -157,7 +174,8 @@ public class DetallePalabra extends AppCompatActivity {
                     .with(ObjectAnimator.ofFloat(cardView, View.TRANSLATION_Y,
                             finalBounds.top, startBounds.top))
                     .with(ObjectAnimator.ofFloat(cardView, View.SCALE_X, 1f, startScale))
-                    .with(ObjectAnimator.ofFloat(cardView, View.SCALE_Y, 1f, startScale));
+                    .with(ObjectAnimator.ofFloat(cardView, View.SCALE_Y, 1f, startScale))
+                    .with(alphaDecrease);
             set.setDuration(DURATION).setInterpolator(new DecelerateInterpolator());
             return set;
         }
