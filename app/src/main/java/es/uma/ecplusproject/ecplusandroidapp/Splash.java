@@ -2,7 +2,6 @@ package es.uma.ecplusproject.ecplusandroidapp;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.AssetManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
@@ -23,6 +22,8 @@ import es.uma.ecplusproject.ecplusandroidapp.database.ECPlusDBContract;
 import es.uma.ecplusproject.ecplusandroidapp.database.ECPlusDBHelper;
 import es.uma.ecplusproject.ecplusandroidapp.services.ResourcesStore;
 
+import static es.uma.ecplusproject.ecplusandroidapp.MainActivity.PREFERRED_LANGUAGE;
+
 /**
  * An example full-screen activity that shows and hides the system UI (i.e.
  * status bar and navigation/system bar) with user interaction.
@@ -33,7 +34,7 @@ public class Splash extends AppCompatActivity {
     public static final long DURATION=2000;
     public static final String ECPLUS_MAIN_PREFS = "ecplus-main";
     public static final String LANGUAGES_KEY_PREFS = "languages";
-    public static final int MAIN_VERSION = 7;
+    public static final String [] LANGUAGES = new String []{"es", "cat", "de", "nl", "en"};
     private View mContentView;
     private boolean activityAlive;
     private SVGImageView logo;
@@ -106,8 +107,12 @@ public class Splash extends AppCompatActivity {
                 idiomasPalabras(db, idiomas);
                 idiomasSindromes(db, idiomas);
 
+                addDefaultLanguages(idiomas);
+
                 SharedPreferences.Editor editor = preferences.edit();
                 editor.putStringSet(LANGUAGES_KEY_PREFS, idiomas);
+                editor.putString(PREFERRED_LANGUAGE, MainActivity.DEFAULT_LANGUAGE);
+
                 editor.commit();
             }
 
@@ -160,6 +165,12 @@ public class Splash extends AppCompatActivity {
                 logo.postDelayed(launchMainActivity, DURATION-elapsedTime);
             }
 
+        }
+    }
+
+    private void addDefaultLanguages(Set<String> idiomas) {
+        for (String language: LANGUAGES) {
+            idiomas.add(language);
         }
     }
 

@@ -19,18 +19,10 @@ import es.uma.ecplusproject.ecplusandroidapp.DetalleSindrome;
 import es.uma.ecplusproject.ecplusandroidapp.MainActivity;
 import es.uma.ecplusproject.ecplusandroidapp.R;
 import es.uma.ecplusproject.ecplusandroidapp.Splash;
-import es.uma.ecplusproject.ecplusandroidapp.modelo.CargaListaSindromes;
-import es.uma.ecplusproject.ecplusandroidapp.modelo.DAO;
-import es.uma.ecplusproject.ecplusandroidapp.modelo.PalabrasDAO;
-import es.uma.ecplusproject.ecplusandroidapp.modelo.PalabrasDAOImpl;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.SindromesDAO;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.SindromesDAOImpl;
-import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Palabra;
-import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Resolucion;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Sindrome;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.TipoDocumento;
-import es.uma.ecplusproject.ecplusandroidapp.restws.DescargaListaSindromes;
-import es.uma.ecplusproject.ecplusandroidapp.services.UpdateService;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -53,7 +45,7 @@ public class Sindromes extends Panel {
         adaptador = new ArrayAdapter<Sindrome>(getContext(), android.R.layout.simple_list_item_1);
 
         SharedPreferences preferences = getActivity().getSharedPreferences(Splash.ECPLUS_MAIN_PREFS, Context.MODE_PRIVATE);
-        preferredLanguage = preferences.getString(MainActivity.PREFERRED_LANGUAGE, "cat");
+        preferredLanguage = preferences.getString(MainActivity.PREFERRED_LANGUAGE, MainActivity.DEFAULT_LANGUAGE);
 
 
         reloadSyndromes();

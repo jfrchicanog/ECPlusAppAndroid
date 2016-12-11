@@ -1,47 +1,29 @@
 package es.uma.ecplusproject.ecplusandroidapp;
 
-import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.os.Environment;
 import android.os.IBinder;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
-import android.widget.Toast;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-
-import es.uma.ecplusproject.ecplusandroidapp.database.ECPlusDB;
-import es.uma.ecplusproject.ecplusandroidapp.database.ECPlusDBContract;
-import es.uma.ecplusproject.ecplusandroidapp.database.ECPlusDBHelper;
 import es.uma.ecplusproject.ecplusandroidapp.dialogs.ChooseLanguageDialog;
 import es.uma.ecplusproject.ecplusandroidapp.fragments.Comunicacion;
 import es.uma.ecplusproject.ecplusandroidapp.fragments.Palabras;
 import es.uma.ecplusproject.ecplusandroidapp.fragments.PalabrasAvanzadas;
-import es.uma.ecplusproject.ecplusandroidapp.fragments.Panel;
 import es.uma.ecplusproject.ecplusandroidapp.fragments.Sindromes;
-import es.uma.ecplusproject.ecplusandroidapp.modelo.CargarListaPalabras;
-import es.uma.ecplusproject.ecplusandroidapp.modelo.DAO;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Resolucion;
 import es.uma.ecplusproject.ecplusandroidapp.services.UpdateListener;
 import es.uma.ecplusproject.ecplusandroidapp.services.UpdateListenerEvent;
@@ -50,6 +32,7 @@ import es.uma.ecplusproject.ecplusandroidapp.services.UpdateService;
 public class MainActivity extends AppCompatActivity {
 
     public static final String PREFERRED_LANGUAGE = "preferred language";
+    public static final String DEFAULT_LANGUAGE = "es";
     private static final String TAG="EC+ MainActivity";
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
@@ -122,8 +105,6 @@ public class MainActivity extends AppCompatActivity {
 
         barraProgreso = (ProgressBar) findViewById(R.id.progressBar);
 
-        DAO.setContext(this);
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -149,7 +130,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void updateDatabase() {
         SharedPreferences preferences = getSharedPreferences(Splash.ECPLUS_MAIN_PREFS, Context.MODE_PRIVATE);
-        String preferredLanguage = preferences.getString(MainActivity.PREFERRED_LANGUAGE, "cat");
+        String preferredLanguage = preferences.getString(MainActivity.PREFERRED_LANGUAGE, DEFAULT_LANGUAGE);
 
         UpdateService.startUpdateSyndromes(this, preferredLanguage);
         UpdateService.startUpdateWords(this, preferredLanguage, Resolucion.BAJA.toString());

@@ -13,19 +13,17 @@ import android.widget.ListView;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
+
+import javax.crypto.spec.DESedeKeySpec;
 
 import es.uma.ecplusproject.ecplusandroidapp.DetallePalabra;
 import es.uma.ecplusproject.ecplusandroidapp.MainActivity;
 import es.uma.ecplusproject.ecplusandroidapp.R;
 import es.uma.ecplusproject.ecplusandroidapp.Splash;
-import es.uma.ecplusproject.ecplusandroidapp.modelo.CargarListaPalabras;
-import es.uma.ecplusproject.ecplusandroidapp.modelo.DAO;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.PalabrasDAO;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.PalabrasDAOImpl;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Palabra;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Resolucion;
-import es.uma.ecplusproject.ecplusandroidapp.restws.DescargaListaPalabras;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -48,7 +46,7 @@ public class PalabrasAvanzadas extends Panel {
         adaptador = new AdaptadorPalabras(getContext());
 
         SharedPreferences preferences = getActivity().getSharedPreferences(Splash.ECPLUS_MAIN_PREFS, Context.MODE_PRIVATE);
-        preferredLanguage = preferences.getString(MainActivity.PREFERRED_LANGUAGE, "cat");
+        preferredLanguage = preferences.getString(MainActivity.PREFERRED_LANGUAGE, MainActivity.DEFAULT_LANGUAGE);
 
         populateAdaptorDBComplete();
 
