@@ -82,6 +82,15 @@ public class Splash extends AppCompatActivity {
             actionBar.hide();
         }
 
+        Set<String> idiomas = new HashSet<>();
+        SharedPreferences preferences = getSharedPreferences(ECPLUS_MAIN_PREFS, MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        addDefaultLanguages(idiomas);
+        editor.putStringSet(LANGUAGES_KEY_PREFS, idiomas);
+        editor.putString(PREFERRED_LANGUAGE, MainActivity.DEFAULT_LANGUAGE);
+
+        editor.commit();
+
         new PreparaDB().execute();
     }
 
@@ -100,6 +109,7 @@ public class Splash extends AppCompatActivity {
             SQLiteDatabase db = helper.getWritableDatabase();
 
             SharedPreferences preferences = getSharedPreferences(ECPLUS_MAIN_PREFS, MODE_PRIVATE);
+
             if (!preferences.contains(LANGUAGES_KEY_PREFS)) {
                 // Consulta el idioma de los recursos
                 // y los guarda en las preferencias
