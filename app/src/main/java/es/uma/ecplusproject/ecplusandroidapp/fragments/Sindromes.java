@@ -47,6 +47,10 @@ public class Sindromes extends Panel {
         SharedPreferences preferences = getActivity().getSharedPreferences(Splash.ECPLUS_MAIN_PREFS, Context.MODE_PRIVATE);
         preferredLanguage = preferences.getString(MainActivity.PREFERRED_LANGUAGE, MainActivity.DEFAULT_LANGUAGE);
 
+        // Añado esto por excepciones que lanza, pero no entiendo la razón
+        if (preferredLanguage==null) {
+            preferredLanguage = MainActivity.DEFAULT_LANGUAGE;
+        }
 
         reloadSyndromes();
 
