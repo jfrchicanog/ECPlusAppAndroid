@@ -96,8 +96,16 @@ public class AdaptadorRecursos extends RecyclerView.Adapter<AdaptadorRecursos.Re
         @Override
         public void bindRecursoAV(RecursoAV recurso) {
             super.bindRecursoAV(recurso);
-            File file = resourcesStore.getFileResource(recurso.getFicheros().get(resolucion));
-            if (file.exists()) {
+
+            String hash = recurso.getFicheros().get(resolucion);
+            File file;
+            if (hash != null) {
+                file = resourcesStore.getFileResource(hash);
+            } else {
+                file = null;
+            }
+
+            if (file!=null && file.exists()) {
                 Bitmap bm = ThumbnailUtils.createVideoThumbnail(file.getPath(), MediaStore.Images.Thumbnails.MINI_KIND);
                 thumbnail.setImageBitmap(bm);
                 thumbnail.setVisibility(View.VISIBLE);
@@ -122,8 +130,13 @@ public class AdaptadorRecursos extends RecyclerView.Adapter<AdaptadorRecursos.Re
         @Override
         public void bindRecursoAV(RecursoAV recurso) {
             super.bindRecursoAV(recurso);
-            Log.d("Adpater", "Mostrando "+recurso.getFicheros().get(resolucion));
-            imagenSVG = resourcesStore.tryToUseSVG(pictograma, recurso.getFicheros().get(resolucion));
+            String hash = recurso.getFicheros().get(resolucion);
+            Log.d("Adpater", "Mostrando "+ hash);
+            if (hash != null) {
+                imagenSVG = resourcesStore.tryToUseSVG(pictograma, hash);
+            } else {
+                imagenSVG = null;
+            }
             if (imagenSVG != null){
                 texto.setVisibility(View.GONE);
             } else {
@@ -145,18 +158,21 @@ public class AdaptadorRecursos extends RecyclerView.Adapter<AdaptadorRecursos.Re
         @Override
         public void bindRecursoAV(RecursoAV recurso) {
             super.bindRecursoAV(recurso);
-            resourcesStore.tryToUseBitmap(foto, recurso.getFicheros().get(resolucion),
-                    new ResourcesStore.BitmapLoadListener() {
-                        @Override
-                        public void finishedBitmapLoad(Bitmap bitmap) {
-                            FotoViewHolder.this.bitmap = bitmap;
-                            if (bitmap!=null) {
-                                texto.setVisibility(View.GONE);
-                            } else {
-                                texto.setVisibility(View.VISIBLE);
+            String hash = recurso.getFicheros().get(resolucion);
+            if (hash != null) {
+                resourcesStore.tryToUseBitmap(foto, hash,
+                        new ResourcesStore.BitmapLoadListener() {
+                            @Override
+                            public void finishedBitmapLoad(Bitmap bitmap) {
+                                FotoViewHolder.this.bitmap = bitmap;
+                                if (bitmap != null) {
+                                    texto.setVisibility(View.GONE);
+                                } else {
+                                    texto.setVisibility(View.VISIBLE);
+                                }
                             }
-                        }
-                    });
+                        });
+            }
         }
     }
 

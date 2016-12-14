@@ -91,15 +91,27 @@ public class AdaptadorPalabras extends ArrayAdapter<Palabra> implements SectionI
         SVGImageView icono = viewHolder.icono;
 
         if (palabra.getIcono()!= null && palabra.getIcono() instanceof Pictograma) {
-            resourceStore.tryToUseSVG(icono, palabra.getIcono().getFicheros().get(resolucion));
+            String hash = palabra.getIcono().getFicheros().get(resolucion);
+            if (hash != null) {
+                resourceStore.tryToUseSVG(icono, hash);
+            } else {
+                icono.setSVG(resourceStore.getApplicationLogoSVG());
+            }
         } else {
-            icono.setSVG(resourceStore.getApplicationLogoSVG());
+            String hash = null;
             for (RecursoAV recurso : palabra.getRecursos()) {
                 if (recurso instanceof Pictograma) {
-                    resourceStore.tryToUseSVG(icono, recurso.getFicheros().get(resolucion));
-                    break;
+                    hash = recurso.getFicheros().get(resolucion);
+                    if (hash != null) {
+                        resourceStore.tryToUseSVG(icono, hash);
+                        break;
+                    }
                 }
             }
+            if (hash == null) {
+                icono.setSVG(resourceStore.getApplicationLogoSVG());
+            }
+
         }
         return view;
     }

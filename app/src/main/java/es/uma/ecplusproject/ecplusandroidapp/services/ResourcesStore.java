@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
@@ -107,7 +108,7 @@ public class ResourcesStore {
     }
 
     public SVG tryToUseSVG(SVGImageView icono, String hash) {
-        SVG svg = getSVGFromFile(hash);
+        SVG svg = hash!=null?getSVGFromFile(hash):null;
         if (svg != null) {
             icono.setSVG(svg);
             return svg;
@@ -118,19 +119,19 @@ public class ResourcesStore {
     }
 
     public SVG getApplicationLogoSVG() {
-        if (applicationLog != null) {
-        }
-        try {
-            InputStream is = contexto.getResources().openRawResource(R.raw.logo_proyecto);
-            SVG svg = SVG.getFromInputStream(is);
-            svg.renderToPicture();
-            is.close();
-            SVG.Box box = svg.getDocumentBoundingBox();
-            svg.setDocumentViewBox(box.minX, box.minY, box.width, box.height);
-            applicationLog = svg;
+        if (applicationLog == null) {
+            try {
+                InputStream is = contexto.getResources().openRawResource(R.raw.logo_proyecto);
+                SVG svg = SVG.getFromInputStream(is);
+                svg.renderToPicture();
+                is.close();
+                SVG.Box box = svg.getDocumentBoundingBox();
+                svg.setDocumentViewBox(box.minX, box.minY, box.width, box.height);
+                applicationLog = svg;
 
-        } catch (IOException | SVGParseException e) {
-            e.printStackTrace();
+            } catch (IOException | SVGParseException e) {
+                e.printStackTrace();
+            }
         }
         return applicationLog;
     }
@@ -148,19 +149,24 @@ public class ResourcesStore {
     }
 
     public void tryToUseBitmap(final ImageView imagen, final String hash, final BitmapLoadListener listener) {
-        Log.d("RS", "width: "+imagen.getWidth()+", height: "+imagen.getHeight());
-        if (imagen.getWidth()==0 || imagen.getHeight()==0) {
-            imagen.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-                @Override
-                public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                    new CargaBitmapEscalado(imagen, hash, listener).execute(v.getWidth());
-                    v.removeOnLayoutChangeListener(this);
-                }
-            });
+        if (hash != null) {
+            Log.d("RS", "width: " + imagen.getWidth() + ", height: " + imagen.getHeight());
+            if (imagen.getWidth() == 0 || imagen.getHeight() == 0) {
+                imagen.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                    @Override
+                    public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                        new CargaBitmapEscalado(imagen, hash, listener).execute(v.getWidth());
+                        v.removeOnLayoutChangeListener(this);
+                    }
+                });
+            } else {
+                new CargaBitmapEscalado(imagen, hash, listener).execute(imagen.getWidth());
+            }
         } else {
-            new CargaBitmapEscalado(imagen, hash, listener).execute(imagen.getWidth());
+            // TODO
         }
     }
+
 
     private Bitmap getBitmapFromFile(String hash, int width) {
         Bitmap bitmap=null;

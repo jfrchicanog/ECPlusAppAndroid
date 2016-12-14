@@ -165,7 +165,7 @@ public class UpdateService extends IntentService {
         for (Palabra palabra: getDAOPalabras().getWords(language, resolution)) {
             for (RecursoAV recurso: palabra.getRecursos()) {
                 String hash = recurso.getFicheros().get(resolution);
-                if (!existsResource(hash)) {
+                if (hash != null && !existsResource(hash)) {
                     downloadResource(hash);
                 }
             }
