@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.Rect;
@@ -71,7 +72,13 @@ public class DetallePalabra extends AppCompatActivity {
             if (viewHolder instanceof AdaptadorRecursos.PictogramaViewHolder) {
                 imagen.setSVG(((AdaptadorRecursos.PictogramaViewHolder) viewHolder).imagenSVG);
             } else if (viewHolder instanceof AdaptadorRecursos.FotoViewHolder) {
-                imagen.setImageBitmap(((AdaptadorRecursos.FotoViewHolder) viewHolder).bitmap);
+
+                Bitmap bitmap = ((AdaptadorRecursos.FotoViewHolder) viewHolder).bitmap;
+                if (bitmap!=null) {
+                    imagen.setImageBitmap(bitmap);
+                } else {
+                    imagen.setImageDrawable(resourcesStore.getDefaultDrawable());
+                }
             }
             touchableArea.setVisibility(View.VISIBLE);
 

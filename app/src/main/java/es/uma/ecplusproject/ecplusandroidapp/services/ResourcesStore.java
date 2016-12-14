@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -27,6 +28,9 @@ public class ResourcesStore {
     private static final String FILES_PATH="resources";
     private File filesDirectory;
     private Context contexto;
+
+    private SVG applicationLog;
+    private Drawable drawable;
 
     public interface BitmapLoadListener {
         void finishedBitmapLoad(Bitmap bitmap);
@@ -54,7 +58,7 @@ public class ResourcesStore {
                 imagen.setImageBitmap(bm);
                 fireBitmapLoadFinished(bm);
             } else {
-                imagen.setImageDrawable(contexto.getResources().getDrawable(R.drawable.logo));
+                imagen.setImageDrawable(getDefaultDrawable());
                 fireBitmapLoadFinished(null);
             }
         }
@@ -64,6 +68,13 @@ public class ResourcesStore {
                 listener.finishedBitmapLoad(success);
             }
         }
+    }
+
+    public Drawable getDefaultDrawable() {
+        if (drawable == null) {
+            drawable = contexto.getResources().getDrawable(R.drawable.logo);
+        }
+        return drawable;
     }
 
     public ResourcesStore(Context context) {
@@ -102,11 +113,13 @@ public class ResourcesStore {
             return svg;
         } else {
             icono.setSVG(getApplicationLogoSVG());
-            return null;
+            return getApplicationLogoSVG();
         }
     }
 
     public SVG getApplicationLogoSVG() {
+        if (applicationLog != null) {
+        }
         try {
             InputStream is = contexto.getResources().openRawResource(R.raw.logo_proyecto);
             SVG svg = SVG.getFromInputStream(is);
@@ -114,11 +127,12 @@ public class ResourcesStore {
             is.close();
             SVG.Box box = svg.getDocumentBoundingBox();
             svg.setDocumentViewBox(box.minX, box.minY, box.width, box.height);
-            return svg;
+            applicationLog = svg;
+
         } catch (IOException | SVGParseException e) {
             e.printStackTrace();
-            return null;
         }
+        return applicationLog;
     }
 
     public Bitmap getBitmapFromFile(String hash) {
