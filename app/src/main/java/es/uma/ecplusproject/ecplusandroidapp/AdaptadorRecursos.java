@@ -51,6 +51,7 @@ public class AdaptadorRecursos extends RecyclerView.Adapter<AdaptadorRecursos.Re
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    System.out.println("click");
                     if (listener != null) {
                         listener.onItemClick(RecursosAVViewHolder.this);
                     }
@@ -80,6 +81,7 @@ public class AdaptadorRecursos extends RecyclerView.Adapter<AdaptadorRecursos.Re
         }
 
         private void prepareMediaController() {
+            /*
             video.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
@@ -88,7 +90,7 @@ public class AdaptadorRecursos extends RecyclerView.Adapter<AdaptadorRecursos.Re
                     video.setMediaController(mediaController);
                     thumbnail.setVisibility(View.GONE);
                 }
-            });
+            });*/
         }
 
         @Override

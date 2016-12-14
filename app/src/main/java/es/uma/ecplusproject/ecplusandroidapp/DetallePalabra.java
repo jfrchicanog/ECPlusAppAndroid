@@ -265,6 +265,9 @@ public class DetallePalabra extends AppCompatActivity {
                     Log.d(TAG, "Click en elemento");
                     izc = new ImageZoomCoordinator(viewHolder, viewHolder.getRecurso().getFicheros().get(Resolucion.BAJA));
                     izc.zoomIn();
+                } else {
+                    ((AdaptadorRecursos.VideoViewHolder) viewHolder).video.start();
+                    ((AdaptadorRecursos.VideoViewHolder) viewHolder).thumbnail.setVisibility(GONE);
                 }
             }
         });
