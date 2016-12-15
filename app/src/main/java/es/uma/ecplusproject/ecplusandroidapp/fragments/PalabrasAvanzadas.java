@@ -90,7 +90,9 @@ public class PalabrasAvanzadas extends Panel {
     }
 
     public void reloadWords() {
-        populateAdaptorDBComplete();
+        if (preferredLanguage != null) {
+            populateAdaptorDBComplete();
+        }
     }
 
 

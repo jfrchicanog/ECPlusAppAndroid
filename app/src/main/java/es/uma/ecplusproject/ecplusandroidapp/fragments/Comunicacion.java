@@ -89,7 +89,9 @@ public class Comunicacion extends Panel {
     }
 
     public void reloadSyndromes() {
-        populateAdaptorDBComplete();
+        if (preferredLanguage != null) {
+            populateAdaptorDBComplete();
+        }
     }
 
     @Override

@@ -88,7 +88,9 @@ public class Palabras extends Panel {
     }
 
     public void reloadWords() {
-        populateAdaptorDBComplete();
+        if (preferredLanguage!=null) {
+            populateAdaptorDBComplete();
+        }
     }
 
 

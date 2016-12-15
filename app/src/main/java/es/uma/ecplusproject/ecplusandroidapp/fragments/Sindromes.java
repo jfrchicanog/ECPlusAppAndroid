@@ -48,9 +48,10 @@ public class Sindromes extends Panel {
         preferredLanguage = preferences.getString(MainActivity.PREFERRED_LANGUAGE, MainActivity.DEFAULT_LANGUAGE);
 
         // Añado esto por excepciones que lanza, pero no entiendo la razón
+        /*
         if (preferredLanguage==null) {
             preferredLanguage = MainActivity.DEFAULT_LANGUAGE;
-        }
+        }*/
 
         reloadSyndromes();
 
@@ -93,7 +94,9 @@ public class Sindromes extends Panel {
     }
 
     public void reloadSyndromes() {
-        populateAdaptorDBComplete();
+        if (preferredLanguage != null) {
+            populateAdaptorDBComplete();
+        }
     }
 
     @Override
