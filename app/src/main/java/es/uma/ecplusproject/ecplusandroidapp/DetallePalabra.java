@@ -81,6 +81,7 @@ public class DetallePalabra extends AppCompatActivity {
                 }
             }
             touchableArea.setVisibility(View.VISIBLE);
+            viewHolder.itemView.setVisibility(View.INVISIBLE);
 
             return prepareZoomInAnimation();
 
@@ -205,6 +206,7 @@ public class DetallePalabra extends AppCompatActivity {
         protected void zoomedOut() {
             Log.d(TAG, "Zoomed out");
             touchableArea.setVisibility(View.INVISIBLE);
+            viewHolder.itemView.setVisibility(View.VISIBLE);
         }
     }
     private AdaptadorRecursos adaptador;
