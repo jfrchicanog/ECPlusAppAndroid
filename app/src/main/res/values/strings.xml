@@ -11,4 +11,5 @@
     <string name="videoNotAvailable">Video not available</string>
     <string name="pictogramNotAvailable">Pictogram not available</string>
     <string name="pictureNotAvailable">Picture not available</string>
+    <string name="pictograms">Pictograms</string>
 </resources>

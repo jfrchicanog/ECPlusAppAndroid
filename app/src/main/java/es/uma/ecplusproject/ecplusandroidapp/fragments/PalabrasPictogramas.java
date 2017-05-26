@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.GridView;
 import android.widget.ListView;
 
 import java.util.Iterator;
@@ -22,27 +23,29 @@ import es.uma.ecplusproject.ecplusandroidapp.Splash;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.PalabrasDAO;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.PalabrasDAOImpl;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Palabra;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Pictograma;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.RecursoAV;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Resolucion;
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class Palabras extends Panel {
+public class PalabrasPictogramas extends Panel {
 
-    private ListView listaPalabras;
-    private AdaptadorPalabras adaptador;
+    private GridView listaPalabras;
+    private AdaptadorPictogramas adaptador;
     private String preferredLanguage;
 
-    public Palabras() {
+    public PalabrasPictogramas() {
         super();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.palabras, container, false);
-        listaPalabras = (ListView)rootView.findViewById(R.id.listaPalabras);
-        adaptador = new AdaptadorPalabras(getContext());
+        View rootView = inflater.inflate(R.layout.pictogramas, container, false);
+        listaPalabras = (GridView)rootView.findViewById(R.id.listaPalabras);
+        adaptador = new AdaptadorPictogramas(getContext());
 
         SharedPreferences preferences = getActivity().getSharedPreferences(Splash.ECPLUS_MAIN_PREFS, Context.MODE_PRIVATE);
         preferredLanguage = preferences.getString(MainActivity.PREFERRED_LANGUAGE, MainActivity.DEFAULT_LANGUAGE);
@@ -59,7 +62,7 @@ public class Palabras extends Panel {
             }
         });
 
-        listaPalabras.setFastScrollEnabled(true);
+        //listaPalabras.setFastScrollEnabled(true);
 
         return rootView;
     }
@@ -73,9 +76,21 @@ public class Palabras extends Panel {
                 Iterator<Palabra> iterator = palabras.iterator();
                 while (iterator.hasNext()) {
                     Palabra palabra = iterator.next();
-                    if (palabra.getAvanzada()!=null && palabra.getAvanzada()) {
+                    boolean icon = false;
+                    if (palabra.getIcono()!=null && palabra.getIcono() instanceof Pictograma) {
+                        icon = true;
+                    } else {
+                        for (RecursoAV recurso : palabra.getRecursos()) {
+                            if (recurso instanceof Pictograma) {
+                                icon = true;
+                            }
+                        }
+
+                    }
+                    if (!icon) {
                         iterator.remove();
                     }
+
                 }
                 return palabras;
             }
@@ -98,6 +113,6 @@ public class Palabras extends Panel {
 
     @Override
     public String getFragmentName() {
-        return contexto.getString(R.string.palabras);
+        return contexto.getString(R.string.pictograms);
     }
 }

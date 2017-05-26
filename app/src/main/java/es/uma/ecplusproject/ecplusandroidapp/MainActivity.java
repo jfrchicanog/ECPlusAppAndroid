@@ -24,6 +24,7 @@ import es.uma.ecplusproject.ecplusandroidapp.dialogs.ChooseLanguageDialog;
 import es.uma.ecplusproject.ecplusandroidapp.fragments.Comunicacion;
 import es.uma.ecplusproject.ecplusandroidapp.fragments.Palabras;
 import es.uma.ecplusproject.ecplusandroidapp.fragments.PalabrasAvanzadas;
+import es.uma.ecplusproject.ecplusandroidapp.fragments.PalabrasPictogramas;
 import es.uma.ecplusproject.ecplusandroidapp.fragments.Sindromes;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Resolucion;
 import es.uma.ecplusproject.ecplusandroidapp.services.UpdateListener;
@@ -78,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
     private Comunicacion panelComunicacion;
     private Palabras panelPalabras;
     private PalabrasAvanzadas panelPalabrasAvanzadas;
+    private PalabrasPictogramas panelPalabrasPictogramas;
     private ProgressBar barraProgreso;
 
     private void reportUpdateEvent(UpdateListenerEvent event) {
@@ -120,7 +122,7 @@ public class MainActivity extends AppCompatActivity {
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager(),
-                getPanelPalabras(), getPanelPalabrasAvanzadas(), getPanelSindromes(), getPanelComunicacion());
+                getPanelPictogramas(), getPanelPalabras(), getPanelPalabrasAvanzadas(), getPanelSindromes(), getPanelComunicacion());
 
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
@@ -164,6 +166,15 @@ public class MainActivity extends AppCompatActivity {
             panelPalabras.setContext(this);
         }
         return panelPalabras;
+    }
+
+    @NonNull
+    private PalabrasPictogramas getPanelPictogramas() {
+        if (panelPalabrasPictogramas == null) {
+            panelPalabrasPictogramas = new PalabrasPictogramas();
+            panelPalabrasPictogramas.setContext(this);
+        }
+        return panelPalabrasPictogramas;
     }
 
     @NonNull
