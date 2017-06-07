@@ -31,7 +31,7 @@ import static es.uma.ecplusproject.ecplusandroidapp.MainActivity.PREFERRED_LANGU
 public class Splash extends AppCompatActivity {
 
     public static final String TAG="Splash";
-    public static final long DURATION=2000;
+    public static final long DURATION=3000;
     public static final String ECPLUS_MAIN_PREFS = "ecplus-main";
     public static final String LANGUAGES_KEY_PREFS = "languages";
     public static final String [] LANGUAGES = new String []{"es", "cat", "de", "nl", "en"};
