@@ -190,17 +190,24 @@ public class AdaptadorRecursos extends RecyclerView.Adapter<AdaptadorRecursos.Re
         @Override
         public void bindRecursoAV(RecursoAV recurso) {
             super.bindRecursoAV(recurso);
-            String hash = recurso.getFicheros().get(resolucion);
-            if (hash != null) {
-                try {
+            try {
+                String hash = recurso.getFicheros().get(resolucion);
+                if (mediaPlayer != null) {
+                    mediaPlayer.release();
                     mediaPlayer= null;
-                    mediaPlayer = new MediaPlayer();
-                    Uri uri = android.net.Uri.fromFile(resourcesStore.getFileResource(hash));
-                    mediaPlayer.setDataSource(itemView.getContext(), uri);
-                    mediaPlayer.prepare();
-                } catch (IOException e) {
-                    mediaPlayer=null;
                 }
+
+                if (hash != null) {
+                    File path = resourcesStore.getFileResource(hash);
+                    if (path.exists()) {
+                        Uri uri = android.net.Uri.fromFile(path);
+                        mediaPlayer = new MediaPlayer();
+                        mediaPlayer.setDataSource(itemView.getContext(), uri);
+                        mediaPlayer.prepare();
+                    }
+                }
+            } catch (IOException e) {
+                Log.e("AdaptadorRecursos", e.getMessage());
             }
         }
     }
