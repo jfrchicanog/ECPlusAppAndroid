@@ -48,6 +48,9 @@ public abstract class RecursoAV implements Serializable {
             case "Fotografia":
                 rav = new Fotografia();
                 break;
+            case "Audio":
+                rav = new Audio();
+                break;
         }
         return rav;
     }

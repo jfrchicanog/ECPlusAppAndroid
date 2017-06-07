@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.media.ThumbnailUtils;
+import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -19,15 +20,19 @@ import com.caverock.androidsvg.SVG;
 import com.caverock.androidsvg.SVGImageView;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Audio;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Fotografia;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Pictograma;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.RecursoAV;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Resolucion;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Video;
 import es.uma.ecplusproject.ecplusandroidapp.services.ResourcesStore;
+
+import static es.uma.ecplusproject.ecplusandroidapp.R.id.texto;
 
 /**
  * Created by francis on 13/5/16.
@@ -176,6 +181,30 @@ public class AdaptadorRecursos extends RecyclerView.Adapter<AdaptadorRecursos.Re
         }
     }
 
+    public class AudioViewHolder extends RecursosAVViewHolder {
+        public MediaPlayer mediaPlayer;
+        public AudioViewHolder(View foto) {
+            super(foto);
+        }
+
+        @Override
+        public void bindRecursoAV(RecursoAV recurso) {
+            super.bindRecursoAV(recurso);
+            String hash = recurso.getFicheros().get(resolucion);
+            if (hash != null) {
+                try {
+                    mediaPlayer= null;
+                    mediaPlayer = new MediaPlayer();
+                    Uri uri = android.net.Uri.fromFile(resourcesStore.getFileResource(hash));
+                    mediaPlayer.setDataSource(itemView.getContext(), uri);
+                    mediaPlayer.prepare();
+                } catch (IOException e) {
+                    mediaPlayer=null;
+                }
+            }
+        }
+    }
+
     private ResourcesStore resourcesStore;
     private Resolucion resolucion = Resolucion.BAJA;
     private List<RecursoAV> recursos;
@@ -200,6 +229,9 @@ public class AdaptadorRecursos extends RecyclerView.Adapter<AdaptadorRecursos.Re
             case TIPO_FOTO:
                 view = LayoutInflater.from(parent.getContext()).inflate(R.layout.detallefoto, parent, false);
                 return new FotoViewHolder(view);
+            case TIPO_AUDIO:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.detalleaudio, parent, false);
+                return new AudioViewHolder(view);
         }
         return null;
     }
@@ -219,6 +251,8 @@ public class AdaptadorRecursos extends RecyclerView.Adapter<AdaptadorRecursos.Re
             return TIPO_FOTO;
         } else if (recurso instanceof Video) {
             return TIPO_VIDEO;
+        } else if (recurso instanceof Audio) {
+            return TIPO_AUDIO;
         }
 
         return super.getItemViewType(position);

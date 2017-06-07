@@ -270,13 +270,15 @@ public class DetallePalabra extends AppCompatActivity {
         adaptador.setItemClickListener(new AdaptadorRecursos.ItemClickListener() {
             @Override
             public void onItemClick(AdaptadorRecursos.RecursosAVViewHolder viewHolder) {
-                if (!(viewHolder instanceof AdaptadorRecursos.VideoViewHolder)) {
+                if (viewHolder instanceof AdaptadorRecursos.VideoViewHolder) {
+                    ((AdaptadorRecursos.VideoViewHolder) viewHolder).video.start();
+                    ((AdaptadorRecursos.VideoViewHolder) viewHolder).thumbnail.setVisibility(GONE);
+                } else if (viewHolder instanceof AdaptadorRecursos.AudioViewHolder) {
+                    ((AdaptadorRecursos.AudioViewHolder) viewHolder).mediaPlayer.start();
+                } else {
                     Log.d(TAG, "Click en elemento");
                     izc = new ImageZoomCoordinator(viewHolder, viewHolder.getRecurso().getFicheros().get(Resolucion.BAJA));
                     izc.zoomIn();
-                } else {
-                    ((AdaptadorRecursos.VideoViewHolder) viewHolder).video.start();
-                    ((AdaptadorRecursos.VideoViewHolder) viewHolder).thumbnail.setVisibility(GONE);
                 }
             }
         });
