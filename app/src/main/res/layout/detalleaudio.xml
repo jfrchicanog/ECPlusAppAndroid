@@ -14,8 +14,7 @@
         android:id="@+id/audio"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/cardview_shadow_start_color"
-        android:scaleType="centerInside"
-        card_view:srcCompat="@android:drawable/ic_lock_silent_mode_off" />
+        android:scaleType="centerCrop"
+        android:src="@mipmap/ic_volume_up_black_24dp" />
 
 </es.uma.ecplusproject.ecplusandroidapp.views.SquaredCardView>
