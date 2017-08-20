@@ -8,6 +8,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -17,6 +18,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import es.uma.ecplusproject.ecplusandroidapp.modelo.PalabrasDAO;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.PalabrasDAOImpl;
@@ -151,6 +153,8 @@ public class UpdateService extends IntentService {
 
             fireEvent(UpdateListenerEvent.stopUpdateWordsDatabaseEvent(databaseChanged));
 
+            removeUnusedFiles();
+
             updateFiles(language, resolution);
             updating = false;
             fireEvent(UpdateListenerEvent.stopUpdateWordsFilesEvent(false));
@@ -158,6 +162,19 @@ public class UpdateService extends IntentService {
             Log.d(TAG, e.getMessage());
             updating=false;
             fireEvent(UpdateListenerEvent.stopUpdateWordsError());
+        }
+    }
+
+    private void removeUnusedFiles() {
+        Set<String> usedHashes = getDAOPalabras().getAllHashes();
+        Log.d(TAG, "Used Hashes: "+usedHashes.size());
+        File[] allFileResourcesInStore = getResourcesStore().getAllFileResourcesInStore();
+        Log.d(TAG, "Files in Store: "+allFileResourcesInStore.length);
+        for (File file: allFileResourcesInStore) {
+            if (!usedHashes.contains(file.getName())) {
+                Log.d(TAG, "Deleting file: "+file.getName());
+                file.delete();
+            }
         }
     }
 

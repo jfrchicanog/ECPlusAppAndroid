@@ -7,8 +7,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import es.uma.ecplusproject.ecplusandroidapp.database.ECPlusDB;
 import es.uma.ecplusproject.ecplusandroidapp.database.ECPlusDBContract;
@@ -76,6 +78,10 @@ public class PalabrasDAOImpl implements PalabrasDAO {
             "on r."+ECPlusDBContract.RecursoAudioVisual.ID+"=pr."+ECPlusDBContract.PalabraRecursoAudioVisual.REF_RECURSO_AUDIOVISUAL+" " +
             "where p."+ECPlusDBContract.Palabra.REF_LISTA_PALABRAS+"=? " +
             "order by pr."+ECPlusDBContract.PalabraRecursoAudioVisual.REF_PALABRA+" ASC";
+
+    private static final String allHashesQuery = "select "+
+            ECPlusDBContract.Ficheros.HASH+ " "+
+            "from " + ECPlusDBContract.Ficheros.TABLE_NAME;
 
     private static final String TAG="PalabrasDAOImpl";
 
@@ -367,4 +373,19 @@ public class PalabrasDAOImpl implements PalabrasDAO {
                 new String[]{""+ wordId});
     }
 
+    @Override
+    public Set<String> getAllHashes() {
+        Set<String> result = new HashSet<>();
+        Cursor c = db.query(true, ECPlusDBContract.Ficheros.TABLE_NAME,new String[]{ECPlusDBContract.Ficheros.HASH},
+                null, null, null, null, null, null);
+
+        if (c.moveToFirst()){
+            do {
+                result.add(c.getString(c.getColumnIndex(ECPlusDBContract.Ficheros.HASH)).toLowerCase());
+            } while (c.moveToNext());
+        }
+        c.close();
+
+        return result;
+    }
 }

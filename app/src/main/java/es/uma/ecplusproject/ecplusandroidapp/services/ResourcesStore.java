@@ -17,9 +17,11 @@ import com.caverock.androidsvg.SVGImageView;
 import com.caverock.androidsvg.SVGParseException;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 import es.uma.ecplusproject.ecplusandroidapp.R;
 import es.uma.ecplusproject.ecplusandroidapp.fragments.AdaptadorPalabras;
@@ -89,6 +91,15 @@ public class ResourcesStore {
     @NonNull
     public File getFileResource(String hash) {
         return new File(filesDirectory,hash.toLowerCase());
+    }
+
+    public File [] getAllFileResourcesInStore() {
+        return filesDirectory.listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File pathname) {
+                return !pathname.isDirectory() && pathname.canRead() && pathname.exists() && pathname.isFile();
+            }
+        });
     }
 
     @NonNull
