@@ -16,9 +16,10 @@ import es.uma.ecplusproject.ecplusandroidapp.R;
  */
 public class ECPlusDBHelper extends SQLiteOpenHelper {
 
-    public static final int DATABASE_VERSION = 2;
+    public static final int DATABASE_VERSION = 3;
     public static final String DATABASE_FILE = "ecplusdb-android.db";
-    private DatabaseVersionChange [] transformaciones = new DatabaseVersionChange[]{new Version1To2()};
+    private DatabaseVersionChange [] transformaciones = new DatabaseVersionChange[]{
+            new Version1To2(), new Version2To3()};
 
     private static final String SQL_CREATE_FICHEROS = "CREATE TABLE " + ECPlusDBContract.Ficheros.TABLE_NAME
             + "("
@@ -74,9 +75,15 @@ public class ECPlusDBHelper extends SQLiteOpenHelper {
             "  "+ECPlusDBContract.Palabra.AVANZADA+" bit(1) DEFAULT NULL,\n" +
             "  "+ECPlusDBContract.Palabra.REF_ICONO+" bigint(20) DEFAULT NULL,\n" +
             "  "+ECPlusDBContract.Palabra.REF_LISTA_PALABRAS+" bigint(20) DEFAULT NULL,\n" +
+            "  "+ECPlusDBContract.Palabra.REF_ICONO_PERSONALIZADO+" bigint(20) DEFAULT NULL,\n" +
+            "  "+ECPlusDBContract.Palabra.REF_CATEGORIA+" bigint(20) DEFAULT NULL,\n" +
+            "  "+ECPlusDBContract.Palabra.REF_PALABRA_CONTRARIA+" bigint(20) DEFAULT NULL,\n" +
             "  PRIMARY KEY ("+ECPlusDBContract.Palabra.ID+"),\n" +
             "  CONSTRAINT `FKrfwuygvxilyqojx92fgys5xq2` FOREIGN KEY ("+ECPlusDBContract.Palabra.REF_LISTA_PALABRAS+") REFERENCES "+ECPlusDBContract.ListaPalabras.TABLE_NAME+" ("+ECPlusDBContract.ListaPalabras.ID+"),\n" +
-            "  CONSTRAINT `FKrsd5gspwqehrhvny29n6y1xki` FOREIGN KEY ("+ECPlusDBContract.Palabra.REF_ICONO+") REFERENCES "+ECPlusDBContract.RecursoAudioVisual.TABLE_NAME+" ("+ECPlusDBContract.RecursoAudioVisual.ID+")" +
+            "  CONSTRAINT `FKrsd5gspwqehrhvny29n6y1xki` FOREIGN KEY ("+ECPlusDBContract.Palabra.REF_ICONO+") REFERENCES "+ECPlusDBContract.RecursoAudioVisual.TABLE_NAME+" ("+ECPlusDBContract.RecursoAudioVisual.ID+"),\n" +
+            "  CONSTRAINT `Palabra2Categoria` FOREIGN KEY (" + ECPlusDBContract.Palabra.REF_CATEGORIA + ") REFERENCES " +ECPlusDBContract.Categoria.TABLE_NAME+" ("+ECPlusDBContract.Categoria.ID+"),\n"+
+            "  CONSTRAINT `IconoPersonalizado` FOREIGN KEY ("+ECPlusDBContract.Palabra.REF_ICONO_PERSONALIZADO+") REFERENCES " +ECPlusDBContract.RecursoAudioVisual.TABLE_NAME+" ("+ECPlusDBContract.RecursoAudioVisual.ID+"),\n"+
+            "  CONSTRAINT `PalabraContraria` FOREIGN KEY ("+ECPlusDBContract.Palabra.REF_PALABRA_CONTRARIA+") REFERENCES " +ECPlusDBContract.Palabra.TABLE_NAME+" ("+ECPlusDBContract.Palabra.ID+")"+
             ") ";
 
     private static final String SQL_CREATE_PALABRA_RECURSO_AUDIOVISUAL="CREATE TABLE "+ECPlusDBContract.PalabraRecursoAudioVisual.TABLE_NAME+" (\n" +
@@ -106,6 +113,27 @@ public class ECPlusDBHelper extends SQLiteOpenHelper {
             +ECPlusDBContract.ListaSindromes.TABLE_NAME+" ("+ECPlusDBContract.ListaSindromes.ID+")\n" +
             ") ";
 
+    static final String SQL_CREATE_CATEGORIA = "CREATE TABLE "+ECPlusDBContract.Categoria.TABLE_NAME+" (\n" +
+            "  "+ECPlusDBContract.Categoria.ID+" bigint(20) NOT NULL,\n" +
+            "  "+ECPlusDBContract.Categoria.NOMBRE+" varchar(255) DEFAULT NULL,\n" +
+            "  "+ECPlusDBContract.Categoria.REF_LISTA_PALABRAS+" bigint(20) DEFAULT NULL,\n" +
+            "  PRIMARY KEY ("+ECPlusDBContract.Categoria.ID+"),\n" +
+            "  CONSTRAINT `Categoria2ListaPalabras` FOREIGN KEY ("
+            +ECPlusDBContract.Categoria.REF_LISTA_PALABRAS+") REFERENCES "
+            +ECPlusDBContract.ListaPalabras.TABLE_NAME+" ("+ECPlusDBContract.ListaPalabras.ID+")\n" +
+            ") ";
+
+    static final String SQL_CREATE_USO_PALABRA = "CREATE TABLE "+ECPlusDBContract.UsoPalabra.TABLE_NAME+" (\n" +
+            "  "+ECPlusDBContract.UsoPalabra.REF_PALABRA+" bigint(20) NOT NULL,\n" +
+            "  "+ECPlusDBContract.UsoPalabra.ACCESOS+" bigint(20) NOT NULL,\n" +
+            "  "+ECPlusDBContract.UsoPalabra.ULTIMO_USO+" text DEFAULT NULL,\n" +
+            "  PRIMARY KEY ("+ECPlusDBContract.UsoPalabra.REF_PALABRA+"),\n" +
+            "  CONSTRAINT `Uso2Palabra` FOREIGN KEY ("
+            +ECPlusDBContract.UsoPalabra.REF_PALABRA+") REFERENCES "
+            +ECPlusDBContract.Palabra.TABLE_NAME+" ("+ECPlusDBContract.Palabra.ID+")\n" +
+            ") ";
+
+
 
     private Context context;
     public ECPlusDBHelper(Context context) {
@@ -118,10 +146,12 @@ public class ECPlusDBHelper extends SQLiteOpenHelper {
         db.execSQL(SQL_CREATE_LISTA_PALABRAS);
         db.execSQL(SQL_CREATE_HASHES_LISTA_PALABRAS);
         db.execSQL(SQL_CREATE_RECURSOAUDIOVISUAL);
+        db.execSQL(SQL_CREATE_CATEGORIA);
         db.execSQL(SQL_CREATE_PALABRA);
         db.execSQL(SQL_CREATE_HASHES_PALABRA);
         db.execSQL(SQL_CREATE_PALABRA_RECURSO_AUDIOVISUAL);
         db.execSQL(SQL_CREATE_FICHEROS);
+        db.execSQL(SQL_CREATE_USO_PALABRA);
 
         db.execSQL(SQL_CREATE_LISTA_SINDROMES);
         db.execSQL(SQL_CREATE_SINDROME);

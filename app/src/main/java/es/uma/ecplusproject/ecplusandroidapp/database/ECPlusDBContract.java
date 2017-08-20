@@ -46,6 +46,13 @@ public final class ECPlusDBContract {
         public static final String DTYPE  = "DTYPE";
     }
 
+    public static abstract class Categoria {
+        public static final String TABLE_NAME = "Categoria";
+        public static final String ID = "id";
+        public static final String NOMBRE = "nombre";
+        public static final String REF_LISTA_PALABRAS  = "listapalabras";
+    }
+
     public static abstract class HashesPalabra {
 
         public static final String TABLE_NAME = "HashesPalabra";
@@ -61,6 +68,9 @@ public final class ECPlusDBContract {
         public static final String NOMBRE = "nombre";
         public static final String AVANZADA = "avanzada";
         public static final String REF_ICONO = "icono_id";
+        public static final String REF_ICONO_PERSONALIZADO = "icono_pers_id";
+        public static final String REF_CATEGORIA = "categoria_id";
+        public static final String REF_PALABRA_CONTRARIA = "contraria_id";
         public static final String REF_LISTA_PALABRAS  = "listapalabras";
 
     }
@@ -69,6 +79,14 @@ public final class ECPlusDBContract {
         public static final String TABLE_NAME = "Palabra_RecursoAudioVisual";
         public static final String REF_PALABRA = "Palabra_id";
         public static final String REF_RECURSO_AUDIOVISUAL  = "audiovisuales_id";
+
+    }
+
+    public static abstract class UsoPalabra {
+        public static final String TABLE_NAME = "UsoPalabra";
+        public static final String REF_PALABRA = "palabra_id";
+        public static final String ACCESOS = "accesos";
+        public static final String ULTIMO_USO = "ultimo_uso";
     }
 
     public static abstract class Sindrome {
