@@ -12,4 +12,9 @@
     <string name="pictogramNotAvailable">Pictogram not available</string>
     <string name="pictureNotAvailable">Picture not available</string>
     <string name="pictograms">Pictograms</string>
+    <string name="changePictureTitle">Select a source for the customized picture</string>
+    <string name="changePictureMessage">Changing picture for word %1$s. Select a source for the new picture.</string>
+    <string name="takeFromCamera">Camera</string>
+    <string name="cancel">Cancel</string>
+    <string name="restoreOriginalIcon">Restore</string>
 </resources>

@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.Iterator;
 import java.util.List;
@@ -43,6 +44,7 @@ public class Palabras extends Panel {
         View rootView = inflater.inflate(R.layout.palabras, container, false);
         listaPalabras = (ListView)rootView.findViewById(R.id.listaPalabras);
         adaptador = new AdaptadorPalabras(getContext());
+        adaptador.setChangePictureListener((MainActivity)getActivity());
 
         SharedPreferences preferences = getActivity().getSharedPreferences(Splash.ECPLUS_MAIN_PREFS, Context.MODE_PRIVATE);
         preferredLanguage = preferences.getString(MainActivity.PREFERRED_LANGUAGE, MainActivity.DEFAULT_LANGUAGE);
@@ -100,4 +102,5 @@ public class Palabras extends Panel {
     public String getFragmentName() {
         return contexto.getString(R.string.palabras);
     }
+
 }

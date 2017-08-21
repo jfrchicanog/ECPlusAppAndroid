@@ -6,18 +6,30 @@
     android:layout_height="match_parent">
 
     <android.support.v7.widget.CardView
+        android:id="@+id/externalCardView"
         android:layout_width="@dimen/imagenPalabras"
         android:layout_height="@dimen/imagenPalabras"
         app:cardCornerRadius="4dp"
         android:layout_margin="10dp"
         app:contentPadding="2dp"
+        app:cardBackgroundColor="@color/colorPrimary"
         >
-        <com.caverock.androidsvg.SVGImageView
+        <android.support.v7.widget.CardView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/imagenPalabra"
-            android:src="@mipmap/logo"
-            />
+            app:cardCornerRadius="4dp"
+            app:contentPadding="2dp"
+            app:cardBackgroundColor="@color/cardview_light_background"
+            >
+
+            <com.caverock.androidsvg.SVGImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@+id/imagenPalabra"
+                android:src="@mipmap/logo"
+                />
+        </android.support.v7.widget.CardView>
+
     </android.support.v7.widget.CardView>
 
     <TextView

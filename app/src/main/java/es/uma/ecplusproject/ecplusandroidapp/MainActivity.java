@@ -19,23 +19,29 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
+import es.uma.ecplusproject.ecplusandroidapp.dialogs.ChangePictureDialog;
 import es.uma.ecplusproject.ecplusandroidapp.dialogs.ChooseLanguageDialog;
+import es.uma.ecplusproject.ecplusandroidapp.fragments.ChangePictureListener;
 import es.uma.ecplusproject.ecplusandroidapp.fragments.Comunicacion;
 import es.uma.ecplusproject.ecplusandroidapp.fragments.Palabras;
 import es.uma.ecplusproject.ecplusandroidapp.fragments.PalabrasAvanzadas;
 import es.uma.ecplusproject.ecplusandroidapp.fragments.PalabrasPictogramas;
 import es.uma.ecplusproject.ecplusandroidapp.fragments.Sindromes;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Palabra;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Resolucion;
 import es.uma.ecplusproject.ecplusandroidapp.services.UpdateListener;
 import es.uma.ecplusproject.ecplusandroidapp.services.UpdateListenerEvent;
 import es.uma.ecplusproject.ecplusandroidapp.services.UpdateService;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements ChangePictureListener {
 
     public static final String PREFERRED_LANGUAGE = "preferred language";
     public static final String DEFAULT_LANGUAGE = "es";
     private static final String TAG="EC+ MainActivity";
+    public static final String NOMBRE_PALABRA = "nombrePalabra";
+    public static final String CUSTOMIZED_ICON = "customizedIcon";
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private ViewPager mViewPager;
@@ -234,5 +240,15 @@ public class MainActivity extends AppCompatActivity {
             startActivity(i);
         }
 
+    }
+    @Override
+    public void requestToChangePictureForWord(Palabra palabra) {
+        ChangePictureDialog dialog = new ChangePictureDialog();
+        Bundle arguments = new Bundle();
+        arguments.putString(NOMBRE_PALABRA, palabra.getNombre());
+        arguments.putBoolean(CUSTOMIZED_ICON, palabra.getIconoPersonalizado()!=null);
+        dialog.setArguments(arguments);
+
+        dialog.show(getSupportFragmentManager(),"Change Picture for Word");
     }
 }

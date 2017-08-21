@@ -1,6 +1,7 @@
 package es.uma.ecplusproject.ecplusandroidapp.fragments;
 
 import android.content.Context;
+import android.support.v7.widget.CardView;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.SectionIndexer;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.caverock.androidsvg.SVGImageView;
 
@@ -33,7 +35,7 @@ import es.uma.ecplusproject.ecplusandroidapp.services.ResourcesStore;
 /**
  * Created by francis on 20/4/16.
  */
-public class AdaptadorPalabras extends ArrayAdapter<Palabra> implements SectionIndexer {
+public class AdaptadorPalabras extends ArrayAdapter<Palabra> implements SectionIndexer, View.OnLongClickListener {
 
     private Map<Character, Integer> letraASeccion;
     private Object [] seccionALetra;
@@ -45,11 +47,13 @@ public class AdaptadorPalabras extends ArrayAdapter<Palabra> implements SectionI
     private static class ViewHolder {
         private TextView texto;
         private SVGImageView icono;
+        private CardView externalCardView;
     }
 
     private Context contexto;
     private Resolucion resolucion;
     private ResourcesStore resourceStore;
+    private ChangePictureListener changePictureListener;
 
     public AdaptadorPalabras(Context contexto) {
         super(contexto, 0);
@@ -66,7 +70,20 @@ public class AdaptadorPalabras extends ArrayAdapter<Palabra> implements SectionI
                 return collator.compare(eliminarNoLetras(lhs), eliminarNoLetras(rhs));
             }
         };
+        changePictureListener = null;
 
+    }
+
+    public void setChangePictureListener(ChangePictureListener changePictureListener) {
+        this.changePictureListener=changePictureListener;
+    }
+
+    @Override
+    public boolean onLongClick(View view) {
+        if (changePictureListener!=null) {
+            changePictureListener.requestToChangePictureForWord((Palabra)view.getTag());
+        }
+        return true;
     }
 
     @Override
@@ -78,6 +95,8 @@ public class AdaptadorPalabras extends ArrayAdapter<Palabra> implements SectionI
             ViewHolder viewHolder = new ViewHolder();
             viewHolder.texto = (TextView)view.findViewById(R.id.textoPalabra);
             viewHolder.icono = (SVGImageView)view.findViewById(R.id.imagenPalabra);
+            viewHolder.externalCardView = (CardView) view.findViewById(R.id.externalCardView);
+            viewHolder.externalCardView.setOnLongClickListener(this);
             view.setTag(viewHolder);
 
         } else {
@@ -85,10 +104,16 @@ public class AdaptadorPalabras extends ArrayAdapter<Palabra> implements SectionI
         }
 
         ViewHolder viewHolder = (ViewHolder)view.getTag();
-
         viewHolder.texto.setText(palabra.toString());
         //imagen.setImageDrawable(contexto.getResources().getDrawable(R.drawable.abrigo));
         SVGImageView icono = viewHolder.icono;
+        CardView externalCardView = viewHolder.externalCardView;
+
+        externalCardView.setCardBackgroundColor(getContext().getResources().getColor(
+                palabra.getIconoReemplazable()?R.color.colorPrimary:R.color.cardview_light_background));
+        externalCardView.setLongClickable(palabra.getIconoReemplazable());
+        externalCardView.setTag(palabra);
+
 
         if (palabra.getIcono()!= null && palabra.getIcono() instanceof Pictograma) {
             String hash = palabra.getIcono().getFicheros().get(resolucion);
