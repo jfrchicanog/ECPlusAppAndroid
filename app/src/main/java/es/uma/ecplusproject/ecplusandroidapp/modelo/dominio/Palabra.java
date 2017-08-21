@@ -15,13 +15,13 @@ public class Palabra implements Serializable {
     private List<RecursoAV> recursos;
     private Map<Resolucion, String> hashes;
     private RecursoAV icono;
+    private String iconoPersonalizado;
     private Boolean iconoReemplazable;
     private Boolean avanzada;
 
     public Boolean getAvanzada() {
         return avanzada;
     }
-
     public void setAvanzada(Boolean avanzada) {
         this.avanzada = avanzada;
     }
@@ -86,5 +86,13 @@ public class Palabra implements Serializable {
 
     public void setIconoReemplazable(Boolean iconoReemplazable) {
         this.iconoReemplazable = iconoReemplazable;
+    }
+
+    public String getIconoPersonalizado() {
+        return iconoPersonalizado;
+    }
+
+    public void setIconoPersonalizado(String iconoPersonalizado) {
+        this.iconoPersonalizado = iconoPersonalizado;
     }
 }

@@ -68,7 +68,7 @@ public final class ECPlusDBContract {
         public static final String NOMBRE = "nombre";
         public static final String AVANZADA = "avanzada";
         public static final String REF_ICONO = "icono_id";
-        public static final String REF_ICONO_PERSONALIZADO = "icono_pers_id";
+        public static final String ICONO_PERSONALIZADO = "icono_pers";
         public static final String REF_CATEGORIA = "categoria_id";
         public static final String REF_PALABRA_CONTRARIA = "contraria_id";
         public static final String REF_LISTA_PALABRAS  = "listapalabras";

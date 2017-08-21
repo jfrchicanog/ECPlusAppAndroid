@@ -24,8 +24,7 @@ public class Version2To3 extends DatabaseVersionChangeAdapter {
         );
 
         db.execSQL("ALTER TABLE "+ECPlusDBContract.Palabra.TABLE_NAME
-                +" ADD "+ECPlusDBContract.Palabra.REF_ICONO_PERSONALIZADO+" bigint(20) default null"
-                +" REFERENCES " +ECPlusDBContract.RecursoAudioVisual.TABLE_NAME+" ("+ECPlusDBContract.RecursoAudioVisual.ID+")"
+                +" ADD "+ECPlusDBContract.Palabra.ICONO_PERSONALIZADO+" text default null"
         );
 
         db.execSQL("ALTER TABLE "+ECPlusDBContract.Palabra.TABLE_NAME

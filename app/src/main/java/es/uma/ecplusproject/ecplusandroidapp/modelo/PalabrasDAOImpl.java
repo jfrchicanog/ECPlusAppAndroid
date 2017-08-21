@@ -28,6 +28,7 @@ public class PalabrasDAOImpl implements PalabrasDAO {
     private static final String NOMBRE = "nombre";
     private static final String DTYPE = "dtype";
     private static final String ICON = "icon";
+    private static final String PERSONALIZED_ICON = "pers_icon";
     private static final String REPLACEABLE_ICON = "replaceableIcon";
     private static final String AVANZADA = "advanced";
     private static final String HASH = "hash";
@@ -39,6 +40,7 @@ public class PalabrasDAOImpl implements PalabrasDAO {
             "p."+ECPlusDBContract.Palabra.ICONO_REEMPLAZABLE+" as "+REPLACEABLE_ICON+", "+
             "p."+ECPlusDBContract.Palabra.AVANZADA+" as "+AVANZADA+", "+
             "p."+ECPlusDBContract.Palabra.REF_ICONO+" as "+ICON+", "+
+            "p."+ECPlusDBContract.Palabra.ICONO_PERSONALIZADO+" as "+PERSONALIZED_ICON+", "+
             "r."+ECPlusDBContract.RecursoAudioVisual.ID+" as "+RID+", "+
             "r."+ECPlusDBContract.RecursoAudioVisual.DTYPE+" as "+DTYPE+", " +
             "f."+ECPlusDBContract.Ficheros.HASH+" as "+HASH+", " +
@@ -130,6 +132,9 @@ public class PalabrasDAOImpl implements PalabrasDAO {
                     palabra.getHashes().put(resolution, c.getString(c.getColumnIndex(HASH_PALABRA)));
                     palabra.setIconoReemplazable(c.getInt(c.getColumnIndex(REPLACEABLE_ICON))>0);
                     palabra.setAvanzada(c.getInt(c.getColumnIndex(AVANZADA))>0);
+                    if (!c.isNull(c.getColumnIndex(PERSONALIZED_ICON))) {
+                        palabra.setIconoPersonalizado(c.getString(c.getColumnIndex(PERSONALIZED_ICON)));
+                    }
                 }
                 if (!c.isNull(c.getColumnIndex(DTYPE))) {
                     RecursoAV rav = RecursoAV.createRecursoAV(c.getString(c.getColumnIndex(DTYPE)));

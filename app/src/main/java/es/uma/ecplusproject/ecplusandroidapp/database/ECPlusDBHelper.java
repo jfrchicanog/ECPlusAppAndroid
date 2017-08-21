@@ -75,14 +75,13 @@ public class ECPlusDBHelper extends SQLiteOpenHelper {
             "  "+ECPlusDBContract.Palabra.AVANZADA+" bit(1) DEFAULT NULL,\n" +
             "  "+ECPlusDBContract.Palabra.REF_ICONO+" bigint(20) DEFAULT NULL,\n" +
             "  "+ECPlusDBContract.Palabra.REF_LISTA_PALABRAS+" bigint(20) DEFAULT NULL,\n" +
-            "  "+ECPlusDBContract.Palabra.REF_ICONO_PERSONALIZADO+" bigint(20) DEFAULT NULL,\n" +
+            "  "+ECPlusDBContract.Palabra.ICONO_PERSONALIZADO+" text DEFAULT NULL,\n" +
             "  "+ECPlusDBContract.Palabra.REF_CATEGORIA+" bigint(20) DEFAULT NULL,\n" +
             "  "+ECPlusDBContract.Palabra.REF_PALABRA_CONTRARIA+" bigint(20) DEFAULT NULL,\n" +
             "  PRIMARY KEY ("+ECPlusDBContract.Palabra.ID+"),\n" +
             "  CONSTRAINT `FKrfwuygvxilyqojx92fgys5xq2` FOREIGN KEY ("+ECPlusDBContract.Palabra.REF_LISTA_PALABRAS+") REFERENCES "+ECPlusDBContract.ListaPalabras.TABLE_NAME+" ("+ECPlusDBContract.ListaPalabras.ID+"),\n" +
             "  CONSTRAINT `FKrsd5gspwqehrhvny29n6y1xki` FOREIGN KEY ("+ECPlusDBContract.Palabra.REF_ICONO+") REFERENCES "+ECPlusDBContract.RecursoAudioVisual.TABLE_NAME+" ("+ECPlusDBContract.RecursoAudioVisual.ID+"),\n" +
             "  CONSTRAINT `Palabra2Categoria` FOREIGN KEY (" + ECPlusDBContract.Palabra.REF_CATEGORIA + ") REFERENCES " +ECPlusDBContract.Categoria.TABLE_NAME+" ("+ECPlusDBContract.Categoria.ID+"),\n"+
-            "  CONSTRAINT `IconoPersonalizado` FOREIGN KEY ("+ECPlusDBContract.Palabra.REF_ICONO_PERSONALIZADO+") REFERENCES " +ECPlusDBContract.RecursoAudioVisual.TABLE_NAME+" ("+ECPlusDBContract.RecursoAudioVisual.ID+"),\n"+
             "  CONSTRAINT `PalabraContraria` FOREIGN KEY ("+ECPlusDBContract.Palabra.REF_PALABRA_CONTRARIA+") REFERENCES " +ECPlusDBContract.Palabra.TABLE_NAME+" ("+ECPlusDBContract.Palabra.ID+")"+
             ") ";
 
