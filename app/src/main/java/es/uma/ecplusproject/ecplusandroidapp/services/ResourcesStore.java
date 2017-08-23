@@ -4,8 +4,10 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.ExifInterface;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -213,36 +215,101 @@ public class ResourcesStore {
 
     private Bitmap getBitmapFromFile(String hash, int width) {
         Bitmap bitmap=null;
-
+        try {
         File fichero = getFileResource(hash);
-        // Averiguamos las dimensiones de la imagen sin cargarla
-        BitmapFactory.Options opciones = new BitmapFactory.Options();
-        opciones.inJustDecodeBounds=true;
-        BitmapFactory.decodeFile(fichero.getAbsolutePath(), opciones);
+            ExifInterface exif = new ExifInterface(fichero.getAbsolutePath());
+            int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION,
+                    ExifInterface.ORIENTATION_UNDEFINED);
 
-        int originalWidth= opciones.outWidth;
-        int originalHeight= opciones.outHeight;
+            // Averiguamos las dimensiones de la imagen sin cargarla
+            BitmapFactory.Options opciones = new BitmapFactory.Options();
+            opciones.inJustDecodeBounds=true;
+            BitmapFactory.decodeFile(fichero.getAbsolutePath(), opciones);
 
-        // Calculamos por cuanto tenemos que dividir las dimensiones de la imagen
+            int originalWidth= opciones.outWidth;
+            int originalHeight= opciones.outHeight;
 
-        if (originalWidth < width) {
-            return BitmapFactory.decodeFile(fichero.getAbsolutePath());
+            // Calculamos por cuanto tenemos que dividir las dimensiones de la imagen
+
+            if (originalWidth < width) {
+                return BitmapFactory.decodeFile(fichero.getAbsolutePath());
+            }
+
+            double ratio = (double)originalWidth / width;
+            double height = originalHeight/ratio;
+
+            // Ajustamos el tamño de la muestra para cargar una versión reducida
+            opciones.inSampleSize = 1 << ((int)Math.floor(Math.log(ratio)/Math.log(2.0)));
+            opciones.inJustDecodeBounds = false;
+
+            // Cargamos la imagen (si es capaz de decodificarla)
+            bitmap = BitmapFactory.decodeFile(fichero.getAbsolutePath(), opciones);
+            if (bitmap != null) {
+                Bitmap newBitmap = Bitmap.createScaledBitmap(bitmap, width, (int) height, false);
+                if (newBitmap!=bitmap) {
+                    bitmap.recycle();
+                }
+                bitmap=newBitmap;
+
+                newBitmap = rotateBitmap(bitmap, orientation);
+                if (newBitmap != bitmap) {
+                    bitmap.recycle();
+                }
+                bitmap=newBitmap;
+            }
+
+            return bitmap;
+
+        } catch (IOException e) {
+            Log.d("ResourceStore", e.getMessage());
+            e.printStackTrace();
         }
 
-        double ratio = (double)originalWidth / width;
-        double height = originalHeight/ratio;
+        return null;
+    }
 
-        // Ajustamos el tamño de la muestra para cargar una versión reducida
-        opciones.inSampleSize = 1 << ((int)Math.floor(Math.log(ratio)/Math.log(2.0)));
-        opciones.inJustDecodeBounds = false;
+    private static Bitmap rotateBitmap(Bitmap bitmap, int orientation) {
 
-        // Cargamos la imagen (si es capaz de decodificarla)
-        bitmap = BitmapFactory.decodeFile(fichero.getAbsolutePath(), opciones);
-        if (bitmap != null) {
-            bitmap = Bitmap.createScaledBitmap(bitmap, width, (int) height, false);
+        Matrix matrix = new Matrix();
+        switch (orientation) {
+            case ExifInterface.ORIENTATION_NORMAL:
+                return bitmap;
+            case ExifInterface.ORIENTATION_FLIP_HORIZONTAL:
+                matrix.setScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_180:
+                matrix.setRotate(180);
+                break;
+            case ExifInterface.ORIENTATION_FLIP_VERTICAL:
+                matrix.setRotate(180);
+                matrix.postScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_TRANSPOSE:
+                matrix.setRotate(90);
+                matrix.postScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_90:
+                matrix.setRotate(90);
+                break;
+            case ExifInterface.ORIENTATION_TRANSVERSE:
+                matrix.setRotate(-90);
+                matrix.postScale(-1, 1);
+                break;
+            case ExifInterface.ORIENTATION_ROTATE_270:
+                matrix.setRotate(-90);
+                break;
+            default:
+                return bitmap;
         }
-
-        return bitmap;
+        try {
+            Bitmap bmRotated = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+            bitmap.recycle();
+            return bmRotated;
+        }
+        catch (OutOfMemoryError e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 }
