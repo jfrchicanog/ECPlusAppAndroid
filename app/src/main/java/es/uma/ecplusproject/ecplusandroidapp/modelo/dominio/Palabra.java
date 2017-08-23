@@ -1,5 +1,8 @@
 package es.uma.ecplusproject.ecplusandroidapp.modelo.dominio;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,6 +21,7 @@ public class Palabra implements Serializable {
     private String iconoPersonalizado;
     private Boolean iconoReemplazable;
     private Boolean avanzada;
+    private Long listaPalabrasId;
 
     public Boolean getAvanzada() {
         return avanzada;
@@ -94,5 +98,13 @@ public class Palabra implements Serializable {
 
     public void setIconoPersonalizado(String iconoPersonalizado) {
         this.iconoPersonalizado = iconoPersonalizado;
+    }
+
+    public Long getListaPalabrasId() {
+        return listaPalabrasId;
+    }
+
+    public void setListaPalabrasId(Long listaPalabrasId) {
+        this.listaPalabrasId = listaPalabrasId;
     }
 }

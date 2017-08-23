@@ -279,8 +279,10 @@ public class UpdateService extends IntentService {
             } else {
                 //Log.d(TAG, "Should I update? "+local.getId()+" "+local.getNombre());
                 if (!local.getHash(resolution).equalsIgnoreCase(remote.getHash(resolution))) {
+                    remote.setIconoPersonalizado(local.getIconoPersonalizado());
+                    remote.setListaPalabrasId(local.getListaPalabrasId());
                     Log.d(TAG, "Updating "+local.getId()+" "+local.getNombre());
-                    getDAOPalabras().updateWord(remote, language);
+                    getDAOPalabras().updateWord(remote);
                 }
                 local = getNextElementOfIterator(localIterator);
                 remote = getNextElementOfIterator(remoteIterator);

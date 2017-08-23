@@ -1,7 +1,10 @@
 package es.uma.ecplusproject.ecplusandroidapp.fragments;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.CardView;
+import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -44,10 +47,35 @@ public class AdaptadorPalabras extends ArrayAdapter<Palabra> implements SectionI
     private final Comparator<String> comparador;
     private final Collator collator;
 
-    private static class ViewHolder {
+    private class ViewHolder implements ResourcesStore.ImageViewContainer{
         private TextView texto;
         private SVGImageView icono;
         private CardView externalCardView;
+
+        private ResourcesStore.CargaBitmapEscalado loader;
+
+        public void asynchronousBitmapLoad(String hash) {
+            this.loader=resourceStore. new CargaBitmapEscalado(this, hash, null);
+            resourceStore.tryToUseBitmap(icono, loader);
+        }
+
+        public void cancelAsynchronousBitmapLoad(){
+            this.loader= null;
+        }
+
+        @Override
+        public void setImageBitmap(ResourcesStore.CargaBitmapEscalado cargador, Bitmap bm) {
+            if (cargador == loader) {
+                icono.setImageBitmap(bm);
+            }
+        }
+
+        @Override
+        public void setImageDrawable(ResourcesStore.CargaBitmapEscalado cargador, Drawable dr) {
+            if (cargador== loader) {
+                icono.setImageDrawable(dr);
+            }
+        }
     }
 
     private Context contexto;
@@ -114,9 +142,13 @@ public class AdaptadorPalabras extends ArrayAdapter<Palabra> implements SectionI
         externalCardView.setLongClickable(palabra.getIconoReemplazable());
         externalCardView.setTag(palabra);
 
-
-        if (palabra.getIcono()!= null && palabra.getIcono() instanceof Pictograma) {
+        if (palabra.getIconoPersonalizado()!= null) {
+            Log.d("AdaptadorPalabras", "Poniendo imagen en "+icono);
+            viewHolder.asynchronousBitmapLoad(palabra.getIconoPersonalizado());
+        }
+        else if (palabra.getIcono()!= null && palabra.getIcono() instanceof Pictograma) {
             String hash = palabra.getIcono().getFicheros().get(resolucion);
+            viewHolder.cancelAsynchronousBitmapLoad();
             if (hash != null) {
                 resourceStore.tryToUseSVG(icono, hash);
             } else {
@@ -124,6 +156,7 @@ public class AdaptadorPalabras extends ArrayAdapter<Palabra> implements SectionI
             }
         } else {
             String hash = null;
+            viewHolder.cancelAsynchronousBitmapLoad();
             for (RecursoAV recurso : palabra.getRecursos()) {
                 if (recurso instanceof Pictograma) {
                     hash = recurso.getFicheros().get(resolucion);

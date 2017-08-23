@@ -22,13 +22,17 @@ import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Palabra;
  */
 public class ChangePictureDialog extends DialogFragment {
 
-    private String nombrePalabra;
-    private boolean customizedIcon;
+    public enum PictureSource {CAMERA, GALLERY, RESTORE};
 
-    @Override
-    public void setArguments(Bundle args) {
-        nombrePalabra = args.getString(MainActivity.NOMBRE_PALABRA);
-        customizedIcon = args.getBoolean(MainActivity.CUSTOMIZED_ICON);
+    public interface OnSourceSelectionListener {
+        void onSourceSelection(Palabra palabra, PictureSource source);
+    }
+
+    private Palabra palabra;
+    private OnSourceSelectionListener listener;
+
+    public void setPalabra(Palabra palabra) {
+        this.palabra=palabra;
     }
 
     @NonNull
@@ -40,7 +44,7 @@ public class ChangePictureDialog extends DialogFragment {
         //builder.setMessage(String.format(getString(R.string.changePictureMessage),nombrePalabra));
 
         String [] options;
-        if (customizedIcon) {
+        if (palabra.getIconoPersonalizado()!=null) {
             options = new String[]{getString(R.string.takeFromCamera), getString(R.string.restoreOriginalIcon)};
         } else {
             options = new String[]{getString(R.string.takeFromCamera)};
@@ -49,13 +53,25 @@ public class ChangePictureDialog extends DialogFragment {
         builder.setItems(options, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                // TODO
+                PictureSource source = null;
+                switch (which){
+                    case 0: source=PictureSource.CAMERA;
+                        break;
+                    case 1: source=PictureSource.RESTORE;
+                        break;
+                }
+                if (listener!=null) {
+                    listener.onSourceSelection(palabra,source);
+                }
             }
         });
-
 
         builder.setNegativeButton(R.string.cancel, null);
 
         return builder.create();
+    }
+
+    public void setOnSourceSelectionListener(OnSourceSelectionListener listener) {
+        this.listener=listener;
     }
 }

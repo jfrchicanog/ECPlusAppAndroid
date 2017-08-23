@@ -97,6 +97,10 @@ public class Palabras extends Panel {
         }
     }
 
+    public void dataChanged() {
+        adaptador.notifyDataSetChanged();
+    }
+
 
     @Override
     public String getFragmentName() {

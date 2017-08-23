@@ -26,6 +26,7 @@ public class PalabrasDAOImpl implements PalabrasDAO {
     private static final String PID = "pid";
     private static final String RID = "rid";
     private static final String NOMBRE = "nombre";
+    private static final String LISTA_PALABRAS_ID = "lpid";
     private static final String DTYPE = "dtype";
     private static final String ICON = "icon";
     private static final String PERSONALIZED_ICON = "pers_icon";
@@ -35,6 +36,7 @@ public class PalabrasDAOImpl implements PalabrasDAO {
     private static final String HASH_PALABRA = "hashp";
 
     private static final String megaconsulta = "select " +
+            "lp."+ ECPlusDBContract.ListaPalabras.ID+" as "+LISTA_PALABRAS_ID+", " +
             "p."+ ECPlusDBContract.Palabra.NOMBRE+" as "+NOMBRE+", " +
             "p."+ECPlusDBContract.Palabra.ID+" as "+PID+", " +
             "p."+ECPlusDBContract.Palabra.ICONO_REEMPLAZABLE+" as "+REPLACEABLE_ICON+", "+
@@ -129,6 +131,7 @@ public class PalabrasDAOImpl implements PalabrasDAO {
                     }
                     palabra = new Palabra(c.getString(c.getColumnIndex(NOMBRE)));
                     palabra.setId(idPalabra);
+                    palabra.setListaPalabrasId(c.getLong(c.getColumnIndex(LISTA_PALABRAS_ID)));
                     palabra.getHashes().put(resolution, c.getString(c.getColumnIndex(HASH_PALABRA)));
                     palabra.setIconoReemplazable(c.getInt(c.getColumnIndex(REPLACEABLE_ICON))>0);
                     palabra.setAvanzada(c.getInt(c.getColumnIndex(AVANZADA))>0);
@@ -293,8 +296,12 @@ public class PalabrasDAOImpl implements PalabrasDAO {
     }
 
     @Override
-    public void updateWord(Palabra remote, String language) {
-        Long idList = getIDForWordList(language);
+    public void updateWord(Palabra remote) {
+        if (remote.getListaPalabrasId()==null) {
+            throw new IllegalArgumentException("I don¡t identify the word list to add this word");
+        }
+        //Long idList = getIDForWordList(language);
+        Long idList = remote.getListaPalabrasId();
         ContentValues values = new ContentValues();
 
         for (RecursoAV rav: remote.getRecursos()) {
@@ -332,6 +339,9 @@ public class PalabrasDAOImpl implements PalabrasDAO {
         values.put(ECPlusDBContract.Palabra.REF_LISTA_PALABRAS, idList);
         if (remote.getIcono()!=null) {
             values.put(ECPlusDBContract.Palabra.REF_ICONO, remote.getIcono().getId());
+        }
+        if (remote.getIconoPersonalizado()!=null) {
+            values.put(ECPlusDBContract.Palabra.ICONO_PERSONALIZADO, remote.getIconoPersonalizado());
         }
         db.replace(ECPlusDBContract.Palabra.TABLE_NAME,null, values);
     }
@@ -387,6 +397,18 @@ public class PalabrasDAOImpl implements PalabrasDAO {
         if (c.moveToFirst()){
             do {
                 result.add(c.getString(c.getColumnIndex(ECPlusDBContract.Ficheros.HASH)).toLowerCase());
+            } while (c.moveToNext());
+        }
+        c.close();
+
+        c = db.query(true, ECPlusDBContract.Palabra.TABLE_NAME,new String[]{ECPlusDBContract.Palabra.ICONO_PERSONALIZADO},
+                null,null,null,null,null,null);
+
+        if (c.moveToFirst()) {
+            do {
+                if (!c.isNull(c.getColumnIndex(ECPlusDBContract.Palabra.ICONO_PERSONALIZADO))) {
+                    result.add(c.getString(c.getColumnIndex(ECPlusDBContract.Palabra.ICONO_PERSONALIZADO)));
+                }
             } while (c.moveToNext());
         }
         c.close();

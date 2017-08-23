@@ -39,12 +39,37 @@ public class ResourcesStore {
         void finishedBitmapLoad(Bitmap bitmap);
     }
 
+    public interface ImageViewContainer {
+        void setImageBitmap(CargaBitmapEscalado loader, Bitmap bm);
+        void setImageDrawable(CargaBitmapEscalado loader, Drawable dr);
+    }
+
+    public static class ImageViewContainerAdapter  implements ImageViewContainer{
+        private ImageView imageView;
+
+        public ImageViewContainerAdapter(ImageView im) {
+            imageView=im;
+        }
+
+        @Override
+        public void setImageBitmap(CargaBitmapEscalado loader, Bitmap bm) {
+            imageView.setImageBitmap(bm);
+        }
+
+        @Override
+        public void setImageDrawable(CargaBitmapEscalado loader, Drawable dr) {
+            imageView.setImageDrawable(dr);
+        }
+
+
+    }
+
     public class CargaBitmapEscalado extends AsyncTask<Integer, Void, Bitmap> {
-        private ImageView imagen;
+        private ImageViewContainer imagen;
         private String hash;
         private BitmapLoadListener listener;
 
-        public CargaBitmapEscalado(ImageView imagen, String hash, BitmapLoadListener listener) {
+        public CargaBitmapEscalado(ImageViewContainer imagen, String hash, BitmapLoadListener listener) {
             this.imagen = imagen;
             this.hash=hash;
             this.listener=listener;
@@ -58,10 +83,10 @@ public class ResourcesStore {
         @Override
         protected void onPostExecute(Bitmap bm) {
             if (bm != null) {
-                imagen.setImageBitmap(bm);
+                imagen.setImageBitmap(this, bm);
                 fireBitmapLoadFinished(bm);
             } else {
-                imagen.setImageDrawable(getDefaultDrawable());
+                imagen.setImageDrawable(this, getDefaultDrawable());
                 fireBitmapLoadFinished(null);
             }
         }
@@ -161,21 +186,28 @@ public class ResourcesStore {
 
     public void tryToUseBitmap(final ImageView imagen, final String hash, final BitmapLoadListener listener) {
         if (hash != null) {
-            Log.d("RS", "width: " + imagen.getWidth() + ", height: " + imagen.getHeight());
-            if (imagen.getWidth() == 0 || imagen.getHeight() == 0) {
-                imagen.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
-                    @Override
-                    public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
-                        new CargaBitmapEscalado(imagen, hash, listener).execute(v.getWidth());
-                        v.removeOnLayoutChangeListener(this);
-                    }
-                });
-            } else {
-                new CargaBitmapEscalado(imagen, hash, listener).execute(imagen.getWidth());
-            }
+            final CargaBitmapEscalado cargador = new CargaBitmapEscalado(new ImageViewContainerAdapter(imagen), hash, listener);
+            tryToUseBitmap(imagen, cargador);
         } else {
             // TODO
         }
+    }
+
+    public void tryToUseBitmap(final ImageView imagen, final CargaBitmapEscalado cargador) {
+
+        Log.d("RS", "width: " + imagen.getWidth() + ", height: " + imagen.getHeight());
+        if (imagen.getWidth() == 0 || imagen.getHeight() == 0) {
+            imagen.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+                @Override
+                public void onLayoutChange(View v, int left, int top, int right, int bottom, int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                    cargador.execute(v.getWidth());
+                    v.removeOnLayoutChangeListener(this);
+                }
+            });
+        } else {
+            cargador.execute(imagen.getWidth());
+        }
+
     }
 
 
