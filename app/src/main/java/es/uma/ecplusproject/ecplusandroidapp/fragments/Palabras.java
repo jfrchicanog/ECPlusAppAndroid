@@ -98,7 +98,9 @@ public class Palabras extends Panel {
     }
 
     public void dataChanged() {
-        adaptador.notifyDataSetChanged();
+        if (adaptador !=null) {
+            adaptador.notifyDataSetChanged();
+        }
     }
 
 
