@@ -269,7 +269,7 @@ public class AdaptadorPalabras extends ArrayAdapter<Palabra> implements SectionI
 
         boolean thereAreFrequent=false;
         int posicion=0;
-        if (getItem(posicion).getAccesos()!=null) {
+        if (posicion < getCount() && getItem(posicion).getAccesos()!=null) {
             thereAreFrequent=true;
             letras.add(contexto.getString(R.string.frequent));
             secciones.add(posicion);
