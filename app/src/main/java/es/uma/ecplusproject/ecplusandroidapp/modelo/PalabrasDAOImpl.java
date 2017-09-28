@@ -34,6 +34,8 @@ public class PalabrasDAOImpl implements PalabrasDAO {
     private static final String AVANZADA = "advanced";
     private static final String HASH = "hash";
     private static final String HASH_PALABRA = "hashp";
+    private static final String ACCESOS = "acceso";
+    private static final String ULTIMO_USO = "ultuso";
 
     private static final String megaconsulta = "select " +
             "lp."+ ECPlusDBContract.ListaPalabras.ID+" as "+LISTA_PALABRAS_ID+", " +
@@ -46,7 +48,9 @@ public class PalabrasDAOImpl implements PalabrasDAO {
             "r."+ECPlusDBContract.RecursoAudioVisual.ID+" as "+RID+", "+
             "r."+ECPlusDBContract.RecursoAudioVisual.DTYPE+" as "+DTYPE+", " +
             "f."+ECPlusDBContract.Ficheros.HASH+" as "+HASH+", " +
-            "hp."+ECPlusDBContract.HashesPalabra.HASH+" as "+HASH_PALABRA+" "+
+            "hp."+ECPlusDBContract.HashesPalabra.HASH+" as "+HASH_PALABRA+", "+
+            "up."+ECPlusDBContract.UsoPalabra.ACCESOS+" as "+ACCESOS+", "+
+            "up."+ECPlusDBContract.UsoPalabra.ULTIMO_USO+" as "+ULTIMO_USO+" "+
             "from "+ECPlusDBContract.Palabra.TABLE_NAME+" p " +
             "inner join "+ECPlusDBContract.HashesPalabra.TABLE_NAME+" hp on p."+
             ECPlusDBContract.Palabra.ID+" = hp."+ECPlusDBContract.HashesPalabra.REF_PALABRA+" "+
@@ -59,6 +63,8 @@ public class PalabrasDAOImpl implements PalabrasDAO {
             "and f."+ECPlusDBContract.Ficheros.RESOLUCION+"= hp."+ECPlusDBContract.HashesPalabra.RESOLUCION+" "+
             "inner join "+ECPlusDBContract.ListaPalabras.TABLE_NAME+" lp on lp."
             +ECPlusDBContract.ListaPalabras.ID+" = p."+ECPlusDBContract.Palabra.REF_LISTA_PALABRAS+" " +
+            "left join "+ECPlusDBContract.UsoPalabra.TABLE_NAME+" up on p."
+            +ECPlusDBContract.Palabra.ID+" = up."+ECPlusDBContract.UsoPalabra.REF_PALABRA+" "+
             "where hp."+ECPlusDBContract.Ficheros.RESOLUCION+" = ? and lp."+ECPlusDBContract.ListaPalabras.IDIOMA+"=? " +
             "order by p."+ECPlusDBContract.Palabra.NOMBRE+"," +
             "p."+ECPlusDBContract.Palabra.ID+" "+
@@ -138,6 +144,11 @@ public class PalabrasDAOImpl implements PalabrasDAO {
                     if (!c.isNull(c.getColumnIndex(PERSONALIZED_ICON))) {
                         palabra.setIconoPersonalizado(c.getString(c.getColumnIndex(PERSONALIZED_ICON)));
                     }
+
+                    if (!c.isNull(c.getColumnIndex(ACCESOS))) {
+                        palabra.setAccesos(c.getLong(c.getColumnIndex(ACCESOS)));
+                    }
+
                 }
                 if (!c.isNull(c.getColumnIndex(DTYPE))) {
                     RecursoAV rav = RecursoAV.createRecursoAV(c.getString(c.getColumnIndex(DTYPE)));
@@ -259,6 +270,9 @@ public class PalabrasDAOImpl implements PalabrasDAO {
         values.put(ECPlusDBContract.Palabra.ICONO_REEMPLAZABLE, word.getIconoReemplazable());
         values.put(ECPlusDBContract.Palabra.AVANZADA, word.getAvanzada());
         values.put(ECPlusDBContract.Palabra.NOMBRE, word.getNombre());
+        if (word.getIconoPersonalizado()!=null) {
+            values.put(ECPlusDBContract.Palabra.ICONO_PERSONALIZADO, word.getIconoPersonalizado());
+        }
         if (word.getIcono()!=null) {
             values.put(ECPlusDBContract.Palabra.REF_ICONO, word.getIcono().getId());
         }
@@ -344,6 +358,13 @@ public class PalabrasDAOImpl implements PalabrasDAO {
             values.put(ECPlusDBContract.Palabra.ICONO_PERSONALIZADO, remote.getIconoPersonalizado());
         }
         db.replace(ECPlusDBContract.Palabra.TABLE_NAME,null, values);
+    }
+
+    public void updateUso(Palabra palabra) {
+        ContentValues values = new ContentValues();
+        values.put(ECPlusDBContract.UsoPalabra.REF_PALABRA, palabra.getId());
+        values.put(ECPlusDBContract.UsoPalabra.ACCESOS, palabra.getAccesos());
+        db.replace(ECPlusDBContract.UsoPalabra.TABLE_NAME, null, values);
     }
 
     @Override

@@ -4,7 +4,9 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +24,9 @@ public class Palabra implements Serializable {
     private Boolean iconoReemplazable;
     private Boolean avanzada;
     private Long listaPalabrasId;
+
+    private Long accesos;
+    private Date ultimoUso;
 
     public Boolean getAvanzada() {
         return avanzada;
@@ -106,5 +111,28 @@ public class Palabra implements Serializable {
 
     public void setListaPalabrasId(Long listaPalabrasId) {
         this.listaPalabrasId = listaPalabrasId;
+    }
+
+    public Long getAccesos() {
+        return accesos;
+    }
+
+    public void incrementAccesos() {
+        if (accesos==null) {
+            accesos = 0L;
+        }
+        accesos++;
+    }
+
+    public void setAccesos(Long accesos) {
+        this.accesos = accesos;
+    }
+
+    public Date getUltimoUso() {
+        return ultimoUso;
+    }
+
+    public void setUltimoUso(Date ultimoUso) {
+        this.ultimoUso = ultimoUso;
     }
 }

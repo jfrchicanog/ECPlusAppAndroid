@@ -25,8 +25,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import es.uma.ecplusproject.ecplusandroidapp.R;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Palabra;
@@ -40,14 +42,20 @@ import es.uma.ecplusproject.ecplusandroidapp.services.ResourcesStore;
  */
 public class AdaptadorPalabras extends ArrayAdapter<Palabra> implements SectionIndexer, View.OnLongClickListener {
 
+    private final int WORD_VIEW=0;
+    private final int SEPARATOR_VIEW=1;
+    private final int VIEW_TYPES=2;
+
     private Map<Character, Integer> letraASeccion;
     private Object [] seccionALetra;
     private Integer [] inicioSeccion;
+    private Set<Integer> initialInSection;
 
     private final Comparator<String> comparador;
     private final Collator collator;
 
     private class ViewHolder implements ResourcesStore.ImageViewContainer{
+        private TextView sectionLabel;
         private TextView texto;
         private SVGImageView icono;
         private CardView externalCardView;
@@ -115,12 +123,32 @@ public class AdaptadorPalabras extends ArrayAdapter<Palabra> implements SectionI
     }
 
     @Override
+    public int getViewTypeCount() {
+        return VIEW_TYPES;
+    }
+
+    public int getItemViewType(int position) {
+        if (initialInSection.contains(position)) {
+            return SEPARATOR_VIEW;
+        } else {
+            return WORD_VIEW;
+        }
+    }
+
+    @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         Palabra palabra = getItem(position);
         View view=null;
         if (convertView == null) {
-            view = LayoutInflater.from(contexto).inflate(R.layout.entradapalabra, null);
             ViewHolder viewHolder = new ViewHolder();
+
+            if (getItemViewType(position) == SEPARATOR_VIEW) {
+                view = LayoutInflater.from(contexto).inflate(R.layout.sectionentradapalabra, null);
+                viewHolder.sectionLabel = (TextView) view.findViewById(R.id.section);
+            } else {
+                view = LayoutInflater.from(contexto).inflate(R.layout.entradapalabra, null);
+            }
+
             viewHolder.texto = (TextView)view.findViewById(R.id.textoPalabra);
             viewHolder.icono = (SVGImageView)view.findViewById(R.id.imagenPalabra);
             viewHolder.externalCardView = (CardView) view.findViewById(R.id.externalCardView);
@@ -171,6 +199,10 @@ public class AdaptadorPalabras extends ArrayAdapter<Palabra> implements SectionI
             }
 
         }
+
+        if (getItemViewType(position) == SEPARATOR_VIEW) {
+            viewHolder.sectionLabel.setText(seccionALetra[getSectionForPosition(position)].toString());
+        }
         return view;
     }
 
@@ -187,7 +219,15 @@ public class AdaptadorPalabras extends ArrayAdapter<Palabra> implements SectionI
     @Override
     public int getSectionForPosition(int position) {
         Palabra palabra = getItem(position);
-        return letraASeccion.get(primeraLetra(palabra.getNombre()));
+        if (palabra.getAccesos() != null) {
+            return 0;
+        } else {
+            return letraASeccion.get(primeraLetra(palabra.getNombre()));
+        }
+    }
+
+    public void touchOrder() {
+        recalcularIndice();
     }
 
     @Override
@@ -206,30 +246,56 @@ public class AdaptadorPalabras extends ArrayAdapter<Palabra> implements SectionI
         sort(new Comparator<Palabra>() {
             @Override
             public int compare(Palabra lhs, Palabra rhs) {
-                return comparador.compare(lhs.getNombre(), rhs.getNombre());
+                if (lhs.getAccesos()!=null && rhs.getAccesos()==null) {
+                    return -1;
+                } else if (lhs.getAccesos()==null && rhs.getAccesos()!=null) {
+                    return 1;
+                } else if (lhs.getAccesos() == null && rhs.getAccesos()== null) {
+                    return comparador.compare(lhs.getNombre(), rhs.getNombre());
+                } else {
+                    if (lhs.getAccesos() > rhs.getAccesos()) {
+                        return -1;
+                    } else if (lhs.getAccesos() < rhs.getAccesos()) {
+                        return 1;
+                    } else {
+                        return comparador.compare(lhs.getNombre(), rhs.getNombre());
+                    }
+                }
             }
         });
 
-        List<Character> letras = new ArrayList<>();
+        List<String> letras = new ArrayList<>();
         List<Integer> secciones = new ArrayList<>();
 
-        for (int posicion=0; posicion < getCount(); posicion++) {
+        boolean thereAreFrequent=false;
+        int posicion=0;
+        if (getItem(posicion).getAccesos()!=null) {
+            thereAreFrequent=true;
+            letras.add(contexto.getString(R.string.frequent));
+            secciones.add(posicion);
+        }
+
+        for (; posicion < getCount() && getItem(posicion).getAccesos()!=null; posicion++);
+
+        for (; posicion < getCount(); posicion++) {
             Character letra = primeraLetra(getItem(posicion).getNombre());
             if (letras.isEmpty() || collator.compare(""+letra, ""+letras.get(letras.size()-1))!=0) {
-                letras.add(letra);
+                letras.add(""+letra);
                 secciones.add(posicion);
             }
         }
 
-
         letraASeccion = new HashMap<>();
-        for (int i=0; i < letras.size(); i++) {
-            letraASeccion.put(letras.get(i), i);
+        for (int i=thereAreFrequent?1:0; i < letras.size(); i++) {
+            letraASeccion.put(letras.get(i).charAt(0), i);
         }
         seccionALetra = letras.toArray();
         inicioSeccion = secciones.toArray(new Integer[0]);
+        initialInSection = new HashSet<>();
+        initialInSection.addAll(secciones);
 
     }
+
 
     private String eliminarNoLetras(String cadena) {
         StringBuilder builder = new StringBuilder();

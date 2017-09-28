@@ -20,6 +20,7 @@ public interface PalabrasDAO {
     List<Palabra> getWords(String language, Resolucion resolution);
     void addWord(Palabra word, String language, Resolucion reoslution);
     void updateWord(Palabra remote);
+    void updateUso(Palabra palabra);
     void setHashForListOfWords(String language, Resolucion resolution, String hash);
     void removeWord(Palabra word);
     Set<String> getAllHashes();

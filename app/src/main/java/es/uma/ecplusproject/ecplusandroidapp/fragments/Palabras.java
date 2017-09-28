@@ -30,6 +30,7 @@ import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Resolucion;
  */
 public class Palabras extends Panel {
 
+    private final PalabrasDAOImpl palabrasDAO = new PalabrasDAOImpl();
     private ListView listaPalabras;
     private AdaptadorPalabras adaptador;
     private String preferredLanguage;
@@ -56,8 +57,12 @@ public class Palabras extends Panel {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent detallePalabra = new Intent(getContext(),DetallePalabra.class);
-                detallePalabra.putExtra(DetallePalabra.PALABRA, adaptador.getItem(position));
+                Palabra palabra = adaptador.getItem(position);
+                palabra.incrementAccesos();
+                palabrasDAO.updateUso(palabra);
+                detallePalabra.putExtra(DetallePalabra.PALABRA, palabra);
                 startActivity(detallePalabra);
+                adaptador.touchOrder();
             }
         });
 
@@ -67,7 +72,7 @@ public class Palabras extends Panel {
     }
 
     private void populateAdaptorDBComplete() {
-        final PalabrasDAO daoPalabras =new PalabrasDAOImpl();
+        final PalabrasDAO daoPalabras = palabrasDAO;
         new AsyncTask<Void, Void, List<Palabra>>(){
             @Override
             protected List<Palabra> doInBackground(Void... params) {
