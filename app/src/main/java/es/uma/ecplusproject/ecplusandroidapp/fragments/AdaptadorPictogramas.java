@@ -1,24 +1,16 @@
 package es.uma.ecplusproject.ecplusandroidapp.fragments;
 
 import android.content.Context;
-import android.util.Log;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.SectionIndexer;
-import android.widget.TextView;
 
 import com.caverock.androidsvg.SVGImageView;
 
-import java.text.Collator;
-import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import es.uma.ecplusproject.ecplusandroidapp.R;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Palabra;
@@ -30,61 +22,52 @@ import es.uma.ecplusproject.ecplusandroidapp.services.ResourcesStore;
 /**
  * Created by francis on 20/4/16.
  */
-public class AdaptadorPictogramas extends ArrayAdapter<Palabra> {
+public class AdaptadorPictogramas extends RecyclerView.Adapter<AdaptadorPictogramas.ViewHolder> {
 
-    private Map<Character, Integer> letraASeccion;
-    private Object [] seccionALetra;
-    private Integer [] inicioSeccion;
-
-    private final Comparator<String> comparador;
-    private final Collator collator;
-
-    private static class ViewHolder {
-        private TextView texto;
+    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private SVGImageView icono;
+        private Palabra palabra;
+        private ClickPalabraListener listener;
+
+        public ViewHolder(View itemView, ClickPalabraListener listener) {
+            super(itemView);
+            icono = (SVGImageView)itemView.findViewById(R.id.imagenPalabra);
+            itemView.setOnClickListener(this);
+            this.listener = listener;
+        }
+
+        @Override
+        public void onClick(View v) {
+            if (listener != null) {
+                listener.onClickPalabra(palabra);
+            }
+        }
     }
+
+    public interface ClickPalabraListener {
+        void onClickPalabra(Palabra palabra);
+    }
+
+    private List<Palabra> listaPalabras = new ArrayList<>();
 
     private Context contexto;
     private Resolucion resolucion;
     private ResourcesStore resourceStore;
+    private ClickPalabraListener listener;
 
-    public AdaptadorPictogramas(Context contexto) {
-        super(contexto, 0);
-        this.contexto=contexto;
-        resourceStore = new ResourcesStore(contexto);
-        // TODO: change this when resolution modification is added to the App
-        resolucion = Resolucion.BAJA;
-
-        collator = Collator.getInstance();
-        collator.setStrength(Collator.PRIMARY);
-        comparador = new Comparator<String>() {
-            @Override
-            public int compare(String lhs, String rhs) {
-                return collator.compare(eliminarNoLetras(lhs), eliminarNoLetras(rhs));
-            }
-        };
-
+    @Override
+    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(contexto).inflate(R.layout.entradapictograma, null);
+        ViewHolder viewHolder = new ViewHolder(view, listener);
+        return viewHolder;
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        Log.d("AdaptadorPicto", ""+position);
-        Palabra palabra = getItem(position);
-        View view=null;
-        if (convertView == null) {
-            view = LayoutInflater.from(contexto).inflate(R.layout.entradapictograma, null);
-            ViewHolder viewHolder = new ViewHolder();
-            viewHolder.icono = (SVGImageView)view.findViewById(R.id.imagenPalabra);
-            view.setTag(viewHolder);
-
-        } else {
-            view = convertView;
-        }
-
-        ViewHolder viewHolder = (ViewHolder)view.getTag();
-
+    public void onBindViewHolder(ViewHolder holder, int position) {
+        Palabra palabra = listaPalabras.get(position);
         //imagen.setImageDrawable(contexto.getResources().getDrawable(R.drawable.abrigo));
-        SVGImageView icono = viewHolder.icono;
+        SVGImageView icono = holder.icono;
+        holder.palabra = palabra;
 
         if (palabra.getIcono()!= null && palabra.getIcono() instanceof Pictograma) {
             String hash = palabra.getIcono().getFicheros().get(resolucion);
@@ -108,74 +91,32 @@ public class AdaptadorPictogramas extends ArrayAdapter<Palabra> {
                 icono.setSVG(resourceStore.getApplicationLogoSVG());
             }
         }
-
-        return view;
     }
 
     @Override
-    public void addAll(Palabra... items) {
-        super.addAll(items);
-        recalcularIndice();
+    public int getItemCount() {
+        return listaPalabras.size();
     }
 
-    @Override
-    public void addAll(Collection<? extends Palabra> collection) {
-        super.addAll(collection);
-        recalcularIndice();
+    public AdaptadorPictogramas(Context contexto) {
+        this.contexto=contexto;
+        resourceStore = new ResourcesStore(contexto);
+        // TODO: change this when resolution modification is added to the App
+        resolucion = Resolucion.BAJA;
     }
 
-    private void recalcularIndice() {
-        sort(new Comparator<Palabra>() {
-            @Override
-            public int compare(Palabra lhs, Palabra rhs) {
-                return comparador.compare(lhs.getNombre(), rhs.getNombre());
-            }
-        });
-
-        List<Character> letras = new ArrayList<>();
-        List<Integer> secciones = new ArrayList<>();
-
-        for (int posicion=0; posicion < getCount(); posicion++) {
-            Character letra = primeraLetra(getItem(posicion).getNombre());
-            if (letras.isEmpty() || collator.compare(""+letra, ""+letras.get(letras.size()-1))!=0) {
-                letras.add(letra);
-                secciones.add(posicion);
-            }
-        }
-
-
-        letraASeccion = new HashMap<>();
-        for (int i=0; i < letras.size(); i++) {
-            letraASeccion.put(letras.get(i), i);
-        }
-        seccionALetra = letras.toArray();
-        inicioSeccion = secciones.toArray(new Integer[0]);
-
+    public void setOnClickPalabraListener(ClickPalabraListener listener) {
+        this.listener = listener;
     }
 
-    private String eliminarNoLetras(String cadena) {
-        StringBuilder builder = new StringBuilder();
-        for (char c: cadena.toCharArray()) {
-            if (Character.isLetter(c)) {
-                builder.append(c);
-            }
-        }
-        return builder.toString();
+    public void addAll(Collection<Palabra> items) {
+        listaPalabras.addAll(items);
+        notifyDataSetChanged();
     }
 
-    private String normalizar(String palabra) {
-        palabra = Normalizer.normalize(palabra, Normalizer.Form.NFD);
-        return palabra.replaceAll("[\\p{InCombiningDiacriticalMarks}]", "");
+    public void clear() {
+        listaPalabras.clear();
+        notifyDataSetChanged();
     }
-
-    private char primeraLetra(String palabra) {
-        String transformada = normalizar(eliminarNoLetras(palabra)).toUpperCase();
-        if (transformada.isEmpty()) {
-            return '#';
-        } else {
-            return transformada.charAt(0);
-        }
-    }
-
 
 }

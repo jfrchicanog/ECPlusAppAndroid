@@ -3,12 +3,18 @@ package es.uma.ecplusproject.ecplusandroidapp.fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Rect;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ListView;
@@ -32,9 +38,10 @@ import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Resolucion;
  */
 public class PalabrasPictogramas extends Panel {
 
-    private GridView listaPalabras;
+    private RecyclerView listaPalabras;
     private AdaptadorPictogramas adaptador;
     private String preferredLanguage;
+    private float padding;
 
     public PalabrasPictogramas() {
         super();
@@ -44,8 +51,21 @@ public class PalabrasPictogramas extends Panel {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.pictogramas, container, false);
-        listaPalabras = (GridView)rootView.findViewById(R.id.listaPalabras);
+        listaPalabras = (RecyclerView)rootView.findViewById(R.id.listaPalabras);
         adaptador = new AdaptadorPictogramas(getContext());
+
+        Display display = ((WindowManager) getContext().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+        DisplayMetrics metrics = new DisplayMetrics();
+        display.getMetrics(metrics);
+
+        float columnWidth = getContext().getResources().getDimension(R.dimen.anchoColumnaGrid);
+        int numColumns = (int)Math.floor(metrics.widthPixels/columnWidth);
+
+        padding = getContext().getResources().getDimension(R.dimen.gridPadding);
+
+        GridLayoutManager layout = new GridLayoutManager(getContext(), numColumns);
+        listaPalabras.setLayoutManager(layout);
+
 
         SharedPreferences preferences = getActivity().getSharedPreferences(Splash.ECPLUS_MAIN_PREFS, Context.MODE_PRIVATE);
         preferredLanguage = preferences.getString(MainActivity.PREFERRED_LANGUAGE, MainActivity.DEFAULT_LANGUAGE);
@@ -53,6 +73,24 @@ public class PalabrasPictogramas extends Panel {
         populateAdaptorDBComplete();
 
         listaPalabras.setAdapter(adaptador);
+        listaPalabras.addItemDecoration(new RecyclerView.ItemDecoration() {
+            @Override
+            public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+                outRect.bottom=(int)padding;
+                outRect.left=(int)padding;
+            }
+        });
+
+        adaptador.setOnClickPalabraListener(new AdaptadorPictogramas.ClickPalabraListener() {
+            @Override
+            public void onClickPalabra(Palabra palabra) {
+                Intent detallePalabra = new Intent(getContext(),DetallePalabra.class);
+                detallePalabra.putExtra(DetallePalabra.PALABRA, palabra);
+                startActivity(detallePalabra);
+            }
+        });
+
+        /*
         listaPalabras.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -60,7 +98,7 @@ public class PalabrasPictogramas extends Panel {
                 detallePalabra.putExtra(DetallePalabra.PALABRA, adaptador.getItem(position));
                 startActivity(detallePalabra);
             }
-        });
+        });*/
 
         //listaPalabras.setFastScrollEnabled(true);
 

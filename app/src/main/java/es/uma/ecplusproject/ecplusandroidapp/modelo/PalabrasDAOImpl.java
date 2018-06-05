@@ -469,6 +469,10 @@ public class PalabrasDAOImpl implements PalabrasDAO {
     @Override
     public List<Category> getCategories(String language) {
         Long idList = getIDForWordList(language);
+        if (idList == null) {
+            return new ArrayList<>();
+        }
+
         List<Category> result = new ArrayList<>();
         Cursor c = db.query(ECPlusDBContract.Categoria.TABLE_NAME,
                 new String[] {ECPlusDBContract.Categoria.ID,ECPlusDBContract.Categoria.NOMBRE},
