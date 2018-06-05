@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Category;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Palabra;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Pictograma;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.RecursoAV;
@@ -34,6 +35,7 @@ public class PalabrasWSImpl implements PalabrasWS {
     private static final String CONTEXT_PATH = "/academicPortal";
     private static final String REST_API_BASE = "/ecplus/api/v1";
     private static final String WORDS_RESOURCE = "/words";
+    private static final String CATEGORIES_RESOURCE = "/categories";
     private static final String HASH = "/hash";
     private static final String RESOURCE = "/resource";
     private static final String RESOLUTION = "?resolution=";
@@ -77,6 +79,7 @@ public class PalabrasWSImpl implements PalabrasWS {
             nuevaPalabra.getHashes().put(resolution, palabra.getHash());
             nuevaPalabra.setIconoReemplazable(palabra.getIconoReemplazable());
             nuevaPalabra.setAvanzada(palabra.getAvanzada());
+            nuevaPalabra.setCategoria(new Category(palabra.getCategoria()));
 
             for (RecursoAudioVisualREST ravREST : palabra.getAudiovisuales()) {
                 //Log.d(getClass().getSimpleName(), ravREST.getType());
@@ -99,5 +102,14 @@ public class PalabrasWSImpl implements PalabrasWS {
         URL url = new URL(PROTOCOL + HOST + CONTEXT_PATH + REST_API_BASE
                 + RESOURCE + "/" + hash);
         return url.openStream();
+    }
+
+    @Override
+    public List<Category> getCategories(String language) {
+        String url = PROTOCOL + HOST + CONTEXT_PATH + REST_API_BASE
+                + CATEGORIES_RESOURCE + "/" + language;
+
+        Category[] categorias = restTemplate.getForObject(url, Category[].class);
+        return Arrays.asList(categorias);
     }
 }

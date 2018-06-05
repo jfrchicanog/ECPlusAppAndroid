@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,7 @@ import java.util.Set;
 
 import es.uma.ecplusproject.ecplusandroidapp.database.ECPlusDB;
 import es.uma.ecplusproject.ecplusandroidapp.database.ECPlusDBContract;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Category;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Palabra;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.RecursoAV;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Resolucion;
@@ -30,6 +32,7 @@ public class PalabrasDAOImpl implements PalabrasDAO {
     private static final String DTYPE = "dtype";
     private static final String ICON = "icon";
     private static final String PERSONALIZED_ICON = "pers_icon";
+    private static final String CATEGORY = "cat";
     private static final String REPLACEABLE_ICON = "replaceableIcon";
     private static final String AVANZADA = "advanced";
     private static final String HASH = "hash";
@@ -45,6 +48,7 @@ public class PalabrasDAOImpl implements PalabrasDAO {
             "p."+ECPlusDBContract.Palabra.AVANZADA+" as "+AVANZADA+", "+
             "p."+ECPlusDBContract.Palabra.REF_ICONO+" as "+ICON+", "+
             "p."+ECPlusDBContract.Palabra.ICONO_PERSONALIZADO+" as "+PERSONALIZED_ICON+", "+
+            "p."+ECPlusDBContract.Palabra.REF_CATEGORIA+" as "+CATEGORY+", "+
             "r."+ECPlusDBContract.RecursoAudioVisual.ID+" as "+RID+", "+
             "r."+ECPlusDBContract.RecursoAudioVisual.DTYPE+" as "+DTYPE+", " +
             "f."+ECPlusDBContract.Ficheros.HASH+" as "+HASH+", " +
@@ -89,6 +93,12 @@ public class PalabrasDAOImpl implements PalabrasDAO {
             "where p."+ECPlusDBContract.Palabra.REF_LISTA_PALABRAS+"=? " +
             "order by pr."+ECPlusDBContract.PalabraRecursoAudioVisual.REF_PALABRA+" ASC";
 
+    private static final String categoriesForWordList = "select "
+            +ECPlusDBContract.Categoria.ID
+            +", "+ECPlusDBContract.Categoria.NOMBRE
+            +" from " + ECPlusDBContract.Categoria.TABLE_NAME
+            +" where "+ECPlusDBContract.Categoria.REF_LISTA_PALABRAS+"=?";
+
     private static final String allHashesQuery = "select "+
             ECPlusDBContract.Ficheros.HASH+ " "+
             "from " + ECPlusDBContract.Ficheros.TABLE_NAME;
@@ -126,6 +136,12 @@ public class PalabrasDAOImpl implements PalabrasDAO {
         List<Palabra> resultado = new ArrayList<>();
 
         db = ECPlusDB.getDatabase(contexto);
+
+        Map<Long, Category> categories = new HashMap<>();
+        for (Category cat: getCategories(language)) {
+            categories.put(cat.getId(), cat);
+        }
+
         Cursor c = db.rawQuery(megaconsulta, new String[]{resolution.toString(), idioma});
         Palabra palabra = null;
         if (c.moveToFirst()) {
@@ -141,6 +157,10 @@ public class PalabrasDAOImpl implements PalabrasDAO {
                     palabra.getHashes().put(resolution, c.getString(c.getColumnIndex(HASH_PALABRA)));
                     palabra.setIconoReemplazable(c.getInt(c.getColumnIndex(REPLACEABLE_ICON))>0);
                     palabra.setAvanzada(c.getInt(c.getColumnIndex(AVANZADA))>0);
+                    if (!c.isNull(c.getColumnIndex(CATEGORY))) {
+                        Log.d(TAG, "Categoria no nula");
+                        palabra.setCategoria(categories.get(c.getLong(c.getColumnIndex(CATEGORY))));
+                    }
                     if (!c.isNull(c.getColumnIndex(PERSONALIZED_ICON))) {
                         palabra.setIconoPersonalizado(c.getString(c.getColumnIndex(PERSONALIZED_ICON)));
                     }
@@ -187,6 +207,7 @@ public class PalabrasDAOImpl implements PalabrasDAO {
 
     @Override
     public void removeAllResourcesForWordsList(String language, Resolucion resolution) {
+        // TODO: eliminar categorias también
         Long id = getIDForWordList(language);
         if (id !=null) {
             db.delete(ECPlusDBContract.HashesListaPalabras.TABLE_NAME,
@@ -270,6 +291,11 @@ public class PalabrasDAOImpl implements PalabrasDAO {
         values.put(ECPlusDBContract.Palabra.ICONO_REEMPLAZABLE, word.getIconoReemplazable());
         values.put(ECPlusDBContract.Palabra.AVANZADA, word.getAvanzada());
         values.put(ECPlusDBContract.Palabra.NOMBRE, word.getNombre());
+
+        if (word.getCategoria() != null) {
+            values.put(ECPlusDBContract.Palabra.REF_CATEGORIA, word.getCategoria().getId());
+        }
+
         if (word.getIconoPersonalizado()!=null) {
             values.put(ECPlusDBContract.Palabra.ICONO_PERSONALIZADO, word.getIconoPersonalizado());
         }
@@ -316,7 +342,7 @@ public class PalabrasDAOImpl implements PalabrasDAO {
         }
         //Long idList = getIDForWordList(language);
         Long idList = remote.getListaPalabrasId();
-        ContentValues values = new ContentValues();
+        ContentValues values;
 
         for (RecursoAV rav: remote.getRecursos()) {
             values = new ContentValues();
@@ -351,6 +377,9 @@ public class PalabrasDAOImpl implements PalabrasDAO {
         values.put(ECPlusDBContract.Palabra.AVANZADA, remote.getAvanzada());
         values.put(ECPlusDBContract.Palabra.ID, remote.getId());
         values.put(ECPlusDBContract.Palabra.REF_LISTA_PALABRAS, idList);
+        if (remote.getCategoria()!=null) {
+            values.put(ECPlusDBContract.Palabra.REF_CATEGORIA, remote.getCategoria().getId());
+        }
         if (remote.getIcono()!=null) {
             values.put(ECPlusDBContract.Palabra.REF_ICONO, remote.getIcono().getId());
         }
@@ -435,5 +464,43 @@ public class PalabrasDAOImpl implements PalabrasDAO {
         c.close();
 
         return result;
+    }
+
+    @Override
+    public List<Category> getCategories(String language) {
+        Long idList = getIDForWordList(language);
+        List<Category> result = new ArrayList<>();
+        Cursor c = db.query(ECPlusDBContract.Categoria.TABLE_NAME,
+                new String[] {ECPlusDBContract.Categoria.ID,ECPlusDBContract.Categoria.NOMBRE},
+                ECPlusDBContract.Categoria.REF_LISTA_PALABRAS+"=?",new String[]{idList.toString()},
+                null,null,null);
+        if (c.moveToFirst()) {
+            do {
+                Category cat = new Category();
+                cat.setId(c.getLong(c.getColumnIndex(ECPlusDBContract.Categoria.ID)));
+                cat.setNombre(c.getString(c.getColumnIndex(ECPlusDBContract.Categoria.NOMBRE)));
+                result.add(cat);
+            } while (c.moveToNext());
+        }
+        c.close();
+        return result;
+    }
+
+    @Override
+    public void addCategory(Category category, String language) {
+        Long idList = getIDForWordList(language);
+        ContentValues values = new ContentValues();
+        values.put(ECPlusDBContract.Categoria.ID, category.getId());
+        values.put(ECPlusDBContract.Categoria.NOMBRE, category.getNombre());
+        values.put(ECPlusDBContract.Categoria.REF_LISTA_PALABRAS, idList);
+        long i = db.replace(ECPlusDBContract.Categoria.TABLE_NAME,null, values);
+    }
+
+    @Override
+    public void updateCategory(Category remote) {
+        ContentValues values = new ContentValues();
+        values.put(ECPlusDBContract.Categoria.ID, remote.getId());
+        values.put(ECPlusDBContract.Categoria.NOMBRE, remote.getNombre());
+        long i = db.replace(ECPlusDBContract.Categoria.TABLE_NAME,null, values);
     }
 }

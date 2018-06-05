@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Category;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Palabra;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Resolucion;
 
@@ -15,4 +16,5 @@ public interface PalabrasWS {
     String getHashForListOfWords(String language, Resolucion resolucion);
     List<Palabra> getWords(String language, Resolucion resolution);
     InputStream getResource(String hash) throws IOException;
+    List<Category> getCategories(String language);
 }

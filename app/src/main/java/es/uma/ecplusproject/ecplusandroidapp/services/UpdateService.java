@@ -24,6 +24,7 @@ import es.uma.ecplusproject.ecplusandroidapp.modelo.PalabrasDAO;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.PalabrasDAOImpl;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.SindromesDAO;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.SindromesDAOImpl;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Category;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Palabra;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.RecursoAV;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Resolucion;
@@ -66,6 +67,20 @@ public class UpdateService extends IntentService {
             }
         }
     };
+
+    private static final Comparator<Category> CATEGORY_COMPARATOR = new Comparator<Category>() {
+        @Override
+        public int compare(Category lhs, Category rhs) {
+            if (lhs.getId() < rhs.getId()) {
+                return -1;
+            } else if (lhs.getId() > rhs.getId()) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }
+    };
+
     private static final String TAG = "UpdateService";
 
     public class UpdateServiceBinder extends Binder {
@@ -147,7 +162,9 @@ public class UpdateService extends IntentService {
                 if (localHash == null) {
                     getDAOPalabras().createListOfWords(language);
                 }
-                updateLocalWordList(language, resolution, remoteHash);
+                updateLocalCategoryList(language);
+                updateLocalWordList(language, resolution);
+                getDAOPalabras().setHashForListOfWords(language, resolution, remoteHash);
                 databaseChanged = true;
             }
 
@@ -247,7 +264,44 @@ public class UpdateService extends IntentService {
         }
     }
 
-    private void updateLocalWordList(String language, Resolucion resolution, String remoteHash) {
+    private void updateLocalCategoryList(String language) {
+        List<Category> remoteCategories = getWSPalabras().getCategories(language);
+        List<Category> localCategories = getDAOPalabras().getCategories(language);
+        Collections.sort(remoteCategories, CATEGORY_COMPARATOR);
+        Collections.sort(localCategories, CATEGORY_COMPARATOR);
+
+        Iterator<Category> localIterator = localCategories.iterator();
+        Iterator<Category> remoteIterator = remoteCategories.iterator();
+
+        Category local = getNextElementOfIterator(localIterator);
+        Category remote = getNextElementOfIterator(remoteIterator);
+
+        while (local!=null || remote != null) {
+            if (local==null) {
+                Log.d(TAG, "Adding "+remote.getId()+" "+remote.getNombre());
+                getDAOPalabras().addCategory(remote, language);
+                remote = getNextElementOfIterator(remoteIterator);
+            } else if (remote == null) {
+                // TODO: I will not remove now, because it could be used in a word
+                local = getNextElementOfIterator(localIterator);
+            } else if (local.getId() > remote.getId()) {
+                Log.d(TAG, "Adding "+remote.getId()+" "+remote.getNombre());
+                getDAOPalabras().addCategory(remote, language);
+                remote = getNextElementOfIterator(remoteIterator);
+            } else if (local.getId() < remote.getId()) {
+                // TODO: I will not remove now, because it could be used in a word
+                local = getNextElementOfIterator(localIterator);
+            } else {
+                //Log.d(TAG, "Should I update? "+local.getId()+" "+local.getNombre());
+                getDAOPalabras().updateCategory(remote);
+                local = getNextElementOfIterator(localIterator);
+                remote = getNextElementOfIterator(remoteIterator);
+            }
+        }
+
+    }
+
+    private void updateLocalWordList(String language, Resolucion resolution) {
         List<Palabra> remoteWords = getWSPalabras().getWords(language, resolution);
         List<Palabra> localWords = getDAOPalabras().getWords(language, resolution);
         Collections.sort(remoteWords, PALABRA_COMPARATOR);
@@ -289,7 +343,6 @@ public class UpdateService extends IntentService {
             }
         }
 
-        getDAOPalabras().setHashForListOfWords(language, resolution, remoteHash);
     }
 
     private static <E> E getNextElementOfIterator(Iterator<E> iterator) {

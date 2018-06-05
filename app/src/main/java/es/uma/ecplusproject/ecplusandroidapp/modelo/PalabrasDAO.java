@@ -6,6 +6,7 @@ import android.print.PrintAttributes;
 import java.util.List;
 import java.util.Set;
 
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Category;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Palabra;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Resolucion;
 
@@ -24,4 +25,7 @@ public interface PalabrasDAO {
     void setHashForListOfWords(String language, Resolucion resolution, String hash);
     void removeWord(Palabra word);
     Set<String> getAllHashes();
+    List<Category> getCategories(String language);
+    void addCategory(Category category, String langauge);
+    void updateCategory(Category remote);
 }

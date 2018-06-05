@@ -24,6 +24,7 @@ public class Palabra implements Serializable {
     private Boolean iconoReemplazable;
     private Boolean avanzada;
     private Long listaPalabrasId;
+    private Category categoria;
 
     private Long accesos;
     private Date ultimoUso;
@@ -56,7 +57,7 @@ public class Palabra implements Serializable {
     }
 
     public String toString() {
-        return nombre;
+        return nombre;//+((getCategoria()!=null)?getCategoria().getNombre():"");
     }
     public List<RecursoAV> getRecursos() {
         if (recursos==null) {
@@ -134,5 +135,13 @@ public class Palabra implements Serializable {
 
     public void setUltimoUso(Date ultimoUso) {
         this.ultimoUso = ultimoUso;
+    }
+
+    public Category getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(Category categoria) {
+        this.categoria = categoria;
     }
 }
