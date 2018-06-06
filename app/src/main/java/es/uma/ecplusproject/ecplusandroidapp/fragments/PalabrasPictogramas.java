@@ -19,6 +19,9 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ListView;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -28,6 +31,7 @@ import es.uma.ecplusproject.ecplusandroidapp.R;
 import es.uma.ecplusproject.ecplusandroidapp.Splash;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.PalabrasDAO;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.PalabrasDAOImpl;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Category;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Palabra;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Pictograma;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.RecursoAV;
@@ -38,10 +42,32 @@ import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Resolucion;
  */
 public class PalabrasPictogramas extends Panel {
 
+
+    private Comparator<Palabra> comparadorCategorias = new Comparator<Palabra>() {
+        @Override
+        public int compare(Palabra p1, Palabra p2) {
+            if (p1.getCategoria()!=null && p2.getCategoria()==null){
+                return -1;
+            } else if (p1.getCategoria()==null && p2.getCategoria()!=null) {
+                return 1;
+            } else if (p1.getCategoria()==null && p2.getCategoria()==null) {
+                return p1.getNombre().compareTo(p2.getNombre());
+            } else {
+                int compCat = p1.getCategoria().getNombre().compareTo(p2.getCategoria().getNombre());
+                if (compCat != 0) {
+                    return compCat;
+                } else {
+                    return p1.getNombre().compareTo(p2.getNombre());
+                }
+            }
+        }
+    };
+
     private RecyclerView listaPalabras;
     private AdaptadorPictogramas adaptador;
     private String preferredLanguage;
     private float padding;
+    private SectionedGridRecyclerViewAdapter mSectionedAdapter;
 
     public PalabrasPictogramas() {
         super();
@@ -72,7 +98,6 @@ public class PalabrasPictogramas extends Panel {
 
         populateAdaptorDBComplete();
 
-        listaPalabras.setAdapter(adaptador);
         listaPalabras.addItemDecoration(new RecyclerView.ItemDecoration() {
             @Override
             public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
@@ -90,17 +115,13 @@ public class PalabrasPictogramas extends Panel {
             }
         });
 
-        /*
-        listaPalabras.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent detallePalabra = new Intent(getContext(),DetallePalabra.class);
-                detallePalabra.putExtra(DetallePalabra.PALABRA, adaptador.getItem(position));
-                startActivity(detallePalabra);
-            }
-        });*/
 
-        //listaPalabras.setFastScrollEnabled(true);
+        //Add your adapter to the sectionAdapter
+        mSectionedAdapter = new
+                SectionedGridRecyclerViewAdapter(getActivity(), R.layout.section,R.id.section_text,listaPalabras,adaptador);
+
+        //Apply this adapter to the RecyclerView
+        listaPalabras.setAdapter(mSectionedAdapter);
 
         return rootView;
     }
@@ -136,10 +157,41 @@ public class PalabrasPictogramas extends Panel {
             @Override
             protected void onPostExecute(List<Palabra> palabras) {
                 Log.d(getClass().toString(), "palabras:"+palabras.size());
+
+                Collections.sort(palabras,comparadorCategorias);
+
                 adaptador.clear();
                 adaptador.addAll(palabras);
+
+                List<SectionedGridRecyclerViewAdapter.Section> sections =
+                        new ArrayList<SectionedGridRecyclerViewAdapter.Section>();
+
+                if (palabras.size() > 0) {
+                    Category previousCategory = palabras.get(0).getCategoria();
+                    sections.add(new SectionedGridRecyclerViewAdapter.Section(0, nameFromCategory(previousCategory)));
+
+                    for (int i=0; i < palabras.size(); i++) {
+                        Category nuevaCategoria = palabras.get(i).getCategoria();
+                        if (nuevaCategoria != previousCategory) {
+                            sections.add(new SectionedGridRecyclerViewAdapter.Section(i, nameFromCategory(nuevaCategoria)));
+                            previousCategory = nuevaCategoria;
+                        }
+                    }
+                }
+
+                SectionedGridRecyclerViewAdapter.Section[] dummy = new SectionedGridRecyclerViewAdapter.Section[sections.size()];
+                mSectionedAdapter.setSections(sections.toArray(dummy));
+
             }
         }.execute();
+    }
+
+    private String nameFromCategory(Category cat) {
+        if (cat!=null) {
+            return cat.getNombre();
+        } else {
+            return getResources().getString(R.string.noCategory);
+        }
     }
 
     public void reloadWords() {

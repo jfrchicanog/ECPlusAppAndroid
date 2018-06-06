@@ -18,4 +18,5 @@
     <string name="cancel">Cancelar</string>
     <string name="restoreOriginalIcon">Restaurar</string>
     <string name="frequent">Frecuentes</string>
+    <string name="noCategory">Sin categoría</string>
 </resources>

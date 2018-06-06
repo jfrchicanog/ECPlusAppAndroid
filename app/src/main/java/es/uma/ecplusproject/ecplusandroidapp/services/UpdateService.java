@@ -3,6 +3,7 @@ package es.uma.ecplusproject.ecplusandroidapp.services;
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -20,6 +21,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import es.uma.ecplusproject.ecplusandroidapp.BuildConfig;
+import es.uma.ecplusproject.ecplusandroidapp.Splash;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.PalabrasDAO;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.PalabrasDAOImpl;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.SindromesDAO;
@@ -82,6 +85,8 @@ public class UpdateService extends IntentService {
     };
 
     private static final String TAG = "UpdateService";
+    private boolean updateWordsAnyway;
+    private boolean updateSyndromesAnyway;
 
     public class UpdateServiceBinder extends Binder {
         public UpdateService getService() {
@@ -148,6 +153,7 @@ public class UpdateService extends IntentService {
 
     private void handleUpdateWords(String language, Resolucion resolution) {
         try {
+            updateWordsAnyway = checkIfShouldUpdateWordsAnyway();
             updating = true;
             fireEvent(UpdateListenerEvent.startUpdateWordsEvent());
 
@@ -158,14 +164,16 @@ public class UpdateService extends IntentService {
             if (remoteHash == null) {
                 getDAOPalabras().removeAllResourcesForWordsList(language, resolution);
                 databaseChanged = true;
-            } else if (localHash == null || !localHash.equals(remoteHash)) {
-                if (localHash == null) {
-                    getDAOPalabras().createListOfWords(language);
+            } else {
+                if (updateWordsAnyway || localHash == null || !localHash.equals(remoteHash)) {
+                    if (localHash == null) {
+                        getDAOPalabras().createListOfWords(language);
+                    }
+                    updateLocalCategoryList(language);
+                    updateLocalWordList(language, resolution);
+                    getDAOPalabras().setHashForListOfWords(language, resolution, remoteHash);
+                    databaseChanged = true;
                 }
-                updateLocalCategoryList(language);
-                updateLocalWordList(language, resolution);
-                getDAOPalabras().setHashForListOfWords(language, resolution, remoteHash);
-                databaseChanged = true;
             }
 
             fireEvent(UpdateListenerEvent.stopUpdateWordsDatabaseEvent(databaseChanged));
@@ -239,6 +247,7 @@ public class UpdateService extends IntentService {
 
     private void handleUpdateSyndromes(String language) {
         try {
+            updateSyndromesAnyway = checkIfShouldUpdateSyndromesAnyway();
             updating = true;
             fireEvent(UpdateListenerEvent.startUpdateSyndromesEvent());
 
@@ -249,7 +258,7 @@ public class UpdateService extends IntentService {
             if (remoteHash == null) {
                 getDAOSindromes().removeSyndromeList(language);
                 databaseChanged = true;
-            } else if (localHash == null || !localHash.equalsIgnoreCase(remoteHash)) {
+            } else if (updateSyndromesAnyway || localHash == null || !localHash.equalsIgnoreCase(remoteHash)) {
                 if (localHash == null) {
                     getDAOSindromes().createListOfSyndromes(language);
                 }
@@ -332,7 +341,7 @@ public class UpdateService extends IntentService {
                 local = getNextElementOfIterator(localIterator);
             } else {
                 //Log.d(TAG, "Should I update? "+local.getId()+" "+local.getNombre());
-                if (!local.getHash(resolution).equalsIgnoreCase(remote.getHash(resolution))) {
+                if (updateWordsAnyway || !local.getHash(resolution).equalsIgnoreCase(remote.getHash(resolution))) {
                     remote.setIconoPersonalizado(local.getIconoPersonalizado());
                     remote.setListaPalabrasId(local.getListaPalabrasId());
                     Log.d(TAG, "Updating "+local.getId()+" "+local.getNombre());
@@ -367,7 +376,7 @@ public class UpdateService extends IntentService {
             if (local == null || local.getId() > remote.getId()) {
                 getDAOSindromes().addSyndrome(remote, language);
             } else if (local.getId() == remote.getId()) {
-                if (!local.getHash().equalsIgnoreCase(remote.getHash())) {
+                if (updateSyndromesAnyway || !local.getHash().equalsIgnoreCase(remote.getHash())) {
                     getDAOSindromes().updateSyndrome(remote);
                 }
             }
@@ -441,6 +450,23 @@ public class UpdateService extends IntentService {
         for (UpdateListener listener: listeners) {
             listener.onUpdateEvent(event);
         }
+    }
+
+    private boolean checkIfShouldUpdateWordsAnyway() {
+        SharedPreferences shared = getSharedPreferences(Splash.ECPLUS_MAIN_PREFS,MODE_PRIVATE);
+        int installed = shared.getInt(Splash.VERSION_INSTALLED, -1);
+        boolean result = installed < 24;
+
+        SharedPreferences.Editor editor = shared.edit();
+
+        editor.putInt(Splash.VERSION_INSTALLED, BuildConfig.VERSION_CODE);
+        editor.commit();
+
+        return result;
+    }
+
+    private boolean checkIfShouldUpdateSyndromesAnyway() {
+        return false;
     }
 
     @Nullable

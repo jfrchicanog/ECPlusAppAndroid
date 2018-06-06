@@ -34,6 +34,7 @@ public class Splash extends AppCompatActivity {
     public static final long DURATION=3000;
     public static final String ECPLUS_MAIN_PREFS = "ecplus-main";
     public static final String LANGUAGES_KEY_PREFS = "languages";
+    public static final String VERSION_INSTALLED = "version";
     public static final String [] LANGUAGES = new String []{"es", "cat", "de", "nl", "en"};
     private View mContentView;
     private boolean activityAlive;

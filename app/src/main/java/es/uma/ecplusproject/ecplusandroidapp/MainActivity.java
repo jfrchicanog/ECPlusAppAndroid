@@ -92,11 +92,13 @@ public class MainActivity extends AppCompatActivity implements ChangePictureList
             if (UpdateListenerEvent.Element.SYNDROMES.equals(event.getElement()) &&
                     event.isSomethingChanged()) {
                 getPanelSindromes().reloadSyndromes();
+                getPanelComunicacion().reloadSyndromes();
             } else if (UpdateListenerEvent.Element.WORDS.equals(event.getElement())
                     && UpdateListenerEvent.Action.STOP_DATABASE.equals(event.getAction())
                     && event.isSomethingChanged()) {
                 getPanelPalabras().reloadWords();
                 getPanelPalabrasAvanzadas().reloadWords();
+                getPanelPictogramas().reloadWords();
             }
         }
     };
