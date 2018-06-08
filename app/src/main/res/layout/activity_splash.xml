@@ -30,7 +30,7 @@
             android:textSize="50sp"
             android:textStyle="bold" />
 
-        <es.uma.ecplusproject.ecplusandroidapp.views.SquaredCardView
+        <es.uma.ecplusproject.ecplusandroidapp.views.MyCardView
             android:layout_width="300dp"
             android:layout_height="300dp"
             android:layout_below="@id/texto"
@@ -45,7 +45,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
-        </es.uma.ecplusproject.ecplusandroidapp.views.SquaredCardView>
+        </es.uma.ecplusproject.ecplusandroidapp.views.MyCardView>
 
         <android.support.v7.widget.CardView
             android:layout_width="wrap_content"

@@ -29,10 +29,19 @@ public class MyCardView extends CardView {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         //Log.d("MC Measure width", MeasureSpec.toString(widthMeasureSpec));
         //Log.d("MC Measure height", MeasureSpec.toString(heightMeasureSpec));
-        int width = MeasureSpec.getSize(widthMeasureSpec);
-        int height = (int)Math.ceil(width*ratio);
-        int myHeightMeasureSpec = MeasureSpec.makeMeasureSpec(height, MeasureSpec.getMode(widthMeasureSpec));
-        super.onMeasure(widthMeasureSpec, myHeightMeasureSpec);
+        if (MeasureSpec.getMode(heightMeasureSpec) == MeasureSpec.UNSPECIFIED) {
+            int width = MeasureSpec.getSize(widthMeasureSpec);
+            int height = (int)Math.ceil(width*ratio);
+            int myHeightMeasureSpec = MeasureSpec.makeMeasureSpec(height, MeasureSpec.getMode(widthMeasureSpec));
+            super.onMeasure(widthMeasureSpec, myHeightMeasureSpec);
+        } else if (MeasureSpec.getMode(widthMeasureSpec) == MeasureSpec.UNSPECIFIED) {
+            int height = MeasureSpec.getSize(heightMeasureSpec);
+            int width = (int)Math.ceil(height/ratio);
+            int myWidthMeasureSpec = MeasureSpec.makeMeasureSpec(width, MeasureSpec.getMode(heightMeasureSpec));
+            super.onMeasure(myWidthMeasureSpec, heightMeasureSpec);
+        } else {
+            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+        }
         //Log.d("MC width", ""+getMeasuredWidth());
         //Log.d("MC height", ""+getMeasuredHeight());
     }

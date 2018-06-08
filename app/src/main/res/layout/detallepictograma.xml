@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<es.uma.ecplusproject.ecplusandroidapp.views.SquaredCardView
+<es.uma.ecplusproject.ecplusandroidapp.views.MyCardView
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/card_view"
@@ -24,4 +24,4 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-</es.uma.ecplusproject.ecplusandroidapp.views.SquaredCardView>
+</es.uma.ecplusproject.ecplusandroidapp.views.MyCardView>

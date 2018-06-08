@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Point;
@@ -43,6 +44,7 @@ import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.RecursoAV;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Resolucion;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Video;
 import es.uma.ecplusproject.ecplusandroidapp.services.ResourcesStore;
+import es.uma.ecplusproject.ecplusandroidapp.views.MyCardView;
 import es.uma.ecplusproject.ecplusandroidapp.views.SquaredCardView;
 import es.uma.ecplusproject.ecplusandroidapp.views.ZoomCoordinator;
 
@@ -249,7 +251,8 @@ public class DetallePalabra extends AppCompatActivity {
         recursos = (RecyclerView) findViewById(R.id.recursosAV);
         recursos.setHasFixedSize(true);
 
-        GridLayoutManager mLayoutManager = new GridLayoutManager(this, 2);
+        GridLayoutManager mLayoutManager = new GridLayoutManager(this, 2,
+                isLandscape() ?LinearLayoutManager.HORIZONTAL:LinearLayoutManager.VERTICAL, false);
         recursos.setLayoutManager(mLayoutManager);
 
         adaptador = new AdaptadorRecursos(this);
@@ -299,6 +302,10 @@ public class DetallePalabra extends AppCompatActivity {
 
 
 
+    }
+
+    private boolean isLandscape() {
+        return getResources().getConfiguration().orientation== Configuration.ORIENTATION_LANDSCAPE;
     }
 
 }
