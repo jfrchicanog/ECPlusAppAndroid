@@ -31,6 +31,7 @@ import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.RecursoAV;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Resolucion;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Video;
 import es.uma.ecplusproject.ecplusandroidapp.services.ResourcesStore;
+import es.uma.ecplusproject.ecplusandroidapp.views.MyCardView;
 
 import static es.uma.ecplusproject.ecplusandroidapp.R.id.texto;
 
@@ -113,6 +114,7 @@ public class AdaptadorRecursos extends RecyclerView.Adapter<AdaptadorRecursos.Re
             if (file!=null && file.exists()) {
                 Bitmap bm = ThumbnailUtils.createVideoThumbnail(file.getPath(), MediaStore.Images.Thumbnails.MINI_KIND);
                 thumbnail.setImageBitmap(bm);
+                ((MyCardView)itemView).setRatio(bm.getHeight()/((float)bm.getWidth()));
                 thumbnail.setVisibility(View.VISIBLE);
                 video.setVideoPath(file.getPath());
                 texto.setVisibility(View.GONE);
