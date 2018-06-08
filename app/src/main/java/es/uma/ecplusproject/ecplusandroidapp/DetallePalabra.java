@@ -264,7 +264,7 @@ public class DetallePalabra extends AppCompatActivity {
         mLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override
             public int getSpanSize(int position) {
-                return adaptador.getItemViewType(position)==AdaptadorRecursos.TIPO_VIDEO?2:1;
+                return (adaptador.getItemViewType(position)==AdaptadorRecursos.TIPO_VIDEO)?2:1;
             }
         });
 

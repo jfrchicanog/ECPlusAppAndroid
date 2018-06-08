@@ -33,7 +33,7 @@
         android:layout_height="match_parent"
         android:background="@color/black_overlay"
         >
-    <es.uma.ecplusproject.ecplusandroidapp.views.SquaredCardView
+    <es.uma.ecplusproject.ecplusandroidapp.views.LandscapeSquaredCardView
         android:id="@+id/zoomedCardView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -48,7 +48,7 @@
             android:layout_height="match_parent"
             android:src="@mipmap/logo"
             />
-    </es.uma.ecplusproject.ecplusandroidapp.views.SquaredCardView>
+    </es.uma.ecplusproject.ecplusandroidapp.views.LandscapeSquaredCardView>
     </RelativeLayout>
 
 

@@ -20,7 +20,7 @@
             >
         </activity>
         <activity android:name=".DetallePalabra"
-            android:screenOrientation="portrait"/>
+            />
         <activity android:name=".DetalleSindrome"
             />
         <activity
