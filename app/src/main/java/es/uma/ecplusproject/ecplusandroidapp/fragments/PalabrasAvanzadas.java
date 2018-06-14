@@ -44,6 +44,7 @@ public class PalabrasAvanzadas extends Panel {
         View rootView = inflater.inflate(R.layout.palabras, container, false);
         listaPalabras = (ListView)rootView.findViewById(R.id.listaPalabras);
         adaptador = new AdaptadorPalabras(getContext());
+        adaptador.setChangePictureListener((MainActivity)getActivity());
 
         SharedPreferences preferences = getActivity().getSharedPreferences(Splash.ECPLUS_MAIN_PREFS, Context.MODE_PRIVATE);
         preferredLanguage = preferences.getString(MainActivity.PREFERRED_LANGUAGE, MainActivity.DEFAULT_LANGUAGE);

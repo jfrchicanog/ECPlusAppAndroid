@@ -220,20 +220,6 @@ public class DetallePalabra extends AppCompatActivity {
     private ImageZoomCoordinator izc;
 
     private RecyclerView recursos;
-    private Comparator<RecursoAV> comparator = new Comparator<RecursoAV>() {
-        @Override
-        public int compare(RecursoAV lhs, RecursoAV rhs) {
-            boolean lhsVideo = lhs instanceof Video;
-            boolean rhsVideo = rhs instanceof Video;
-            if (lhsVideo && !rhsVideo) {
-                return -1;
-            } else if (rhsVideo && !lhsVideo) {
-                return 1;
-            } else {
-                return 0;
-            }
-        }
-    };
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -256,10 +242,7 @@ public class DetallePalabra extends AppCompatActivity {
         recursos.setLayoutManager(mLayoutManager);
 
         adaptador = new AdaptadorRecursos(this);
-        List<RecursoAV> listaRecursos = palabra.getRecursos();
-
-        Collections.sort(listaRecursos, comparator);
-        adaptador.setRecursos(listaRecursos);
+        adaptador.setRecursos(palabra);
 
         mLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
             @Override

@@ -22,10 +22,13 @@ import com.caverock.androidsvg.SVGImageView;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Audio;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Fotografia;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Palabra;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Pictograma;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.RecursoAV;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Resolucion;
@@ -45,6 +48,7 @@ public class AdaptadorRecursos extends RecyclerView.Adapter<AdaptadorRecursos.Re
     public static final int TIPO_PICTOGRAMA = 1;
     public static final int TIPO_FOTO = 2;
     public static final int TIPO_AUDIO = 3;
+    private static final int TIPO_ICONO_PERSONALIZADO = 4;
 
     public interface ItemClickListener {
         void onItemClick(RecursosAVViewHolder viewHolder);
@@ -217,12 +221,30 @@ public class AdaptadorRecursos extends RecyclerView.Adapter<AdaptadorRecursos.Re
     private ResourcesStore resourcesStore;
     private Resolucion resolucion = Resolucion.BAJA;
     private List<RecursoAV> recursos;
+    private RecursoAV iconoPersonalizado;
     private ItemClickListener listener;
+    private Comparator<RecursoAV> comparator = new Comparator<RecursoAV>() {
+        @Override
+        public int compare(RecursoAV lhs, RecursoAV rhs) {
+            boolean lhsVideo = lhs instanceof Video;
+            boolean rhsVideo = rhs instanceof Video;
+            if (lhsVideo && !rhsVideo) {
+                return -1;
+            } else if (rhsVideo && !lhsVideo) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }
+    };
+
+
 
     public AdaptadorRecursos(Context ctx) {
         resourcesStore = new ResourcesStore(ctx);
         recursos = new ArrayList<>();
         listener = null;
+        iconoPersonalizado = null;
     }
 
     @Override
@@ -247,12 +269,20 @@ public class AdaptadorRecursos extends RecyclerView.Adapter<AdaptadorRecursos.Re
 
     @Override
     public void onBindViewHolder(final RecursosAVViewHolder holder, int position) {
-        RecursoAV recurso = recursos.get(position);
-        holder.bindRecursoAV(recurso);
+        if (position >= recursos.size()) {
+            holder.bindRecursoAV(iconoPersonalizado);
+        } else {
+            RecursoAV recurso = recursos.get(position);
+            holder.bindRecursoAV(recurso);
+        }
     }
 
     @Override
     public int getItemViewType(int position) {
+        if (position >= recursos.size()) {
+            // Icono personalizado
+            return TIPO_FOTO;
+        }
         RecursoAV recurso = recursos.get(position);
         if (recurso instanceof Pictograma) {
             return TIPO_PICTOGRAMA;
@@ -269,11 +299,18 @@ public class AdaptadorRecursos extends RecyclerView.Adapter<AdaptadorRecursos.Re
 
     @Override
     public int getItemCount() {
-        return recursos.size();
+        return recursos.size() + (iconoPersonalizado!=null?1:0);
     }
 
-    public void setRecursos(List<RecursoAV> recursos) {
-        this.recursos = recursos;
+    public void setRecursos(Palabra palabra) {
+        this.recursos = palabra.getRecursos();
+        if (palabra.getIconoPersonalizado()!=null) {
+            iconoPersonalizado = new Fotografia();
+            iconoPersonalizado.getFicheros().put(Resolucion.BAJA,palabra.getIconoPersonalizado());
+        } else {
+            iconoPersonalizado=null;
+        }
+        Collections.sort(this.recursos, comparator);
         notifyDataSetChanged();
     }
 

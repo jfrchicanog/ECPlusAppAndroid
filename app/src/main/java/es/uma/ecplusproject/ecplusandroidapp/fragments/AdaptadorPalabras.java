@@ -166,7 +166,7 @@ public class AdaptadorPalabras extends ArrayAdapter<Palabra> implements SectionI
         CardView externalCardView = viewHolder.externalCardView;
 
         externalCardView.setCardBackgroundColor(getContext().getResources().getColor(
-                palabra.getIconoReemplazable()?R.color.colorPrimary:R.color.cardview_light_background));
+                palabra.getIconoReemplazable()?R.color.cardview_light_background:R.color.colorPrimary));
         externalCardView.setLongClickable(palabra.getIconoReemplazable());
         externalCardView.setTag(palabra);
 
