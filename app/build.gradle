@@ -8,8 +8,8 @@ android {
         applicationId "es.uma.ecplusproject.ecplusandroidapp"
         minSdkVersion 15
         targetSdkVersion 23
-        versionCode 28
-        versionName "0.9.18"
+        versionCode 29
+        versionName "0.9.19"
 
 
     }
