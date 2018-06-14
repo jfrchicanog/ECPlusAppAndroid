@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">EC+</string>
+    <string name="palabras">Paraules</string>
+    <string name="sindrome">Síndromes</string>
+    <string name="no_languages">No hi ha cap idioma disponible</string>
+    <string name="language_menu">Escollir idioma</string>
+    <string name="language_dialog_ok">OK</string>
+    <string name="palabrasAvanzadas">Avançades</string>
+    <string name="communication">Comunicació</string>
+    <string name="videoNotAvailable">Vídeo no disponible</string>
+    <string name="pictogramNotAvailable">Pictograma no disponible</string>
+    <string name="pictureNotAvailable">Foto no disponible</string>
+    <string name="pictograms">Pictogrames</string>
+    <string name="changePictureTitle">Seleccioneu una font per al icona personalitzada</string>
+    <string name="changePictureMessage">Canviant el pictograma per a la paraula %1$s. Seleccioneu una font per al nou pictograma.</string>
+    <string name="takeFromCamera">Cambra</string>
+    <string name="cancel">Cancel</string>
+    <string name="restoreOriginalIcon">Restaurar</string>
+    <string name="frequent">Freqüents</string>
+    <string name="noCategory">Sense categoria</string>
+</resources>

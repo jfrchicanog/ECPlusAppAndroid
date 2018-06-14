@@ -268,7 +268,8 @@ public class UpdateService extends IntentService {
             updating = false;
             fireEvent(UpdateListenerEvent.stopUpdateSyndromesEvent(databaseChanged));
         } catch (RuntimeException e) {
-            Log.d(TAG, e.getMessage());
+            e.printStackTrace();
+            //Log.d(TAG, "Exception: "+e.getMessage());
             fireEvent(UpdateListenerEvent.stopUpdateSyndromesError());
         }
     }
@@ -302,7 +303,7 @@ public class UpdateService extends IntentService {
                 local = getNextElementOfIterator(localIterator);
             } else {
                 //Log.d(TAG, "Should I update? "+local.getId()+" "+local.getNombre());
-                getDAOPalabras().updateCategory(remote);
+                getDAOPalabras().updateCategory(remote, language);
                 local = getNextElementOfIterator(localIterator);
                 remote = getNextElementOfIterator(remoteIterator);
             }

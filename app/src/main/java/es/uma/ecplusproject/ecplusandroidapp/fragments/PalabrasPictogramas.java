@@ -66,7 +66,6 @@ public class PalabrasPictogramas extends Panel {
 
     private RecyclerView listaPalabras;
     private AdaptadorPictogramas adaptador;
-    private String preferredLanguage;
     private float padding;
     private SectionedGridRecyclerViewAdapter mSectionedAdapter;
 
@@ -157,27 +156,29 @@ public class PalabrasPictogramas extends Panel {
 
                 Collections.sort(palabras,comparadorCategorias);
 
-                adaptador.clear();
-                adaptador.addAll(palabras);
+                if (adaptador != null) {
+                    adaptador.clear();
+                    adaptador.addAll(palabras);
 
-                List<SectionedGridRecyclerViewAdapter.Section> sections =
-                        new ArrayList<SectionedGridRecyclerViewAdapter.Section>();
+                    List<SectionedGridRecyclerViewAdapter.Section> sections =
+                            new ArrayList<SectionedGridRecyclerViewAdapter.Section>();
 
-                if (palabras.size() > 0) {
-                    Category previousCategory = palabras.get(0).getCategoria();
-                    sections.add(new SectionedGridRecyclerViewAdapter.Section(0, nameFromCategory(previousCategory)));
+                    if (palabras.size() > 0) {
+                        Category previousCategory = palabras.get(0).getCategoria();
+                        sections.add(new SectionedGridRecyclerViewAdapter.Section(0, nameFromCategory(previousCategory)));
 
-                    for (int i=0; i < palabras.size(); i++) {
-                        Category nuevaCategoria = palabras.get(i).getCategoria();
-                        if (nuevaCategoria != previousCategory) {
-                            sections.add(new SectionedGridRecyclerViewAdapter.Section(i, nameFromCategory(nuevaCategoria)));
-                            previousCategory = nuevaCategoria;
+                        for (int i = 0; i < palabras.size(); i++) {
+                            Category nuevaCategoria = palabras.get(i).getCategoria();
+                            if (nuevaCategoria != previousCategory) {
+                                sections.add(new SectionedGridRecyclerViewAdapter.Section(i, nameFromCategory(nuevaCategoria)));
+                                previousCategory = nuevaCategoria;
+                            }
                         }
                     }
-                }
 
-                SectionedGridRecyclerViewAdapter.Section[] dummy = new SectionedGridRecyclerViewAdapter.Section[sections.size()];
-                mSectionedAdapter.setSections(sections.toArray(dummy));
+                    SectionedGridRecyclerViewAdapter.Section[] dummy = new SectionedGridRecyclerViewAdapter.Section[sections.size()];
+                    mSectionedAdapter.setSections(sections.toArray(dummy));
+                }
 
             }
         }.execute();

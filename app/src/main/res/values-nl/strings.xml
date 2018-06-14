@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">EC+</string>
+    <string name="palabras">Woorden</string>
+    <string name="sindrome">Syndromen</string>
+    <string name="no_languages">Geen talen beschikbaar</string>
+    <string name="language_menu">Kies een taal</string>
+    <string name="language_dialog_ok">OK</string>
+    <string name="palabrasAvanzadas">Geavanceerde woorden</string>
+    <string name="communication">Communicatie</string>
+    <string name="videoNotAvailable">Video niet beschikbaar</string>
+    <string name="pictogramNotAvailable">Pictogram niet beschikbaar</string>
+    <string name="pictureNotAvailable">Foto niet beschikbaar</string>
+    <string name="pictograms">Pictogrammen</string>
+    <string name="changePictureTitle">Selecteer een bron voor de aangepaste afbeelding</string>
+    <string name="changePictureMessage">Beeld veranderen voor woord %1$s. Selecteer een bron voor de afbeelding.</string>
+    <string name="takeFromCamera">Camera</string>
+    <string name="cancel">Annuleer</string>
+    <string name="restoreOriginalIcon">Herstellen</string>
+    <string name="frequent">Frequente woorden</string>
+    <string name="noCategory">Geen categorie</string>
+</resources>

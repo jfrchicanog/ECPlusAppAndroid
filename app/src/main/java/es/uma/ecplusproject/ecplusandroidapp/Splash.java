@@ -14,7 +14,9 @@ import android.view.View;
 import com.caverock.androidsvg.SVG;
 import com.caverock.androidsvg.SVGImageView;
 
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 import es.uma.ecplusproject.ecplusandroidapp.database.ECPlusDB;
@@ -64,8 +66,6 @@ public class Splash extends AppCompatActivity {
             logo.setSVG(svg);
         }
 
-
-
         activityAlive = true;
 
         mContentView = findViewById(R.id.fullscreen_content);
@@ -83,16 +83,32 @@ public class Splash extends AppCompatActivity {
             actionBar.hide();
         }
 
-        Set<String> idiomas = new HashSet<>();
+        addPreferencesIfNecessary();
+
+        new PreparaDB().execute();
+    }
+
+    private void addPreferencesIfNecessary() {
         SharedPreferences preferences = getSharedPreferences(ECPLUS_MAIN_PREFS, MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
-        addDefaultLanguages(idiomas);
-        editor.putStringSet(LANGUAGES_KEY_PREFS, idiomas);
-        editor.putString(PREFERRED_LANGUAGE, MainActivity.DEFAULT_LANGUAGE);
+
+        if (!preferences.contains(LANGUAGES_KEY_PREFS)) {
+            Set<String> idiomas = new HashSet<>();
+            addDefaultLanguages(idiomas);
+            editor.putStringSet(LANGUAGES_KEY_PREFS, idiomas);
+        }
+
+        if (!preferences.contains(PREFERRED_LANGUAGE)) {
+            String languageCode = Locale.getDefault().getLanguage();
+            if (Arrays.binarySearch(LANGUAGES,languageCode) >= 0) {
+                editor.putString(PREFERRED_LANGUAGE, languageCode);
+            } else {
+                editor.putString(PREFERRED_LANGUAGE, MainActivity.DEFAULT_LANGUAGE);
+            }
+        }
 
         editor.commit();
 
-        new PreparaDB().execute();
     }
 
     @Override

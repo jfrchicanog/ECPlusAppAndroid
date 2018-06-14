@@ -87,8 +87,10 @@ public class Palabras extends Panel {
             @Override
             protected void onPostExecute(List<Palabra> palabras) {
                 Log.d(getClass().toString(), "palabras:"+palabras.size());
-                adaptador.clear();
-                adaptador.addAll(palabras);
+                if (adaptador!=null) {
+                    adaptador.clear();
+                    adaptador.addAll(palabras);
+                }
             }
         }.execute();
     }

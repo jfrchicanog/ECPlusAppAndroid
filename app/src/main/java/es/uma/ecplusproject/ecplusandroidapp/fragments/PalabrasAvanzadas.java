@@ -80,8 +80,10 @@ public class PalabrasAvanzadas extends Panel {
 
             @Override
             protected void onPostExecute(List<Palabra> palabras) {
-                adaptador.clear();
-                adaptador.addAll(palabras);
+                if (adaptador!=null) {
+                    adaptador.clear();
+                    adaptador.addAll(palabras);
+                }
             }
         }.execute();
     }

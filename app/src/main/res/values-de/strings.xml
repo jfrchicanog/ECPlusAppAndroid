@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">EC+</string>
+    <string name="sindrome">Syndrome</string>
+    <string name="palabras">Vokabeln</string>
+    <string name="language_menu">Sprache auswählen</string>
+    <string name="no_languages">Sprache nicht verfügbar</string>
+    <string name="language_dialog_ok">OK</string>
+    <string name="palabrasAvanzadas">weitere Vokabeln</string>
+    <string name="communication">Kommunikation</string>
+    <string name="videoNotAvailable">Video nicht verfügbar</string>
+    <string name="pictogramNotAvailable">Bild nicht verfügbar</string>
+    <string name="pictureNotAvailable">Bild nicht verfügbar</string>
+    <string name="pictograms">Bilder</string>
+    <string name="changePictureTitle">Wählen Sie eine Quelle für das benutzerdefinierte Bild</string>
+    <string name="changePictureMessage">Bild für Wort %1$s ändern. Wählen Sie eine Quelle für das neue Bild.</string>
+    <string name="takeFromCamera">Kamera</string>
+    <string name="cancel">Löschen</string>
+    <string name="frequent">Häufig</string>
+    <string name="restoreOriginalIcon">wiederherstellen</string>
+    <string name="noCategory">Vokabeln ohne Wortfel</string>
+</resources>

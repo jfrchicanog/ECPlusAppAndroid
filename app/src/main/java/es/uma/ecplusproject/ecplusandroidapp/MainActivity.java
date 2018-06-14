@@ -36,6 +36,7 @@ import es.uma.ecplusproject.ecplusandroidapp.fragments.Palabras;
 import es.uma.ecplusproject.ecplusandroidapp.fragments.PalabrasAvanzadas;
 import es.uma.ecplusproject.ecplusandroidapp.fragments.PalabrasPictogramas;
 import es.uma.ecplusproject.ecplusandroidapp.fragments.Sindromes;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.CachePalabras;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.PalabrasDAO;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.PalabrasDAOImpl;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Palabra;
@@ -91,14 +92,21 @@ public class MainActivity extends AppCompatActivity implements ChangePictureList
 
             if (UpdateListenerEvent.Element.SYNDROMES.equals(event.getElement()) &&
                     event.isSomethingChanged()) {
+                CachePalabras.getTheInstance().clearCache();
                 getPanelSindromes().reloadSyndromes();
                 getPanelComunicacion().reloadSyndromes();
             } else if (UpdateListenerEvent.Element.WORDS.equals(event.getElement())
                     && UpdateListenerEvent.Action.STOP_DATABASE.equals(event.getAction())
                     && event.isSomethingChanged()) {
+                CachePalabras.getTheInstance().clearCache();
                 getPanelPalabras().reloadWords();
                 getPanelPalabrasAvanzadas().reloadWords();
                 getPanelPictogramas().reloadWords();
+            } else if (UpdateListenerEvent.Element.WORDS.equals(event.getElement())
+                    && UpdateListenerEvent.Action.STOP_FILE.equals(event.getAction())) {
+                getPanelPalabras().dataChanged();
+                getPanelPalabrasAvanzadas().dataChanged();
+                getPanelPictogramas().dataChanged();
             }
         }
     };
@@ -259,6 +267,8 @@ public class MainActivity extends AppCompatActivity implements ChangePictureList
             SharedPreferences.Editor editor = preferences.edit();
             editor.putString(PREFERRED_LANGUAGE, localeCode);
             editor.commit();
+
+            CachePalabras.getTheInstance().clearCache();
 
             finish();
             Intent i = new Intent(this, MainActivity.class);

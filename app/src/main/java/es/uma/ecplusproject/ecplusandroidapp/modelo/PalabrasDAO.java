@@ -27,5 +27,5 @@ public interface PalabrasDAO {
     Set<String> getAllHashes();
     List<Category> getCategories(String language);
     void addCategory(Category category, String langauge);
-    void updateCategory(Category remote);
+    void updateCategory(Category remote, String language);
 }
