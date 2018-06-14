@@ -455,7 +455,7 @@ public class UpdateService extends IntentService {
     private boolean checkIfShouldUpdateWordsAnyway() {
         SharedPreferences shared = getSharedPreferences(Splash.ECPLUS_MAIN_PREFS,MODE_PRIVATE);
         int installed = shared.getInt(Splash.VERSION_INSTALLED, -1);
-        boolean result = installed < 24;
+        boolean result = installed < 28;
 
         SharedPreferences.Editor editor = shared.edit();
 
