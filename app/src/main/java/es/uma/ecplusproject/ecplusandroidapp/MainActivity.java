@@ -277,7 +277,7 @@ public class MainActivity extends AppCompatActivity implements ChangePictureList
                     case RESTORE:
                         palabra.setIconoPersonalizado(null);
                         getDAOPalabras().updateWord(palabra);
-                        panelPalabras.dataChanged();
+                        updatePanels();
                         break;
                     case CAMERA:
                         palabraToAddCustomizedPicture=palabra;
@@ -288,6 +288,12 @@ public class MainActivity extends AppCompatActivity implements ChangePictureList
         });
 
         dialog.show(getSupportFragmentManager(),"Change Picture for Word");
+    }
+
+    private void updatePanels() {
+        panelPalabras.dataChanged();
+        panelPalabrasAvanzadas.dataChanged();
+        panelPalabrasPictogramas.reloadWords();
     }
 
     private void takePictureWithCamera() {
@@ -335,7 +341,8 @@ public class MainActivity extends AppCompatActivity implements ChangePictureList
         if (requestCode==REQUEST_TAKE_PICTURE && resultCode==RESULT_OK) {
             palabraToAddCustomizedPicture.setIconoPersonalizado(mCurrentPhotoPath);
             getDAOPalabras().updateWord(palabraToAddCustomizedPicture);
-            panelPalabras.dataChanged();
+            updatePanels();
+
         }
     }
 }

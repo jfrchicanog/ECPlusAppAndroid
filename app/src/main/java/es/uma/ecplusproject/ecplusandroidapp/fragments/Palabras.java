@@ -20,6 +20,7 @@ import es.uma.ecplusproject.ecplusandroidapp.DetallePalabra;
 import es.uma.ecplusproject.ecplusandroidapp.MainActivity;
 import es.uma.ecplusproject.ecplusandroidapp.R;
 import es.uma.ecplusproject.ecplusandroidapp.Splash;
+import es.uma.ecplusproject.ecplusandroidapp.modelo.CachePalabras;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.PalabrasDAO;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.PalabrasDAOImpl;
 import es.uma.ecplusproject.ecplusandroidapp.modelo.dominio.Palabra;
@@ -33,7 +34,6 @@ public class Palabras extends Panel {
     private final PalabrasDAOImpl palabrasDAO = new PalabrasDAOImpl();
     private ListView listaPalabras;
     private AdaptadorPalabras adaptador;
-    private String preferredLanguage;
 
     public Palabras() {
         super();
@@ -46,9 +46,6 @@ public class Palabras extends Panel {
         listaPalabras = (ListView)rootView.findViewById(R.id.listaPalabras);
         adaptador = new AdaptadorPalabras(getContext());
         adaptador.setChangePictureListener((MainActivity)getActivity());
-
-        SharedPreferences preferences = getActivity().getSharedPreferences(Splash.ECPLUS_MAIN_PREFS, Context.MODE_PRIVATE);
-        preferredLanguage = preferences.getString(MainActivity.PREFERRED_LANGUAGE, MainActivity.DEFAULT_LANGUAGE);
 
         populateAdaptorDBComplete();
 
@@ -72,11 +69,11 @@ public class Palabras extends Panel {
     }
 
     private void populateAdaptorDBComplete() {
-        final PalabrasDAO daoPalabras = palabrasDAO;
         new AsyncTask<Void, Void, List<Palabra>>(){
             @Override
             protected List<Palabra> doInBackground(Void... params) {
-                List<Palabra> palabras = daoPalabras.getWords(preferredLanguage, Resolucion.BAJA);
+
+                List<Palabra> palabras = CachePalabras.getTheInstance().getPalabras();
                 Iterator<Palabra> iterator = palabras.iterator();
                 while (iterator.hasNext()) {
                     Palabra palabra = iterator.next();
@@ -97,9 +94,8 @@ public class Palabras extends Panel {
     }
 
     public void reloadWords() {
-        if (preferredLanguage!=null) {
-            populateAdaptorDBComplete();
-        }
+        populateAdaptorDBComplete();
+
     }
 
     public void dataChanged() {
