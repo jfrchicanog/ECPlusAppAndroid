@@ -501,10 +501,12 @@ public class PalabrasDAOImpl implements PalabrasDAO {
     }
 
     @Override
-    public void updateCategory(Category remote) {
+    public void updateCategory(Category remote, String language) {
+        Long idList = getIDForWordList(language);
         ContentValues values = new ContentValues();
         values.put(ECPlusDBContract.Categoria.ID, remote.getId());
         values.put(ECPlusDBContract.Categoria.NOMBRE, remote.getNombre());
+        values.put(ECPlusDBContract.Categoria.REF_LISTA_PALABRAS, idList);
         long i = db.replace(ECPlusDBContract.Categoria.TABLE_NAME,null, values);
     }
 }
