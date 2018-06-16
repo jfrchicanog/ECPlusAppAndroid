@@ -27,7 +27,6 @@ import android.widget.MediaController;
 import android.widget.TextView;
 import android.widget.VideoView;
 
-import com.android.vending.expansion.zipfile.APKExpansionSupport;
 import com.caverock.androidsvg.SVGImageView;
 
 import java.io.File;
